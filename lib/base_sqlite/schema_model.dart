@@ -11,6 +11,7 @@ class SchemaModel {
   SchemaModel({required this.dbColumnList});
 
   String sqlQuery = '';
+
   getSqlQuery() {
     for (int i = 0; i < dbColumnList.length; i++) {
       sqlQuery += dbColumnList[i].getColumnQuery();
@@ -24,13 +25,16 @@ class DbColumn {
   final String columnName;
   final DbDataType datatype;
   final List<DbDataAttr>? dataAttributes;
+  final String defValue;
 
-  DbColumn(
-      {required this.columnName,
-        this.datatype = DbDataType.integer,
-        this.dataAttributes});
+  DbColumn({
+    required this.columnName,
+    this.datatype = DbDataType.integer,
+    this.dataAttributes,
+    this.defValue = '',
+  });
 
   getColumnQuery() {
-    return '$columnName ${describeEnum(datatype)} ${dataAttributes?.map((e) => e.getAttr()).join(' ') ?? ''}';
+    return '$columnName ${describeEnum(datatype)} ${dataAttributes?.map((e) => e.getAttr()).join(' ') ?? ''}${defValue.isNotEmpty ? ' DEFAULT $defValue' : ''}';
   }
 }
