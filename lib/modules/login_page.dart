@@ -99,25 +99,40 @@ class _FormState extends State<_Form> {
 class _AlternateMethods extends StatelessWidget {
   const _AlternateMethods({Key? key}) : super(key: key);
 
+  static const Widget _divider =
+      Expanded(child: Divider(thickness: 1.0, indent: 10.0, endIndent: 10.0));
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Column(
       children: [
-        FloatingActionButton(
-          heroTag: StringConstants.google,
-          onPressed: () {},
-          backgroundColor: ColorConstants.white,
-          child: IconConstants.google,
+        Row(
+          children: const [
+            _divider,
+            BaseText(StringConstants.orContinueWith),
+            _divider,
+          ],
         ),
-        FloatingActionButton(
-          heroTag: StringConstants.apple,
-          onPressed: () {},
-          backgroundColor: ColorConstants.white,
-          child: IconConstants.apple,
-        )
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FloatingActionButton(
+              heroTag: StringConstants.google,
+              onPressed: () {},
+              backgroundColor: ColorConstants.white,
+              child: IconConstants.google,
+            ),
+            SizeConstants.spaceHorizontal20,
+            FloatingActionButton(
+              heroTag: StringConstants.apple,
+              onPressed: () {},
+              backgroundColor: ColorConstants.white,
+              child: IconConstants.apple,
+            )
+          ],
+        ).paddingDefault(),
       ],
-    ).paddingDefault();
+    );
   }
 }
 

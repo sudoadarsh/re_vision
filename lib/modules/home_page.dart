@@ -3,36 +3,89 @@ import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-/// [HomePage] is the first page of the application. The below widgets are
-/// coded in the order that they appear the ui.
-///
-class _AppBar extends StatelessWidget {
-  const _AppBar({Key? key}) : super(key: key);
+import '../base_widgets/base_table_calendar.dart';
+import '../constants/date_time_constants.dart';
+import '../constants/decoration_constants.dart';
 
-  @override
-  Widget build(BuildContext context) {
+class _AppBar {
+  static PreferredSizeWidget appBar() {
     return AppBar(
       title: const BaseText(StringConstants.empty),
+      backgroundColor: ColorConstants.primary,
       actions: [
         IconButton(
           onPressed: () {},
           icon: IconConstants.add,
-          color: ColorConstants.primary,
+          color: ColorConstants.button,
         )
-      ]
+      ],
     );
   }
 }
 
-
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late DateTime _focusedDay;
+  late DateTime _selectedDay;
+  late CalendarFormat _calendarFormat;
+
+  @override
+  void initState() {
+    _focusedDay = DateTimeConstants.todayTime;
+    _selectedDay = DateTimeConstants.getTodayDateFormatted();
+    _calendarFormat = CalendarFormat.week;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: _AppBar(),
+    return Scaffold(
+      appBar: _AppBar.appBar(),
+      body: Column(
+        children: [
+          BaseTableCalendar(
+            selectedDay: _selectedDay,
+            focusedDay: _focusedDay,
+            calendarFormat: _calendarFormat,
+            onDaySelected: (selectedDay, focusedDay) {
+              _selectedDay = selectedDay;
+              _focusedDay = focusedDay;
+              sst();
+            },
+            onFormatChanged: (format) {
+              if (_calendarFormat != format) {
+                _calendarFormat = format;
+                sst();
+              }
+            },
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
+            calendarStyle: _calendarStyle,
+            // eventLoader: (day) {
+            //   // todo: to build the notifications
+            // },
+          ),
+        ],
+      ),
     );
   }
+
+  void sst() => setState(() {});
+
+  final CalendarStyle _calendarStyle = CalendarStyle(
+    selectedDecoration: DecorationConstants.circleShape
+        .copyWith(color: ColorConstants.secondary),
+    todayDecoration:
+        DecorationConstants.circleShape.copyWith(color: ColorConstants.primary),
+    markersAlignment: Alignment.bottomRight,
+  );
 }

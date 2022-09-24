@@ -21,6 +21,7 @@ class StringConstants {
   static const String appName = 'Re-Vision';
   static const String username = 'Username';
   static const String password = 'Password';
+  static const String orContinueWith = 'Or continue with';
 
   // String constants in the home page.
   static const String homeTitle = empty;
