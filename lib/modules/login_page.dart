@@ -5,7 +5,9 @@ import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
+import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/utils/app_config.dart';
 
 import '../base_widgets/base_depth_form_field.dart';
 
@@ -31,6 +33,7 @@ class _Message extends StatelessWidget {
       StringConstants.appName,
       fontWeight: FontWeight.w300,
       fontSize: 24.0,
+      textAlign: TextAlign.center,
     );
   }
 }
@@ -45,13 +48,14 @@ class _Form extends StatefulWidget {
 }
 
 class _FormState extends State<_Form> {
-
   @override
   Widget build(BuildContext context) {
     return Form(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const _Message(),
+          SizeConstants.spaceVertical20,
           const BaseTextFormFieldWithDepth(
             prefix: IconConstants.username,
             labelText: StringConstants.username,
@@ -76,6 +80,33 @@ class _FormState extends State<_Form> {
   }
 }
 
+/// Social media methods.
+///
+class _AlternateMethods extends StatelessWidget {
+  const _AlternateMethods({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        FloatingActionButton(
+          key: UniqueKey(),
+          onPressed: () {},
+          backgroundColor: ColorConstants.white,
+          child: IconConstants.google,
+        ),
+        FloatingActionButton(
+          key: UniqueKey(),
+          onPressed: () {},
+          backgroundColor: ColorConstants.white,
+          child: IconConstants.apple,
+        )
+      ],
+    ).paddingDefault();
+  }
+}
+
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -88,13 +119,21 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            const _Logo(),
-            const _Message(),
-            SizeConstants.spaceVertical20,
-            const _Form(),
-          ],
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: AppConfig.height(context),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                (AppConfig.height(context) * 0.1).separation(true),
+                const _Logo(),
+                (AppConfig.height(context) * 0.1).separation(true),
+                const _Form(),
+                const Spacer(),
+                const _AlternateMethods(),
+              ],
+            ),
+          ),
         ),
       ),
     );

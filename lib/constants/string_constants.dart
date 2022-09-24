@@ -1,14 +1,17 @@
 class StringConstants {
   // Common string constants.
-  static const empty = '';
+  static const String empty = '';
 
   // String constants in the schemas.
-  static const id = 'id';
-  static const topic = 'topic';
-  static const attachment = 'attachment';
+  static const String id = 'id';
+  static const String topic = 'topic';
+  static const String attachment = 'attachment';
 
   // Path constants.
   static const String logoPath = 'images/revision.png';
+  static const String googlePath = 'images/google.png';
+  static const String applePath = 'images/apple.png';
+
 
   // String constants in the login page.
   static const String login = 'Login';
@@ -18,5 +21,5 @@ class StringConstants {
   static const String password = 'Password';
 
   // String constants in the home page.
-  static const homeTitle = empty;
+  static const String homeTitle = empty;
 }
