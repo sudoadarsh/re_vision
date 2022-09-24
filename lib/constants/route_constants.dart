@@ -1,4 +1,4 @@
 class RouteConstants {
-  static const String homePage = '/';
-  static const String addTask = '/add_task';
+  static const String homePage = '/home_page';
+  static const String loginPage = '/';
 }

@@ -25,16 +25,17 @@ class DbColumn {
   final String columnName;
   final DbDataType datatype;
   final List<DbDataAttr>? dataAttributes;
-  final String defValue;
+  final String? defValue;
 
   DbColumn({
     required this.columnName,
     this.datatype = DbDataType.integer,
     this.dataAttributes,
-    this.defValue = '',
+    this.defValue,
   });
 
   getColumnQuery() {
-    return '$columnName ${describeEnum(datatype)} ${dataAttributes?.map((e) => e.getAttr()).join(' ') ?? ''}${defValue.isNotEmpty ? ' DEFAULT $defValue' : ''}';
+    String def = defValue == null ? ' ' : ' default $defValue ';
+    return '$columnName ${describeEnum(datatype)}$def${dataAttributes?.map((e) => e.getAttr()).join(' ') ?? ''}';
   }
 }

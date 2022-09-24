@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:re_vision/constants/route_constants.dart';
+import 'package:re_vision/modules/login_page.dart';
 
 import '../modules/home_page.dart';
 
@@ -12,6 +13,9 @@ class RouteGenerator {
     Widget page;
 
     switch (settings.name) {
+      case RouteConstants.loginPage:
+        page = const LoginPage();
+        break;
       case RouteConstants.homePage:
         page = const HomePage();
         break;

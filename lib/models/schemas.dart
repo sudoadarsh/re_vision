@@ -18,12 +18,8 @@ class Schemas {
       /// The topic column.
       DbColumn(columnName: StringConstants.topic, datatype: DbDataType.text),
 
-      /// The link column.
-      DbColumn(columnName: StringConstants.link, datatype: DbDataType.text),
-
-      /// To store the reference to an pdf.
-      DbColumn(columnName: StringConstants.link, datatype: DbDataType.text),
-
+      /// The attachment column.
+      DbColumn(columnName: StringConstants.attachment, datatype: DbDataType.text),
     ],
   );
   
