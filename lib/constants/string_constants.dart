@@ -9,6 +9,8 @@ class StringConstants {
 
   // Path constants.
   static const String logoPath = 'images/revision.png';
+  static const String google = 'google';
+  static const String apple = 'apple';
   static const String googlePath = 'images/google.png';
   static const String applePath = 'images/apple.png';
 

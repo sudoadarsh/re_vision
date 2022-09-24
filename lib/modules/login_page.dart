@@ -48,6 +48,9 @@ class _Form extends StatefulWidget {
 }
 
 class _FormState extends State<_Form> {
+  // Instance variable to control the toggle of obscure text.
+  bool _isVisible = false;
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -57,14 +60,25 @@ class _FormState extends State<_Form> {
           const _Message(),
           SizeConstants.spaceVertical20,
           const BaseTextFormFieldWithDepth(
-            prefix: IconConstants.username,
+            prefixIcon: IconConstants.username,
             labelText: StringConstants.username,
           ),
           SizeConstants.spaceVertical10,
-          const BaseTextFormFieldWithDepth(
-            prefix: IconConstants.password,
-            labelText: StringConstants.password,
-          ),
+          StatefulBuilder(builder: (context, sst) {
+            return BaseTextFormFieldWithDepth(
+              prefixIcon: IconConstants.password,
+              labelText: StringConstants.password,
+              suffixIcon: IconButton(
+                onPressed: () {
+                  sst(() => _isVisible = !_isVisible);
+                },
+                icon: _isVisible
+                    ? IconConstants.visibilityOff
+                    : IconConstants.visible,
+              ),
+              obscureText: !_isVisible,
+            );
+          }),
           SizeConstants.spaceVertical10,
           BaseElevatedButton(
             backgroundColor: ColorConstants.loginButton,
@@ -91,13 +105,13 @@ class _AlternateMethods extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         FloatingActionButton(
-          key: UniqueKey(),
+          heroTag: StringConstants.google,
           onPressed: () {},
           backgroundColor: ColorConstants.white,
           child: IconConstants.google,
         ),
         FloatingActionButton(
-          key: UniqueKey(),
+          heroTag: StringConstants.apple,
           onPressed: () {},
           backgroundColor: ColorConstants.white,
           child: IconConstants.apple,
@@ -107,6 +121,8 @@ class _AlternateMethods extends StatelessWidget {
   }
 }
 
+/// To build the [LoginPage.]
+///
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 

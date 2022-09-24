@@ -17,6 +17,9 @@ class IconConstants {
     StringConstants.applePath,
     scale: 15,
   );
+  static const Icon visible = Icon(Icons.visibility, color: ColorConstants.primary);
+  static const Icon visibilityOff = Icon(Icons.visibility_off, color: ColorConstants.primary);
+
 
 
   // Icons used in the home page.
