@@ -75,32 +75,56 @@ class _AddAttachment extends StatelessWidget {
   }
 }
 
-class _AttachTypeContainer extends StatelessWidget {
+class _AttachTypeContainer extends StatefulWidget {
   const _AttachTypeContainer({Key? key}) : super(key: key);
 
   static final List<AttachmentTypeDm> _attachmentTypes = [
-    AttachmentTypeDm(title: StringConstants.article, icon: IconConstants.article),
+    AttachmentTypeDm(
+        title: StringConstants.article, icon: IconConstants.article),
     AttachmentTypeDm(title: StringConstants.image, icon: IconConstants.image),
     AttachmentTypeDm(title: StringConstants.pdf, icon: IconConstants.pdf),
     AttachmentTypeDm(title: StringConstants.video, icon: IconConstants.video),
   ];
 
   @override
+  State<_AttachTypeContainer> createState() => _AttachTypeContainerState();
+}
+
+class _AttachTypeContainerState extends State<_AttachTypeContainer> {
+  bool _addAttachment = false;
+
+  Widget _saveLink() {
+    return const BaseTextFormFieldWithDepth(
+      hintText: StringConstants.pasteTheLinkHere,
+      maxLines: 5,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 210,
       width: 200,
-      child: ListView.builder(
-        itemCount: _attachmentTypes.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            leading: _attachmentTypes[index].icon,
-            title: BaseText(_attachmentTypes[index].title),
-          );
-        },
-      ),
+      child: _addAttachment
+          ? _saveLink()
+          : ListView.builder(
+              itemCount: _AttachTypeContainer._attachmentTypes.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: _AttachTypeContainer._attachmentTypes[index].icon,
+                  onTap: () {
+                    _addAttachment = !_addAttachment;
+                    sst();
+                  },
+                  title: BaseText(
+                      _AttachTypeContainer._attachmentTypes[index].title),
+                );
+              },
+            ),
     );
   }
+
+  void sst() => setState(() {});
 }
 
 class TopicPage extends StatefulWidget {

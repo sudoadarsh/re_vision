@@ -44,4 +44,5 @@ class StringConstants {
   static const String pdf = 'pdf';
   static const String video = 'Video';
   static const String image = 'Image';
+  static const String pasteTheLinkHere = 'Paste the link here.';
 }
