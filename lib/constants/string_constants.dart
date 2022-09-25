@@ -45,4 +45,6 @@ class StringConstants {
   static const String video = 'Video';
   static const String image = 'Image';
   static const String pasteTheLinkHere = 'Paste the link here.';
+  static const String cancel = 'Cancel';
+  static const String save = 'Save';
 }

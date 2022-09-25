@@ -94,9 +94,37 @@ class _AttachTypeContainerState extends State<_AttachTypeContainer> {
   bool _addAttachment = false;
 
   Widget _saveLink() {
-    return const BaseTextFormFieldWithDepth(
-      hintText: StringConstants.pasteTheLinkHere,
-      maxLines: 5,
+    return Column(
+      children: [
+        const BaseTextFormFieldWithDepth(
+          hintText: StringConstants.pasteTheLinkHere,
+          maxLines: 6,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: () {
+                _addAttachment = !_addAttachment;
+                sst();
+              },
+              child: const BaseText(
+                StringConstants.cancel,
+                color: ColorConstants.secondary,
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // todo: save the attachment.
+              },
+              child: const BaseText(
+                StringConstants.save,
+                color: ColorConstants.primary,
+              ),
+            ),
+          ],
+        )
+      ],
     );
   }
 
@@ -156,7 +184,7 @@ class _TopicPageState extends State<TopicPage> {
           Expanded(
             child: GridView.builder(
               gridDelegate: _gridDelegate,
-              itemCount: 6,
+              itemCount: 1,
               itemBuilder: (context, state) {
                 return const _AddAttachment();
               },
