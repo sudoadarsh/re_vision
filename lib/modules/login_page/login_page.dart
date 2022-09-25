@@ -9,7 +9,7 @@ import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/utils/app_config.dart';
 
-import '../base_widgets/base_depth_form_field.dart';
+import '../../base_widgets/base_depth_form_field.dart';
 
 /// Widget to get the logo of the application.
 ///

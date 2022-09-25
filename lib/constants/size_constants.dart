@@ -11,4 +11,6 @@ class SizeConstants {
   static final SizedBox spaceHorizontal10 = 10.0.separation(false);
   static final SizedBox spaceHorizontal15 = 15.0.separation(false);
   static final SizedBox spaceHorizontal20 = 20.0.separation(false);
+
+  static const SizedBox none = SizedBox.shrink();
 }

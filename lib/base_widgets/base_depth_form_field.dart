@@ -32,8 +32,7 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
       maxLines: maxLines ?? 1,
       style: Theme.of(context)
           .primaryTextTheme
-          .bodyMedium
-          ?.copyWith(color: Theme.of(context).primaryColor, fontSize: 14.0),
+          .bodyMedium,
       cursorColor: Theme.of(context).primaryColor,
       decoration: InputDecoration(
         hintText: hintText,

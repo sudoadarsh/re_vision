@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:re_vision/constants/route_constants.dart';
+import 'package:re_vision/base_sqlite/sqlite_helper.dart';
+import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/routes/route_generator.dart';
 import 'package:re_vision/utils/custom_theme_data.dart';
 
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await BaseSqlite.init();
   runApp(const Root());
 }
 

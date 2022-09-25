@@ -5,7 +5,13 @@ class StringConstants {
   // String constants in the schemas.
   static const String id = 'id';
   static const String topic = 'topic';
-  static const String attachment = 'attachment';
+  static const String attachments = 'attachments';
+  static const String createdAt = 'created_at';
+  static const String scheduledTo = 'scheduled_to';
+  static const String iteration = 'iteration';
+  static const String localDbKey = 'localdb.db';
+
+  static const String topicTable = 'topic_table';
 
   // Path constants.
   static const String logoPath = 'images/revision.png';
@@ -25,4 +31,17 @@ class StringConstants {
 
   // String constants in the home page.
   static const String homeTitle = empty;
+  static const String tapToSeeMore = 'Tap to see more';
+
+  // String constants in the topics page.
+  static const String addTopic = 'Add topic';
+  static const String updateTopic = 'Update Topic';
+  static const String topicLabel = 'Topic';
+  static const String addAttachment = 'Add Attachments';
+  static const String selectAttachmentType = 'Select Attachment Type';
+
+  static const String article = 'Article';
+  static const String pdf = 'pdf';
+  static const String video = 'Video';
+  static const String image = 'Image';
 }
