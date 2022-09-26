@@ -1,4 +1,6 @@
+import 'package:favicon/favicon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:re_vision/base_widgets/base_alert_dialog.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
@@ -7,7 +9,9 @@ import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/state_management/attachment_cubit.dart';
 
+import '../../models/attachment_dm.dart';
 import '../../models/attachment_type_dm.dart';
 
 class _AppBar {
@@ -53,7 +57,9 @@ class _Separator extends StatelessWidget {
 }
 
 class _AddAttachment extends StatelessWidget {
-  const _AddAttachment({Key? key}) : super(key: key);
+  const _AddAttachment({Key? key, this.attachmentDm}) : super(key: key);
+
+  final AttachmentDm? attachmentDm;
 
   @override
   Widget build(BuildContext context) {
@@ -91,18 +97,37 @@ class _AttachTypeContainer extends StatefulWidget {
 }
 
 class _AttachTypeContainerState extends State<_AttachTypeContainer> {
-  bool _addAttachment = false;
+  // Key to obtain the value from the link paste field.
+  late final TextEditingController _linkPaste;
 
-  Widget _saveLink() {
+  // Boolean to control the current visible widget in the dropdown.
+  late bool _addAttachment;
+
+  @override
+  void initState() {
+    _linkPaste = TextEditingController();
+    _addAttachment = false;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _linkPaste.dispose();
+    super.dispose();
+  }
+
+  Widget _saveAttachment() {
     return Column(
       children: [
-        const BaseTextFormFieldWithDepth(
+        BaseTextFormFieldWithDepth(
+          controller: _linkPaste,
           hintText: StringConstants.pasteTheLinkHere,
           maxLines: 6,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            // Button to save the link pasted.
             TextButton(
               onPressed: () {
                 _addAttachment = !_addAttachment;
@@ -113,9 +138,15 @@ class _AttachTypeContainerState extends State<_AttachTypeContainer> {
                 color: ColorConstants.secondary,
               ),
             ),
+
+            // Button to cancel adding a link.
             TextButton(
               onPressed: () {
-                // todo: save the attachment.
+                if (_linkPaste.text.isNotEmpty) {
+                  context.read<AttachmentCubit>().addAttachment(AttachmentDm(
+                      type: StringConstants.link, data: _linkPaste.text));
+                }
+                Navigator.pop(context);
               },
               child: const BaseText(
                 StringConstants.save,
@@ -133,22 +164,29 @@ class _AttachTypeContainerState extends State<_AttachTypeContainer> {
     return SizedBox(
       height: 210,
       width: 200,
-      child: _addAttachment
-          ? _saveLink()
-          : ListView.builder(
-              itemCount: _AttachTypeContainer._attachmentTypes.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: _AttachTypeContainer._attachmentTypes[index].icon,
-                  onTap: () {
-                    _addAttachment = !_addAttachment;
-                    sst();
+      child: StatefulBuilder(
+        builder: (context, set) {
+          return _addAttachment
+              ? _saveAttachment()
+              : ListView.builder(
+                  itemCount: _AttachTypeContainer._attachmentTypes.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      leading:
+                          _AttachTypeContainer._attachmentTypes[index].icon,
+                      onTap: () {
+                        set(() {
+                          _addAttachment = !_addAttachment;
+                        });
+                      },
+                      title: BaseText(
+                        _AttachTypeContainer._attachmentTypes[index].title,
+                      ),
+                    );
                   },
-                  title: BaseText(
-                      _AttachTypeContainer._attachmentTypes[index].title),
                 );
-              },
-            ),
+        },
+      ),
     );
   }
 
@@ -182,11 +220,20 @@ class _TopicPageState extends State<TopicPage> {
           SizeConstants.spaceVertical20,
           const _Separator(),
           Expanded(
-            child: GridView.builder(
-              gridDelegate: _gridDelegate,
-              itemCount: 1,
-              itemBuilder: (context, state) {
-                return const _AddAttachment();
+            child: BlocBuilder<AttachmentCubit, AttachmentState>(
+              builder: (context, state) {
+                return GridView.builder(
+                  gridDelegate: _gridDelegate,
+                  itemCount: state.attachments.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return const _AddAttachment();
+                    }
+                    return _AddAttachment(
+                      attachmentDm: state.attachments[index],
+                    );
+                  },
+                );
               },
             ),
           ),
@@ -201,6 +248,7 @@ class _TopicPageState extends State<TopicPage> {
     super.dispose();
   }
 
+  // Grid delete for the grid view builder.
   final SliverGridDelegate _gridDelegate =
       const SliverGridDelegateWithFixedCrossAxisCount(
     crossAxisCount: 3,
@@ -208,4 +256,10 @@ class _TopicPageState extends State<TopicPage> {
     crossAxisSpacing: 8.0,
     childAspectRatio: 1,
   );
+
+  // Function to get the url of a website.
+  Future<String?> getUrlImage(String url) async {
+    Favicon? data = await FaviconFinder.getBest(url);
+    return data?.url;
+  }
 }

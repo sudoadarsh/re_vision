@@ -47,4 +47,5 @@ class StringConstants {
   static const String pasteTheLinkHere = 'Paste the link here.';
   static const String cancel = 'Cancel';
   static const String save = 'Save';
+  static const String link = 'link';
 }
