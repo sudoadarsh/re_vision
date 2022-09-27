@@ -1,26 +1,32 @@
+import 'package:re_vision/models/attachment_type_dm.dart';
+
 /// type : "type"
 /// data : "data"
 
 class AttachmentDm {
   AttachmentDm({
-      String? type, 
-      String? data,}){
+    AttachmentType? type,
+    String? data,
+  }) {
     _type = type;
     _data = data;
-}
+  }
 
   AttachmentDm.fromJson(dynamic json) {
     _type = json['type'];
     _data = json['data'];
   }
-  String? _type;
+  AttachmentType? _type;
   String? _data;
-AttachmentDm copyWith({  String? type,
-  String? data,
-}) => AttachmentDm(  type: type ?? _type,
-  data: data ?? _data,
-);
-  String? get type => _type;
+  AttachmentDm copyWith({
+    AttachmentType? type,
+    String? data,
+  }) =>
+      AttachmentDm(
+        type: type ?? _type,
+        data: data ?? _data,
+      );
+  AttachmentType? get type => _type;
   String? get data => _data;
 
   Map<String, dynamic> toJson() {
@@ -29,5 +35,4 @@ AttachmentDm copyWith({  String? type,
     map['data'] = _data;
     return map;
   }
-
 }

@@ -5,7 +5,6 @@ import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
-import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/utils/app_config.dart';
 
@@ -116,19 +115,9 @@ class _AlternateMethods extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            FloatingActionButton(
-              heroTag: StringConstants.google,
-              onPressed: () {},
-              backgroundColor: ColorConstants.white,
-              child: IconConstants.google,
-            ),
+            IconConstants.google,
             SizeConstants.spaceHorizontal20,
-            FloatingActionButton(
-              heroTag: StringConstants.apple,
-              onPressed: () {},
-              backgroundColor: ColorConstants.white,
-              child: IconConstants.apple,
-            )
+            IconConstants.apple
           ],
         ).paddingDefault(),
       ],
@@ -155,13 +144,10 @@ class _LoginPageState extends State<LoginPage> {
             height: AppConfig.height(context),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                (AppConfig.height(context) * 0.1).separation(true),
-                const _Logo(),
-                (AppConfig.height(context) * 0.1).separation(true),
-                const _Form(),
-                const Spacer(),
-                const _AlternateMethods(),
+              children: const [
+                _Logo(),
+                _Form(),
+                _AlternateMethods(),
               ],
             ),
           ),

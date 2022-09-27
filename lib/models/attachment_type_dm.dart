@@ -1,5 +1,15 @@
 import 'package:flutter/cupertino.dart';
 
+enum AttachmentType {
+  link(0),
+  image(1),
+  pdf(2);
+
+  const AttachmentType(this.value);
+
+  final int value;
+}
+
 class AttachmentTypeDm {
   final String title;
   final Icon icon;
