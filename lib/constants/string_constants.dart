@@ -19,6 +19,7 @@ class StringConstants {
   static const String apple = 'apple';
   static const String googlePath = 'images/google.png';
   static const String applePath = 'images/apple.png';
+  static const String noFavIcon = 'images/no_favicon.png';
 
 
   // String constants in the login page.

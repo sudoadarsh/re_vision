@@ -69,7 +69,7 @@ class _AddAttachment extends StatefulWidget {
 class _AddAttachmentState extends State<_AddAttachment> {
   AttachmentDm? get _attachmentDm => widget.attachmentDm;
 
-  late bool isAttachment;
+  late bool noAttachment;
 
   // Function to get the correct type of widget according to the attachment
   // type.
@@ -77,15 +77,16 @@ class _AddAttachmentState extends State<_AddAttachment> {
     if (_attachmentDm?.type == AttachmentType.link) {
       Favicon? imageUrl = await getImageUrl(_attachmentDm);
       return ClipRRect(
-          borderRadius: BorderRadius.circular(8.0),
-          child: Image.network(imageUrl?.url ?? ''));
+        borderRadius: BorderRadius.circular(8.0),
+        child: Image.network(imageUrl?.url ?? '', height: 40.0, width: 40.0),
+      );
     }
     return null;
   }
 
   @override
   void initState() {
-    isAttachment = widget.attachmentDm?.data == null;
+    noAttachment = widget.attachmentDm?.data == null;
     super.initState();
   }
 
@@ -94,7 +95,7 @@ class _AddAttachmentState extends State<_AddAttachment> {
     return InkWell(
       // On Tap will only be enabled when the grid card has no attachment
       // data.
-      onTap: isAttachment
+      onTap: noAttachment
           ? () async {
               await showDialog(
                 context: context,
@@ -107,16 +108,38 @@ class _AddAttachmentState extends State<_AddAttachment> {
             }
           : null,
       child: Card(
-        child: FutureBuilder(
-          future: getChild(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CupertinoActivityIndicator();
-            } else if (snapshot.hasData) {
-              return snapshot.data ?? SizeConstants.none;
-            }
-            return IconConstants.add;
-          },
+        child: Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            FutureBuilder(
+              future: getChild(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CupertinoActivityIndicator();
+                } else if (snapshot.hasData) {
+                  return snapshot.data ?? SizeConstants.none;
+                } else if (snapshot.hasError) {
+                  return IconConstants.noFavIcon;
+                }
+                return IconConstants.add;
+              },
+            ),
+            !noAttachment
+                ? Positioned(
+                    top: -20,
+                    right: -20,
+                    child: IconButton(
+                      onPressed: () {
+                        context
+                            .read<AttachmentCubit>()
+                            .removeAttachment(widget.attachmentDm!);
+                      },
+                      icon: IconConstants.close,
+                    ),
+                  )
+                : SizeConstants.none,
+          ],
         ),
       ),
     );
@@ -265,6 +288,7 @@ class _TopicPageState extends State<TopicPage> {
           _TopicField(topicController: _topicController),
           SizeConstants.spaceVertical20,
           const _Separator(),
+          SizeConstants.spaceVertical20,
           Expanded(
             child: BlocBuilder<AttachmentCubit, AttachmentState>(
               builder: (context, state) {
