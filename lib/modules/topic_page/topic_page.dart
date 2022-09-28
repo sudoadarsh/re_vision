@@ -11,6 +11,7 @@ import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/state_management/attachment_cubit.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/attachment_dm.dart';
 import '../../models/attachment_type_dm.dart';
@@ -96,17 +97,8 @@ class _AddAttachmentState extends State<_AddAttachment> {
       // On Tap will only be enabled when the grid card has no attachment
       // data.
       onTap: noAttachment
-          ? () async {
-              await showDialog(
-                context: context,
-                builder: (_) => const BaseAlertDialog(
-                  title: StringConstants.selectAttachmentType,
-                  customContent: _AttachTypeContainer(),
-                  actions: [SizeConstants.none],
-                ),
-              );
-            }
-          : null,
+          ? _emptyGrid
+          : _launchUrl,
       child: Card(
         child: Stack(
           alignment: Alignment.center,
@@ -148,6 +140,30 @@ class _AddAttachmentState extends State<_AddAttachment> {
   // Function to get the image from the website url.
   Future<Favicon?> getImageUrl(AttachmentDm? attachment) async {
     return await FaviconFinder.getBest(attachment?.data ?? '');
+  }
+
+  // Function to call on tapping a empty grid card.
+  void _emptyGrid() async {
+    await showDialog(
+      context: context,
+      builder: (_) => const BaseAlertDialog(
+        title: StringConstants.selectAttachmentType,
+        customContent: _AttachTypeContainer(),
+        actions: [SizeConstants.none],
+      ),
+    );
+  }
+
+  // Function to launch an url.
+  void _launchUrl() async {
+    try {
+      final Uri url = Uri.parse(widget.attachmentDm?.data ?? '');
+      await launchUrl(url, mode: LaunchMode.inAppWebView);
+    } catch (e) {
+      // todo: handle argument error.
+      debugPrint('Unable to launch the url: ${widget.attachmentDm?.data}');
+      debugPrint(e.toString());
+    }
   }
 }
 
