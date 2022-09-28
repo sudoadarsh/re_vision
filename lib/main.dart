@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:re_vision/base_sqlite/sqlite_helper.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/routes/route_generator.dart';
-import 'package:re_vision/state_management/attachment_cubit.dart';
+import 'package:re_vision/state_management/attachment/attachment_cubit.dart';
 import 'package:re_vision/utils/custom_theme_data.dart';
 
 

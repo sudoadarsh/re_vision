@@ -1,6 +1,7 @@
 import 'package:favicon/favicon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:re_vision/base_widgets/base_alert_dialog.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
@@ -10,7 +11,7 @@ import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
-import 'package:re_vision/state_management/attachment_cubit.dart';
+import 'package:re_vision/state_management/attachment/attachment_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/attachment_dm.dart';
@@ -93,48 +94,40 @@ class _AddAttachmentState extends State<_AddAttachment> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       // On Tap will only be enabled when the grid card has no attachment
       // data.
       onTap: noAttachment
           ? _emptyGrid
           : _launchUrl,
+      onLongPress: () {
+        // To vibrate the phone on a long press.
+        HapticFeedback.vibrate();
+        print('Long pressed');
+      },
       child: Card(
-        child: Stack(
-          alignment: Alignment.center,
-          clipBehavior: Clip.none,
-          children: [
-            FutureBuilder(
-              future: getChild(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CupertinoActivityIndicator();
-                } else if (snapshot.hasData) {
-                  return snapshot.data ?? SizeConstants.none;
-                } else if (snapshot.hasError) {
-                  return IconConstants.noFavIcon;
-                }
-                return IconConstants.add;
-              },
-            ),
-            !noAttachment
-                ? Positioned(
-                    top: -20,
-                    right: -20,
-                    child: IconButton(
-                      onPressed: () {
-                        context
-                            .read<AttachmentCubit>()
-                            .removeAttachment(widget.attachmentDm!);
-                      },
-                      icon: IconConstants.close,
-                    ),
-                  )
-                : SizeConstants.none,
-          ],
+        child: FutureBuilder(
+          future: getChild(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CupertinoActivityIndicator();
+            } else if (snapshot.hasData) {
+              return snapshot.data ?? SizeConstants.none;
+            } else if (snapshot.hasError) {
+              return IconConstants.noFavIcon;
+            }
+            return IconConstants.add;
+          },
         ),
       ),
     );
+  }
+
+  // Function to delete the long pressed attachment card.
+  void _deleteAttachment() {
+    context
+        .read<AttachmentCubit>()
+        .removeAttachment(widget.attachmentDm!);
   }
 
   // Function to get the image from the website url.
