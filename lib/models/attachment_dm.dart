@@ -1,38 +1,31 @@
-import 'package:re_vision/models/attachment_type_dm.dart';
+import 'package:flutter/cupertino.dart';
 
-/// type : "type"
-/// data : "data"
+enum AttachmentType {
+  link(0),
+  image(1),
+  pdf(2);
+
+  const AttachmentType(this.value);
+
+  final int value;
+}
 
 class AttachmentDm {
+  final String? title;
+  final Icon? icon;
+  final bool isArticle;
+  final bool isPdf;
+  final bool isImage;
+  final bool isVideo;
+  final String? data;
+
   AttachmentDm({
-    AttachmentType? type,
-    String? data,
-  }) {
-    _type = type;
-    _data = data;
-  }
-
-  AttachmentDm.fromJson(dynamic json) {
-    _type = json['type'];
-    _data = json['data'];
-  }
-  AttachmentType? _type;
-  String? _data;
-  AttachmentDm copyWith({
-    AttachmentType? type,
-    String? data,
-  }) =>
-      AttachmentDm(
-        type: type ?? _type,
-        data: data ?? _data,
-      );
-  AttachmentType? get type => _type;
-  String? get data => _data;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['type'] = _type;
-    map['data'] = _data;
-    return map;
-  }
+    this.title,
+    this.icon,
+    this.data,
+    this.isArticle = true,
+    this.isImage = false,
+    this.isPdf = false,
+    this.isVideo = false,
+  });
 }

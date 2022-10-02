@@ -49,4 +49,9 @@ class StringConstants {
   static const String cancel = 'Cancel';
   static const String save = 'Save';
   static const String link = 'link';
+
+  static const String deleteAttachment = 'Delete this attachment?';
+  static const String ok = 'OK';
+
+  static const String saveAnArticle = 'Save an article';
 }

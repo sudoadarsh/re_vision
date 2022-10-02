@@ -35,9 +35,9 @@ class IconConstants {
   static const Icon pdf = Icon(Icons.picture_as_pdf_outlined);
   static const Icon link = Icon(Icons.link);
   static const Widget close = CircleAvatar(
-    radius: 12.0,
+    radius: 18,
     backgroundColor: ColorConstants.secondary,
-    child: Icon(Icons.close, color: ColorConstants.white, size: 16),
+    child: Icon(Icons.close, color: ColorConstants.white, size: 18),
   );
   static final Widget noFavIcon = Image.asset(
     StringConstants.noFavIcon,

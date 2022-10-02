@@ -1,7 +1,6 @@
 // ignore: depend_on_referenced_packages
 import 'package:bloc/bloc.dart';
-
-import '../../models/attachment_dm.dart';
+import 'package:re_vision/models/attachment_dm.dart';
 
 part 'attachment_state.dart';
 
