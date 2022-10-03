@@ -28,4 +28,24 @@ class AttachmentDm {
     this.isPdf = false,
     this.isVideo = false,
   });
+
+  AttachmentDm copyWith({
+    String? title,
+    Icon? icon,
+    bool? isArticle,
+    bool? isPdf,
+    bool? isImage,
+    bool? isVideo,
+    String? data,
+  }) {
+    return AttachmentDm(
+      title: title ?? this.title,
+      icon: icon ?? this.icon,
+      data: data ?? this.data,
+      isArticle: isArticle ?? this.isArticle,
+      isImage: isImage ?? this.isImage,
+      isPdf: isPdf ?? this.isPdf,
+      isVideo: isVideo ?? this.isVideo
+    );
+  }
 }

@@ -43,4 +43,5 @@ class IconConstants {
     StringConstants.noFavIcon,
     scale: 15,
   );
+  static const Icon save = Icon(Icons.save_outlined, color: ColorConstants.primary);
 }

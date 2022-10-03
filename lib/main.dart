@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:re_vision/base_sqlite/sqlite_helper.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/routes/route_generator.dart';
-import 'package:re_vision/state_management/attachment/attachment_cubit.dart';
+import 'package:re_vision/state_management/save_or_delete_attachment/save_delete_cubit.dart';
 import 'package:re_vision/utils/custom_theme_data.dart';
 
 
@@ -21,11 +21,8 @@ class Root extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AttachmentCubit(),
+          create: (context) => SaveDeleteCubit(),
         ),
-        // BlocProvider(
-        //   create: (context) => SubjectBloc(),
-        // ),
       ],
       child: MaterialApp(
         theme: CustomThemeData.themeData,

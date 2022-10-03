@@ -1,7 +1,9 @@
 import 'package:favicon/favicon.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
+import 'package:re_vision/base_widgets/base_image_builder.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/decoration_constants.dart';
@@ -9,28 +11,11 @@ import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
-import 'package:re_vision/state_management/attachment/attachment_cubit.dart';
+import 'package:re_vision/state_management/save_or_delete_attachment/save_delete_cubit.dart';
 
 import '../../base_widgets/base_bottom_modal_sheet.dart';
 import '../../models/attachment_dm.dart';
 import '../add_attachment_page/add_attachment_page.dart';
-
-class _AppBar extends StatelessWidget with PreferredSizeWidget {
-  const _AppBar({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      title: BaseText(title),
-      backgroundColor: ColorConstants.button,
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(56.0);
-}
 
 class _TopicField extends StatelessWidget {
   const _TopicField({Key? key, required this.topicController})
@@ -51,7 +36,7 @@ class _Separator extends StatelessWidget {
   const _Separator({Key? key}) : super(key: key);
 
   static const Widget _divider =
-  Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
+      Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +62,10 @@ class _TopicPageState extends State<TopicPage> {
   late final TextEditingController _topicController;
 
   // List to store the grid cards of added attachments.
-  List<AttachmentDm> _attachmentCards = [];
+  List<AttachmentDm> attachmentCards = [AttachmentDm()];
+
+  // The current index.
+  int _index = 0;
 
   @override
   void initState() {
@@ -85,10 +73,34 @@ class _TopicPageState extends State<TopicPage> {
     super.initState();
   }
 
+  // The app bar.
+  PreferredSizeWidget _appBar(String title) {
+    return AppBar(
+      title: BaseText(title),
+      backgroundColor: ColorConstants.button,
+      actions: [
+        BlocBuilder<SaveDeleteCubit, SaveDeleteState>(
+          builder: (context, state) {
+            if (state.isLongPressed) {
+              return IconButton(
+                onPressed: () {
+                  _deleteAttachment(_index);
+                  context.read<SaveDeleteCubit>().changeState();
+                },
+                icon: IconConstants.delete,
+              );
+            }
+            return IconButton(onPressed: () {}, icon: IconConstants.save);
+          },
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const _AppBar(title: 'Add topic'),
+      appBar: _appBar('Add topic'),
       body: Column(
         children: [
           _TopicField(topicController: _topicController),
@@ -96,30 +108,32 @@ class _TopicPageState extends State<TopicPage> {
           const _Separator(),
           SizeConstants.spaceVertical20,
           Expanded(
-            child: BlocBuilder<AttachmentCubit, AttachmentState>(
-              builder: (context, state) {
-                _attachmentCards = state.attachments + [AttachmentDm()];
-
-                // The grid of attachments.
-                return GridView.builder(
-                  gridDelegate: _gridDelegate,
-                  itemCount: _attachmentCards.length,
-                  itemBuilder: (context, index) {
-                    String data = _attachmentCards[index].data ?? '';
-                    return InkWell(
-                      onTap: () async {
-                        data.isNotEmpty
-                            ? null
-                            : WidgetsBinding.instance
-                            .addPostFrameCallback((timeStamp) {
-                          _addAttachmentSheet();
-                        });
-                      },
-                      child: const Card(
-                        child: IconConstants.add,
-                      ),
-                    );
+            child: GridView.builder(
+              gridDelegate: _gridDelegate,
+              itemCount: attachmentCards.length,
+              itemBuilder: (context, index) {
+                String data = attachmentCards[index].data ?? '';
+                return InkWell(
+                  // Delete an attachment.
+                  onLongPress: () {
+                    _index = index;
+                    setState(() {});
+                    context.read<SaveDeleteCubit>().changeState();
                   },
+                  // Open the bottom sheet.
+                  onTap: () async {
+                    data.isNotEmpty
+                        ? null
+                        : WidgetsBinding.instance
+                            .addPostFrameCallback((timeStamp) {
+                            _addAttachmentSheet();
+                          });
+                  },
+                  child: Card(
+                    child: data.isEmpty
+                        ? IconConstants.add
+                        : _getAppropriateCard(attachmentCards[index]).center(),
+                  ),
                 );
               },
             ),
@@ -135,9 +149,34 @@ class _TopicPageState extends State<TopicPage> {
     super.dispose();
   }
 
+  // Function to expose the correct card according to the type of attachment.
+  Widget _getAppropriateCard(AttachmentDm attachment) {
+    if (attachment.isArticle) {
+      return FutureBuilder(
+        future: getUrlImage(attachment.data ?? ''),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return IconConstants.noFavIcon;
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CupertinoActivityIndicator();
+          } else if (snapshot.hasData) {
+            return BaseImageBuilder(
+              url: snapshot.data ?? '',
+              height: 40,
+              width: 40,
+              error: IconConstants.noFavIcon,
+            );
+          }
+          return SizeConstants.none;
+        },
+      );
+    }
+    return SizeConstants.none;
+  }
+
   // Grid delete for the grid view builder.
   final SliverGridDelegate _gridDelegate =
-  const SliverGridDelegateWithFixedCrossAxisCount(
+      const SliverGridDelegateWithFixedCrossAxisCount(
     crossAxisCount: 3,
     mainAxisSpacing: 8.0,
     crossAxisSpacing: 8.0,
@@ -152,18 +191,26 @@ class _TopicPageState extends State<TopicPage> {
 
   // Function to open to the bottom modal screen to select the attachment
   // type.
-  Future _addAttachmentSheet() async =>
-      showModalBottomSheet(
-        isScrollControlled: true,
+  void _addAttachmentSheet() async {
+    String? link = await showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      shape: DecorationConstants.roundedRectangleBorderTop,
+      builder: (_) => BaseBottomModalSheet(
         context: context,
-        shape: DecorationConstants.roundedRectangleBorderTop,
-        builder: (_) =>
-            BlocProvider(
-              create: (context) => AttachmentCubit(),
-              child: BaseBottomModalSheet(
-                context: context,
-                child: const AddAttachmentPage(),
-              ),
-            ),
-      );
+        child: const AddAttachmentPage(),
+      ),
+    );
+
+    if (link != null && link.trim().isNotEmpty) {
+      attachmentCards.add(AttachmentDm(data: link));
+      setState(() {});
+    }
+  }
+
+  // Function to delete an long pressed attachment card.
+  void _deleteAttachment(int index) {
+    attachmentCards.removeAt(index);
+    setState(() {});
+  }
 }

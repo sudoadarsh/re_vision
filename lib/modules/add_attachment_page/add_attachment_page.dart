@@ -16,10 +16,19 @@ class AddAttachmentPage extends StatefulWidget {
 }
 
 class _AddAttachmentPageState extends State<AddAttachmentPage> {
+
+  // Text editing controller for the past link here text field.
+  late final TextEditingController _pasteLinkController;
+
+  @override
+  void initState() {
+    _pasteLinkController = TextEditingController();
+    super.initState();
+  }
+
   // The list of available attachment types.
   static final List<AttachmentDm> _attachmentList = [
-    AttachmentDm(
-        title: StringConstants.article, icon: IconConstants.article),
+    AttachmentDm(title: StringConstants.article, icon: IconConstants.article),
     AttachmentDm(title: StringConstants.image, icon: IconConstants.image),
     AttachmentDm(title: StringConstants.pdf, icon: IconConstants.pdf),
     AttachmentDm(title: StringConstants.video, icon: IconConstants.video),
@@ -28,41 +37,31 @@ class _AddAttachmentPageState extends State<AddAttachmentPage> {
   // Boolean to control the current widget in the modal bottom sheet.
   bool _articleSelected = false;
 
-  // Global key for text form field that takes the link as an input.
-  final GlobalKey<FormFieldState<String>> _linkFieldKey =
-      GlobalKey<FormFieldState<String>>();
 
   // The list of view of attachments.
   Widget _body() {
     return StatefulBuilder(
       builder: (context, sst) {
         // When the user taps on article, change the widget to text form field.
-        return AnimatedCrossFade(
-          duration: const Duration(milliseconds: 400),
-          firstChild: ListView.builder(
-            shrinkWrap: true,
-            itemCount: _attachmentList.length,
-            itemBuilder: (context, index) {
-              AttachmentDm attachment = _attachmentList[index];
-              return ListTile(
-                onTap: () {
-                  // If the user taps on [Article].
-                  if (attachment.isArticle) {
-                    sst(() {
-                      _articleSelected = true;
-                    });
-                  }
-                },
-                leading: attachment.icon,
-                title: BaseText(attachment.title ?? ''),
-              );
-            },
-          ),
-          secondChild: _pasteLink(sst),
-          crossFadeState: _articleSelected
-              ? CrossFadeState.showSecond
-              : CrossFadeState.showFirst,
-        );
+        return !_articleSelected ?  ListView.builder(
+          shrinkWrap: true,
+          itemCount: _attachmentList.length,
+          itemBuilder: (context, index) {
+            AttachmentDm attachment = _attachmentList[index];
+            return ListTile(
+              onTap: () {
+                // If the user taps on [Article].
+                if (attachment.isArticle) {
+                  sst(() {
+                    _articleSelected = true;
+                  });
+                }
+              },
+              leading: attachment.icon,
+              title: BaseText(attachment.title ?? ''),
+            );
+          },
+        ) : _pasteLink(sst);
       },
     );
   }
@@ -76,11 +75,12 @@ class _AddAttachmentPageState extends State<AddAttachmentPage> {
           title: BaseText(_attachmentList[0].title ?? ''),
         ),
         BaseTextFormFieldWithDepth(
-          maxLines: 4,
-          key: _linkFieldKey,
+          maxLines: 3,
           hintText: StringConstants.pasteTheLinkHere,
+          controller: _pasteLinkController,
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             // Cancel the the addition of article.
             TextButton(
@@ -95,7 +95,7 @@ class _AddAttachmentPageState extends State<AddAttachmentPage> {
             // Save the article.
             TextButton(
               onPressed: () {
-
+                Navigator.of(context).pop(_pasteLinkController.text);
               },
               child: const BaseText(StringConstants.save,
                   color: ColorConstants.primary),
@@ -110,9 +110,4 @@ class _AddAttachmentPageState extends State<AddAttachmentPage> {
   Widget build(BuildContext context) {
     return _body();
   }
-
-  // Function to save the article.
-  // void _saveArticle(AttachmentDm attachmentTypeDm) {
-  //   context.read<AttachmentCubit>().addAttachment(AttachmentDm());
-  // }
 }
