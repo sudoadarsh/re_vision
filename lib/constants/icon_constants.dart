@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 
@@ -44,4 +45,6 @@ class IconConstants {
     scale: 15,
   );
   static const Icon save = Icon(Icons.save_outlined, color: ColorConstants.primary);
+  static const FaIcon expand = FaIcon(FontAwesomeIcons.angleDown);
+  static const FaIcon collapse = FaIcon(FontAwesomeIcons.angleUp);
 }
