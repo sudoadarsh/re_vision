@@ -24,7 +24,7 @@ class IconConstants {
       Icon(Icons.visibility_off, color: ColorConstants.primary);
 
   // Icons used in the home page.
-  static const Icon add = Icon(Icons.add);
+  static const Icon add = Icon(Icons.add, color: ColorConstants.primary);
   static const Icon complete = Icon(Icons.done, color: ColorConstants.primary);
   static const Icon delete =
       Icon(Icons.delete, color: ColorConstants.secondary);

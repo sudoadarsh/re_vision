@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:re_vision/base_widgets/base_alert_dialog.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
@@ -8,6 +9,7 @@ import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 
+import '../../base_widgets/base_underline_field.dart';
 import '../../models/attachment_dm.dart';
 
 // 1. The app bar.
@@ -94,23 +96,48 @@ class _AttachmentsState extends State<_Attachments> {
   @override
   Widget build(BuildContext context) {
     return StatefulBuilder(builder: (context, sst) {
-      return Column(
-        children: [
-          Card(
-            child: ListTile(
-              onTap: () => sst(() {
-                _expand = !_expand;
-              }),
-              leading: widget.leadingIcon,
-              title: BaseText(widget.title),
-              trailing:
-                  !_expand ? IconConstants.expand : IconConstants.collapse,
+      return Card(
+        child: Column(
+          children: [
+            // 1. Disabling the splash.
+            Theme(
+              data: ThemeData(splashColor: Colors.transparent),
+              child: ListTile(
+                onTap: () => sst(() {
+                  _expand = !_expand;
+                }),
+                leading: widget.leadingIcon,
+                title: BaseText(widget.title),
+                trailing:
+                    !_expand ? IconConstants.expand : IconConstants.collapse,
+              ),
             ),
-          ),
-          BaseExpandedSection(expand: _expand, child: widget.expandedView)
-        ],
+            BaseExpandedSection(expand: _expand, child: widget.expandedView)
+          ],
+        ),
       );
     });
+  }
+}
+
+// 5. The expanded view.
+class _ExpandedView extends StatelessWidget {
+  const _ExpandedView({Key? key, required this.add}) : super(key: key);
+
+  final VoidCallback add;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // ListView(),
+        IconButton(
+          onPressed: add,
+          icon: IconConstants.add,
+        ).center(),
+      ],
+    );
   }
 }
 
@@ -125,9 +152,32 @@ class _TopicPageState extends State<TopicPage> {
   // 1. Controller for the topic field.
   late final TextEditingController _topicController;
 
+  // 2. The list of Attachment types.
+  late final List<AttachmentDm> _list;
+
   @override
   void initState() {
     _topicController = TextEditingController();
+
+    _list = [
+      AttachmentDm(
+          title: StringConstants.article,
+          leadingIcon: IconConstants.article,
+          expandedView: _articleExpanded()),
+      AttachmentDm(
+          title: StringConstants.image,
+          leadingIcon: IconConstants.image,
+          expandedView: SizeConstants.none),
+      AttachmentDm(
+          title: StringConstants.pdf,
+          leadingIcon: IconConstants.pdf,
+          expandedView: SizeConstants.none),
+      AttachmentDm(
+          title: StringConstants.video,
+          leadingIcon: IconConstants.video,
+          expandedView: SizeConstants.none),
+    ];
+
     super.initState();
   }
 
@@ -137,13 +187,12 @@ class _TopicPageState extends State<TopicPage> {
     super.dispose();
   }
 
-  // 2. The list of Attachment types.
-  final List<AttachmentDm> _list = [
-    AttachmentDm(title: StringConstants.article, leadingIcon: IconConstants.article, expandedView: SizeConstants.none),
-    AttachmentDm(title: StringConstants.image, leadingIcon: IconConstants.image, expandedView: SizeConstants.none),
-    AttachmentDm(title: StringConstants.pdf, leadingIcon: IconConstants.pdf, expandedView: SizeConstants.none),
-    AttachmentDm(title: StringConstants.video, leadingIcon: IconConstants.video, expandedView: SizeConstants.none),
-  ];
+  // 3. Expanded View for article.
+  Widget _articleExpanded() {
+    return _ExpandedView(add: () {
+      _pasteLink();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,20 +205,113 @@ class _TopicPageState extends State<TopicPage> {
           const _Separator(title: StringConstants.addAttachment),
           SizeConstants.spaceVertical20,
           Expanded(
-            child: ListView.builder(
+            child: ListView.separated(
               itemCount: _list.length,
               itemBuilder: (context, index) {
-                print (_list[index].title);
                 return _Attachments(
                   title: _list[index].title,
                   leadingIcon: _list[index].leadingIcon,
-                  expandedView: const BaseText('none'),
+                  expandedView: _list[index].expandedView,
                 );
+              },
+              separatorBuilder: (context, index) {
+                return const _Separator(title: StringConstants.separator);
               },
             ),
           ),
         ],
       ).paddingDefault(),
+    );
+  }
+
+  // -------------------------------Functions-----------------------------------
+
+  // 3.1 Dialog box to add links of articles.
+  Future _pasteLink() async {
+    return await showDialog(
+      context: context,
+      builder: (context) => const BaseAlertDialog(
+        title: StringConstants.saveArticles,
+        customContent: _PasteLink(),
+      ),
+    );
+  }
+}
+
+// 3.1.1 Paste link.
+class _PasteLink extends StatefulWidget {
+  const _PasteLink({Key? key}) : super(key: key);
+
+  @override
+  State<_PasteLink> createState() => _PasteLinkState();
+}
+
+class _PasteLinkState extends State<_PasteLink> {
+  late List<BaseUnderlineField> _fields;
+  late List<TextEditingController> _controller;
+
+  @override
+  void initState() {
+    _controller = [TextEditingController()];
+    _fields = [_field(_controller[0])];
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    for (TextEditingController controller in _controller) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: _fields.length,
+            itemBuilder: (context, index) {
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(child: _fields[index]),
+                  IconButton(
+                    onPressed: () {
+                      _fields.removeAt(index);
+                      _controller.removeAt(index);
+                      setState(() {});
+                    },
+                    icon: IconConstants.delete,
+                  )
+                ],
+              );
+            },
+          ),
+        ),
+        IconButton(
+          onPressed: () {
+            TextEditingController controller = TextEditingController();
+            BaseUnderlineField field = _field(controller);
+
+            _controller.add(controller);
+            _fields.add(field);
+
+            setState(() {});
+          },
+          icon: IconConstants.add,
+        ).center(),
+      ],
+    );
+  }
+
+  BaseUnderlineField _field(TextEditingController controller) {
+    return BaseUnderlineField(
+      hintText: StringConstants.pasteTheLinkHere,
+      controller: controller,
     );
   }
 }

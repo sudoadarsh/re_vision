@@ -53,5 +53,6 @@ class StringConstants {
   static const String deleteAttachment = 'Delete this attachment?';
   static const String ok = 'OK';
 
-  static const String saveAnArticle = 'Save an article';
+  static const String saveArticles = 'Save article(s)';
+  static const String separator  = '◈◈◈';
 }
