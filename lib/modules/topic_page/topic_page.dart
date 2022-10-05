@@ -8,9 +8,13 @@ import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/models/attachment_data_dm.dart';
 
 import '../../base_widgets/base_underline_field.dart';
 import '../../models/attachment_dm.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../state_management/attachment/attachment_cubit.dart';
 
 // 1. The app bar.
 class _AppBar extends StatefulWidget with PreferredSizeWidget {
@@ -132,6 +136,10 @@ class _ExpandedView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // ListView(),
+        BlocBuilder<AttachmentCubit, AttachmentState>(builder: (context, state) {
+          print (state.data);
+          return SizeConstants.none;
+        }),
         IconButton(
           onPressed: add,
           icon: IconConstants.add,
@@ -233,6 +241,8 @@ class _TopicPageState extends State<TopicPage> {
       builder: (context) => const BaseAlertDialog(
         title: StringConstants.saveArticles,
         customContent: _PasteLink(),
+        actionsPadding: SizeConstants.zeroPadding,
+        actions: [],
       ),
     );
   }
@@ -286,7 +296,7 @@ class _PasteLinkState extends State<_PasteLink> {
                       setState(() {});
                     },
                     icon: IconConstants.delete,
-                  )
+                  ),
                 ],
               );
             },
@@ -304,6 +314,30 @@ class _PasteLinkState extends State<_PasteLink> {
           },
           icon: IconConstants.add,
         ).center(),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            // Close the dialog.
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const BaseText(
+                StringConstants.cancel,
+                color: ColorConstants.secondary,
+              ),
+            ),
+            // Save the added links.
+            TextButton(
+              onPressed: _saveData,
+              child: const BaseText(
+                StringConstants.save,
+                color: ColorConstants.primary,
+              ),
+            ),
+          ],
+        ).alignRight(),
       ],
     );
   }
@@ -313,5 +347,15 @@ class _PasteLinkState extends State<_PasteLink> {
       hintText: StringConstants.pasteTheLinkHere,
       controller: controller,
     );
+  }
+
+  // --------------------------------Functions----------------------------------
+  void _saveData() {
+    List<AttachmentDataDm> data = _controller.where((element) => element.text.isNotEmpty).map((e) =>
+        AttachmentDataDm(type: AttachmentType.article.value, data: e.text)).toList();
+    for (AttachmentDataDm element in data) {
+      context.read<AttachmentCubit>().addAttachment(element);
+    }
+    Navigator.of(context).pop();
   }
 }

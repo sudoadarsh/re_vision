@@ -11,4 +11,5 @@ extension WidgetEx on Widget {
 
   // Alignment extension.
   Widget alignCenter() => Align(child: this);
+  Widget alignRight() => Align(alignment: Alignment.centerRight, child: this);
 }

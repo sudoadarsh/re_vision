@@ -44,10 +44,10 @@ class BaseUnderlineField extends StatelessWidget {
             .primaryTextTheme
             .bodyText1
             ?.copyWith(color: Colors.grey),
-        focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white10)),
-        enabledBorder: UnderlineInputBorder(
+        focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+        enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.black12)),
       ),
     );
   }

@@ -13,4 +13,6 @@ class SizeConstants {
   static final SizedBox spaceHorizontal20 = 20.0.separation(false);
 
   static const SizedBox none = SizedBox.shrink();
+
+  static const zeroPadding = EdgeInsets.all(0.0);
 }
