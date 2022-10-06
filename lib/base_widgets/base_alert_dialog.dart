@@ -9,7 +9,7 @@ class BaseAlertDialog extends StatelessWidget {
     this.description,
     this.actions,
     this.customContent,
-    this.actionsPadding
+    this.actionsPadding, this.contentPadding
   }) : super(key: key);
 
   final String title;
@@ -17,6 +17,7 @@ class BaseAlertDialog extends StatelessWidget {
   final Widget? customContent;
   final List<Widget>? actions;
   final EdgeInsetsGeometry? actionsPadding;
+  final EdgeInsetsGeometry? contentPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +28,7 @@ class BaseAlertDialog extends StatelessWidget {
             description ?? '',
           ),
       actionsPadding: actionsPadding,
+      contentPadding: contentPadding,
       actions: actions ??
           <Widget>[
             TextButton(

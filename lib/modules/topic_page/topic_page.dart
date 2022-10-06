@@ -7,6 +7,7 @@ import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
+import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/attachment_data_dm.dart';
 
@@ -241,6 +242,7 @@ class _TopicPageState extends State<TopicPage> {
       builder: (context) => const BaseAlertDialog(
         title: StringConstants.saveArticles,
         customContent: _PasteLink(),
+        contentPadding: EdgeInsets.only(left: 24.0),
         actionsPadding: SizeConstants.zeroPadding,
         actions: [],
       ),
@@ -289,7 +291,7 @@ class _PasteLinkState extends State<_PasteLink> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Flexible(child: _fields[index]),
-                  IconButton(
+                  index == 0 ? 50.0.separation(false) : IconButton(
                     onPressed: () {
                       _fields.removeAt(index);
                       _controller.removeAt(index);
