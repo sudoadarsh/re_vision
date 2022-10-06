@@ -55,4 +55,5 @@ class StringConstants {
 
   static const String saveArticles = 'Save article(s)';
   static const String separator  = '◈◈◈';
+  static const String tapToOpen = 'Tap to open web-view';
 }

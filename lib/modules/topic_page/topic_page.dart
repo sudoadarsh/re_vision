@@ -1,7 +1,10 @@
+import 'package:favicon/favicon.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:re_vision/base_widgets/base_alert_dialog.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
+import 'package:re_vision/base_widgets/base_image_builder.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
@@ -10,6 +13,7 @@ import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/attachment_data_dm.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../base_widgets/base_underline_field.dart';
 import '../../models/attachment_dm.dart';
@@ -136,10 +140,12 @@ class _ExpandedView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // ListView(),
-        BlocBuilder<AttachmentCubit, AttachmentState>(builder: (context, state) {
-          print (state.data);
-          return SizeConstants.none;
+        BlocBuilder<AttachmentCubit, AttachmentState>(
+            builder: (context, state) {
+          List<AttachmentDataDm> receivedData = state.data.where((element) => element.type == 0).toList();
+          return Column(
+            children: receivedData.map((e) => _ArticleTile(data: e)).toList(),
+          );
         }),
         IconButton(
           onPressed: add,
@@ -291,14 +297,16 @@ class _PasteLinkState extends State<_PasteLink> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Flexible(child: _fields[index]),
-                  index == 0 ? 50.0.separation(false) : IconButton(
-                    onPressed: () {
-                      _fields.removeAt(index);
-                      _controller.removeAt(index);
-                      setState(() {});
-                    },
-                    icon: IconConstants.delete,
-                  ),
+                  index == 0
+                      ? 50.0.separation(false)
+                      : IconButton(
+                          onPressed: () {
+                            _fields.removeAt(index);
+                            _controller.removeAt(index);
+                            setState(() {});
+                          },
+                          icon: IconConstants.delete,
+                        ),
                 ],
               );
             },
@@ -353,11 +361,91 @@ class _PasteLinkState extends State<_PasteLink> {
 
   // --------------------------------Functions----------------------------------
   void _saveData() {
-    List<AttachmentDataDm> data = _controller.where((element) => element.text.isNotEmpty).map((e) =>
-        AttachmentDataDm(type: AttachmentType.article.value, data: e.text)).toList();
+    List<AttachmentDataDm> data = _controller
+        .where((element) => element.text.isNotEmpty)
+        .map((e) =>
+            AttachmentDataDm(type: AttachmentType.article.value, data: e.text))
+        .toList();
     for (AttachmentDataDm element in data) {
       context.read<AttachmentCubit>().addAttachment(element);
     }
     Navigator.of(context).pop();
+  }
+}
+
+// 5.1 For Type Article.
+class _ArticleTile extends StatelessWidget {
+  const _ArticleTile({Key? key, required this.data}) : super(key: key);
+
+  final AttachmentDataDm data;
+
+  Future<String?> getImageUrl() async {
+    String url;
+    try {
+      final Favicon? icon = await FaviconFinder.getBest(data.data ?? '');
+      url = icon?.url ?? '';
+    } catch (e) {
+      debugPrint('Unable to get Favicon');
+      url = '';
+    }
+    return url;
+  }
+
+  String getWebsiteName() {
+    String name;
+    try {
+      final Uri uri = Uri.parse(data.data ?? '');
+      name = uri.host;
+    } catch (e) {
+      debugPrint(e.toString());
+      name = '';
+    }
+    return name;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: SizedBox(
+        width: 20,
+        height: 20,
+        child: FutureBuilder(
+          future: getImageUrl(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return BaseImageBuilder(
+                url: snapshot.data!,
+                error: IconConstants.link,
+                height: 20,
+                width: 20,
+              ).center();
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CupertinoActivityIndicator();
+            }
+            return IconConstants.link;
+          },
+        ),
+      ),
+      title: BaseText(getWebsiteName()),
+      subtitle: const BaseText(
+        StringConstants.tapToOpen,
+        fontWeight: FontWeight.w300,
+        fontSize: 12,
+      ),
+      trailing: IconButton(
+        onPressed: () {
+          // todo: add deletion
+        },
+        icon: IconConstants.delete,
+      ),
+      onTap: () {
+        try {
+          launchUrl(Uri.parse(data.data ?? ''), mode: LaunchMode.inAppWebView);
+        } catch (e) {
+          debugPrint('Error launching web-view.');
+          debugPrint(e.toString());
+        }
+      },
+    );
   }
 }
