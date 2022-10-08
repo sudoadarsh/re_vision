@@ -42,7 +42,7 @@ class StringConstants {
   static const String selectAttachmentType = 'Select Attachment Type';
 
   static const String article = 'Article';
-  static const String pdf = 'pdf';
+  static const String pdf = 'Documents';
   static const String video = 'Video';
   static const String image = 'Image';
   static const String pasteTheLinkHere = 'Paste the link here.';
@@ -56,8 +56,6 @@ class StringConstants {
   static const String saveArticles = 'Save article(s)';
   static const String separator  = '◈◈◈';
   static const String tapToOpenWeb = 'Tap to open web-view';
-  static const String tapToOpenImage = 'Tap to open image';
-  static const String tapToOpenPdf = 'Tap to open pdf';
-  static const String tapToOpenVideo = 'Tap to open video';
+  static const String tapToOpenFile = 'Tap to open the file';
 
 }

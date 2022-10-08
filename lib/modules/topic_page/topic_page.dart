@@ -167,7 +167,7 @@ class _ExpandedView extends StatelessWidget {
     if (type == 0) {
       return _ArticleTile(data: e);
     } else {
-      return _ImageTile(data: e);
+      return _CommonTile(data: e);
     }
   }
 }
@@ -202,11 +202,11 @@ class _TopicPageState extends State<TopicPage> {
       AttachmentDm(
           title: StringConstants.pdf,
           leadingIcon: IconConstants.pdf,
-          expandedView: SizeConstants.none),
+          expandedView: _pdfExpanded()),
       AttachmentDm(
           title: StringConstants.video,
           leadingIcon: IconConstants.video,
-          expandedView: SizeConstants.none),
+          expandedView: _videoExpanded()),
     ];
 
     super.initState();
@@ -232,9 +232,38 @@ class _TopicPageState extends State<TopicPage> {
   Widget _imageExpanded() {
     return _ExpandedView(
       add: () {
-        _pickImage();
+        _pickFile(
+          allowedExtensions: ["jpg", "jpeg", "jfif", "pjpeg", "pjp", "png"],
+          fileType: AttachmentType.image.value,
+        );
       },
-      type: 1,
+      type: AttachmentType.image.value,
+    );
+  }
+
+  // 5. Expand View for pdf.
+  Widget _pdfExpanded() {
+    return _ExpandedView(
+      add: () {
+        _pickFile(
+          allowedExtensions: ["pdf", "xlsx", "docx", "pptx"],
+          fileType: AttachmentType.pdf.value,
+        );
+      },
+      type: AttachmentType.pdf.value,
+    );
+  }
+
+  // 6. Expand view for videos.
+  Widget _videoExpanded() {
+    return _ExpandedView(
+      add: () {
+        _pickFile(
+          allowedExtensions: ["mp4", "mov", "wmv", "avi"],
+          fileType: AttachmentType.video.value,
+        );
+      },
+      type: AttachmentType.video.value,
     );
   }
 
@@ -284,21 +313,21 @@ class _TopicPageState extends State<TopicPage> {
     );
   }
 
-  // 4.1 File picker to image when the user wants to select an image.
+  // 4.1 File picker to pick image when the user wants to select an image.
   // todo: add info plist permissions.
-  Future _pickImage() async {
+  Future _pickFile(
+      {required List<String> allowedExtensions, required int fileType}) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
-      allowedExtensions: ["jpg", "jpeg", "jfif", "pjpeg", "pjp", "png"],
+      allowedExtensions: allowedExtensions,
     );
 
     if (result != null) {
       List<File> files = result.paths.map((path) => File(path!)).toList();
 
       List<AttachmentDataDm> data = files
-          .map((e) =>
-              AttachmentDataDm(data: e.path, type: AttachmentType.image.value))
+          .map((e) => AttachmentDataDm(data: e.path, type: fileType))
           .toList();
 
       for (AttachmentDataDm element in data) {
@@ -507,18 +536,18 @@ class _ArticleTile extends StatelessWidget {
 }
 
 // For type Image.
-class _ImageTile extends StatelessWidget {
-  const _ImageTile({Key? key, required this.data}) : super(key: key);
+class _CommonTile extends StatelessWidget {
+  const _CommonTile({Key? key, required this.data}) : super(key: key);
 
   final AttachmentDataDm data;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: IconConstants.image,
-      title: BaseText(_getImageName()),
+      leading: _getLeading(),
+      title: BaseText(_getFileName()),
       subtitle: const BaseText(
-        StringConstants.tapToOpenImage,
+        StringConstants.tapToOpenFile,
         fontWeight: FontWeight.w300,
         fontSize: 12,
       ),
@@ -526,22 +555,33 @@ class _ImageTile extends StatelessWidget {
         icon: IconConstants.delete,
         onPressed: () {
           context.read<AttachmentCubit>().removeAttachment(data);
-          _deleteImage();
+          _deleteFile();
         },
       ),
       onTap: () {
-        _openImage();
+        _openFile();
       },
     );
   }
 
+  // To get the leading.
+  Widget _getLeading() {
+    if (data.type == 1) {
+      return IconConstants.image;
+    } else if (data.type == 2) {
+      return IconConstants.pdf;
+    } else {
+      return IconConstants.video;
+    }
+  }
+
   // To get the image name.
-  String _getImageName() {
+  String _getFileName() {
     return data.data?.split('/').last ?? '';
   }
 
   // Deleting the image from cache.
-  void _deleteImage() {
+  void _deleteFile() {
     try {
       File(data.data ?? '').delete();
     } catch (e) {
@@ -551,7 +591,7 @@ class _ImageTile extends StatelessWidget {
   }
 
   // Open the image.
-  void _openImage() {
+  void _openFile() {
     if (File(data.data ?? '').existsSync()) {
       OpenFilex.open(data.data ?? '');
     } else {
