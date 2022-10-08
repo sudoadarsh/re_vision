@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:favicon/favicon.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:re_vision/base_widgets/base_alert_dialog.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
@@ -131,9 +135,11 @@ class _AttachmentsState extends State<_Attachments> {
 
 // 5. The expanded view.
 class _ExpandedView extends StatelessWidget {
-  const _ExpandedView({Key? key, required this.add}) : super(key: key);
+  const _ExpandedView({Key? key, required this.add, required this.type})
+      : super(key: key);
 
   final VoidCallback add;
+  final int type;
 
   @override
   Widget build(BuildContext context) {
@@ -142,9 +148,10 @@ class _ExpandedView extends StatelessWidget {
       children: [
         BlocBuilder<AttachmentCubit, AttachmentState>(
             builder: (context, state) {
-          List<AttachmentDataDm> receivedData = state.data.where((element) => element.type == 0).toList();
+          List<AttachmentDataDm> receivedData =
+              state.data.where((element) => element.type == type).toList();
           return Column(
-            children: receivedData.map((e) => _ArticleTile(data: e)).toList(),
+            children: receivedData.map((e) => _getTile(e)).toList(),
           );
         }),
         IconButton(
@@ -153,6 +160,15 @@ class _ExpandedView extends StatelessWidget {
         ).center(),
       ],
     );
+  }
+
+  //----------------------To get the correct tile-------------------------------
+  Widget _getTile(AttachmentDataDm e) {
+    if (type == 0) {
+      return _ArticleTile(data: e);
+    } else {
+      return _ImageTile(data: e);
+    }
   }
 }
 
@@ -182,7 +198,7 @@ class _TopicPageState extends State<TopicPage> {
       AttachmentDm(
           title: StringConstants.image,
           leadingIcon: IconConstants.image,
-          expandedView: SizeConstants.none),
+          expandedView: _imageExpanded()),
       AttachmentDm(
           title: StringConstants.pdf,
           leadingIcon: IconConstants.pdf,
@@ -204,9 +220,22 @@ class _TopicPageState extends State<TopicPage> {
 
   // 3. Expanded View for article.
   Widget _articleExpanded() {
-    return _ExpandedView(add: () {
-      _pasteLink();
-    });
+    return _ExpandedView(
+      add: () {
+        _pasteLink();
+      },
+      type: 0,
+    );
+  }
+
+  // 4. Expand View for image.
+  Widget _imageExpanded() {
+    return _ExpandedView(
+      add: () {
+        _pickImage();
+      },
+      type: 1,
+    );
   }
 
   @override
@@ -247,12 +276,38 @@ class _TopicPageState extends State<TopicPage> {
       context: context,
       builder: (context) => const BaseAlertDialog(
         title: StringConstants.saveArticles,
-        customContent: _PasteLink(),
+        customContent: SizedBox(width: double.maxFinite, child: _PasteLink()),
         contentPadding: EdgeInsets.only(left: 24.0),
         actionsPadding: SizeConstants.zeroPadding,
         actions: [],
       ),
     );
+  }
+
+  // 4.1 File picker to image when the user wants to select an image.
+  // todo: add info plist permissions.
+  Future _pickImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.custom,
+      allowedExtensions: ["jpg", "jpeg", "jfif", "pjpeg", "pjp", "png"],
+    );
+
+    if (result != null) {
+      List<File> files = result.paths.map((path) => File(path!)).toList();
+
+      List<AttachmentDataDm> data = files
+          .map((e) =>
+              AttachmentDataDm(data: e.path, type: AttachmentType.image.value))
+          .toList();
+
+      for (AttachmentDataDm element in data) {
+        if (!mounted) return;
+        context.read<AttachmentCubit>().addAttachment(element);
+      }
+    } else {
+      // todo: User canceled the picker
+    }
   }
 }
 
@@ -428,13 +483,13 @@ class _ArticleTile extends StatelessWidget {
       ),
       title: BaseText(getWebsiteName()),
       subtitle: const BaseText(
-        StringConstants.tapToOpen,
+        StringConstants.tapToOpenWeb,
         fontWeight: FontWeight.w300,
         fontSize: 12,
       ),
       trailing: IconButton(
         onPressed: () {
-          // todo: add deletion
+          context.read<AttachmentCubit>().removeAttachment(data);
         },
         icon: IconConstants.delete,
       ),
@@ -443,9 +498,65 @@ class _ArticleTile extends StatelessWidget {
           launchUrl(Uri.parse(data.data ?? ''), mode: LaunchMode.inAppWebView);
         } catch (e) {
           debugPrint('Error launching web-view.');
+          // todo: add error dialog.
           debugPrint(e.toString());
         }
       },
     );
+  }
+}
+
+// For type Image.
+class _ImageTile extends StatelessWidget {
+  const _ImageTile({Key? key, required this.data}) : super(key: key);
+
+  final AttachmentDataDm data;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: IconConstants.image,
+      title: BaseText(_getImageName()),
+      subtitle: const BaseText(
+        StringConstants.tapToOpenImage,
+        fontWeight: FontWeight.w300,
+        fontSize: 12,
+      ),
+      trailing: IconButton(
+        icon: IconConstants.delete,
+        onPressed: () {
+          context.read<AttachmentCubit>().removeAttachment(data);
+          _deleteImage();
+        },
+      ),
+      onTap: () {
+        _openImage();
+      },
+    );
+  }
+
+  // To get the image name.
+  String _getImageName() {
+    return data.data?.split('/').last ?? '';
+  }
+
+  // Deleting the image from cache.
+  void _deleteImage() {
+    try {
+      File(data.data ?? '').delete();
+    } catch (e) {
+      debugPrint("Error in deleting image from cache.");
+      debugPrint(e.toString());
+    }
+  }
+
+  // Open the image.
+  void _openImage() {
+    if (File(data.data ?? '').existsSync()) {
+      OpenFilex.open(data.data ?? '');
+    } else {
+      // todo: add image fetch failed dialog.
+      debugPrint("Image path doesn't exist");
+    }
   }
 }

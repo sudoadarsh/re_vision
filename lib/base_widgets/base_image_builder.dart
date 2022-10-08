@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:re_vision/constants/icon_constants.dart';
 
 class BaseImageBuilder extends StatelessWidget {
   const BaseImageBuilder({
@@ -23,7 +24,7 @@ class BaseImageBuilder extends StatelessWidget {
         );
       },
       placeholder: (context, url) => const CupertinoActivityIndicator(),
-      errorWidget: (context, url, error) => error,
+      errorWidget: (context, url, error) => IconConstants.noFavIcon,
     );
   }
 }
