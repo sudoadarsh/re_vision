@@ -58,4 +58,8 @@ class StringConstants {
   static const String tapToOpenWeb = 'Tap to open web-view';
   static const String tapToOpenFile = 'Tap to open the file';
 
+  static const String areYouSure = 'Are you sure want to leave?';
+  static const String consequences = 'You have unsaved content, and will be lost unless you save it';
+  static const String discard = 'Discard';
+
 }

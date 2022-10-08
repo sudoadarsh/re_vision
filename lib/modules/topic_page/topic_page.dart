@@ -17,6 +17,7 @@ import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/attachment_data_dm.dart';
+import 'package:re_vision/state_management/save/save_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../base_widgets/base_underline_field.dart';
@@ -27,9 +28,11 @@ import '../../state_management/attachment/attachment_cubit.dart';
 
 // 1. The app bar.
 class _AppBar extends StatefulWidget with PreferredSizeWidget {
-  const _AppBar({Key? key, required this.title}) : super(key: key);
+  const _AppBar({Key? key, required this.title, required this.saveCubit})
+      : super(key: key);
 
   final String title;
+  final SaveCubit saveCubit;
 
   @override
   State<_AppBar> createState() => _AppBarState();
@@ -44,6 +47,20 @@ class _AppBarState extends State<_AppBar> {
     return AppBar(
       backgroundColor: ColorConstants.button,
       title: BaseText(widget.title),
+      actions: [
+        TextButton(
+          onPressed: () {
+            widget.saveCubit.toggleSave();
+          },
+          child: BlocBuilder<SaveCubit, SaveState>(
+            bloc: widget.saveCubit,
+            builder: (context, state) {
+              return BaseText(StringConstants.save,
+                  color: state.isSaved ? ColorConstants.primary : null);
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -180,6 +197,9 @@ class TopicPage extends StatefulWidget {
 }
 
 class _TopicPageState extends State<TopicPage> {
+  // The save cubit.
+  late final SaveCubit _saveCubit;
+
   // 1. Controller for the topic field.
   late final TextEditingController _topicController;
 
@@ -189,6 +209,8 @@ class _TopicPageState extends State<TopicPage> {
   @override
   void initState() {
     _topicController = TextEditingController();
+
+    _saveCubit = SaveCubit();
 
     _list = [
       AttachmentDm(
@@ -215,6 +237,7 @@ class _TopicPageState extends State<TopicPage> {
   @override
   void dispose() {
     _topicController.dispose();
+    _saveCubit.close();
     super.dispose();
   }
 
@@ -269,31 +292,34 @@ class _TopicPageState extends State<TopicPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const _AppBar(title: "Add Topic"),
-      body: Column(
-        children: [
-          _TopicField(topicController: _topicController),
-          SizeConstants.spaceVertical20,
-          const _Separator(title: StringConstants.addAttachment),
-          SizeConstants.spaceVertical20,
-          Expanded(
-            child: ListView.separated(
-              itemCount: _list.length,
-              itemBuilder: (context, index) {
-                return _Attachments(
-                  title: _list[index].title,
-                  leadingIcon: _list[index].leadingIcon,
-                  expandedView: _list[index].expandedView,
-                );
-              },
-              separatorBuilder: (context, index) {
-                return const _Separator(title: StringConstants.separator);
-              },
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: _AppBar(title: "Add Topic", saveCubit: _saveCubit),
+        body: Column(
+          children: [
+            _TopicField(topicController: _topicController),
+            SizeConstants.spaceVertical20,
+            const _Separator(title: StringConstants.addAttachment),
+            SizeConstants.spaceVertical20,
+            Expanded(
+              child: ListView.separated(
+                itemCount: _list.length,
+                itemBuilder: (context, index) {
+                  return _Attachments(
+                    title: _list[index].title,
+                    leadingIcon: _list[index].leadingIcon,
+                    expandedView: _list[index].expandedView,
+                  );
+                },
+                separatorBuilder: (context, index) {
+                  return const _Separator(title: StringConstants.separator);
+                },
+              ),
             ),
-          ),
-        ],
-      ).paddingDefault(),
+          ],
+        ).paddingDefault(),
+      ),
     );
   }
 
@@ -337,6 +363,36 @@ class _TopicPageState extends State<TopicPage> {
     } else {
       // todo: User canceled the picker
     }
+  }
+
+  // To alert the user before leaving the screen.
+  Future<bool> _onWillPop() async {
+    return _saveCubit.state.isSaved
+        ? true
+        : (await showDialog(
+              context: context,
+              builder: (context) => BaseAlertDialog(
+                title: StringConstants.areYouSure,
+                description: StringConstants.consequences,
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(true);
+                    },
+                    child: const BaseText(StringConstants.discard,
+                        color: ColorConstants.secondary),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // Add Login to save the data.
+                    },
+                    child: const BaseText(StringConstants.save,
+                        color: ColorConstants.primary),
+                  )
+                ],
+              ),
+            )) ??
+            false;
   }
 }
 
