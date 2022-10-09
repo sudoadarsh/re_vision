@@ -7,9 +7,6 @@ import '../modules/topic_page/topic_page.dart';
 
 class RouteGenerator {
   static Route<dynamic> generate(RouteSettings settings) {
-    // can use later to pass values between screen.
-    // final args = settings.arguments;
-
     Widget page;
 
     switch (settings.name) {
@@ -20,7 +17,8 @@ class RouteGenerator {
         page = const HomePage();
         break;
       case RouteConstants.topicPage:
-        page = const TopicPage();
+        final args = settings.arguments as TopicPageArguments;
+        page = TopicPage(selectedDay: args.selectedDay, topicDm: args.topicDm);
         break;
       default:
         page = const Scaffold(

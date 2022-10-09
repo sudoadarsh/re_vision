@@ -13,7 +13,6 @@ import 'package:re_vision/base_widgets/base_image_builder.dart';
 import 'package:re_vision/base_widgets/base_snackbar.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
-import 'package:re_vision/constants/date_time_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
@@ -37,12 +36,12 @@ class _AppBar extends StatefulWidget with PreferredSizeWidget {
       {Key? key,
       required this.title,
       required this.saveCubit,
-      required this.topicController})
+      required this.onSaveButtonTap})
       : super(key: key);
 
   final String title;
   final SaveCubit saveCubit;
-  final TextEditingController topicController;
+  final VoidCallback onSaveButtonTap;
 
   @override
   State<_AppBar> createState() => _AppBarState();
@@ -59,10 +58,7 @@ class _AppBarState extends State<_AppBar> {
       title: BaseText(widget.title),
       actions: [
         TextButton(
-          onPressed: () {
-            widget.saveCubit.toggleSave();
-            _saveToLocalDatabase();
-          },
+          onPressed: widget.onSaveButtonTap,
           child: BlocBuilder<SaveCubit, SaveState>(
             bloc: widget.saveCubit,
             builder: (context, state) {
@@ -74,36 +70,6 @@ class _AppBarState extends State<_AppBar> {
       ],
     );
   }
-
-  void _saveToLocalDatabase() async {
-    List<AttachmentDataDm> attachments = context.read<AttachmentCubit>().state.data;
-    List<Map<String, dynamic>> jsonData = attachments.map((e) => e.toJson()).toList();
-
-    // Creating the topic data.
-    final TopicDm data = TopicDm(
-      topic: widget.topicController.text,
-      attachments: jsonEncode(jsonData),
-      createdAt: DateTimeConstants.todayTime.toString(),
-      scheduledTo: DateTimeConstants.todayTime.toString(),
-      iteration: 0,
-    );
-
-    try {
-      await BaseSqlite.insert(
-        tableName: StringConstants.topicTable,
-        data: data,
-      );
-      if (!mounted) return;
-      baseSnackBar(context, message: StringConstants.savedSuccessfully, leading: IconConstants.success);
-      Navigator.of(context).pop();
-    } catch (e) {
-      debugPrint(e.toString());
-      baseSnackBar(context, message: StringConstants.errorInSaving, leading: IconConstants.failed);
-      Navigator.of(context).pop();
-    }
-  }
-
-
 }
 
 // 2. The Topic text field.
@@ -231,7 +197,14 @@ class _ExpandedView extends StatelessWidget {
 }
 
 class TopicPage extends StatefulWidget {
-  const TopicPage({Key? key}) : super(key: key);
+  const TopicPage({
+    Key? key,
+    required this.selectedDay,
+    this.topicDm,
+  }) : super(key: key);
+
+  final DateTime selectedDay;
+  final TopicDm? topicDm;
 
   @override
   State<TopicPage> createState() => _TopicPageState();
@@ -337,9 +310,13 @@ class _TopicPageState extends State<TopicPage> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: _AppBar(
-          title: "Add Topic",
+          title: widget.topicDm == null
+              ? StringConstants.addTopic
+              : StringConstants.updateTopic,
           saveCubit: _saveCubit,
-          topicController: _topicController,
+          onSaveButtonTap: () {
+            _saveToLocalDatabase();
+          },
         ),
         body: Column(
           children: [
@@ -430,7 +407,8 @@ class _TopicPageState extends State<TopicPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Add Login to save the data.
+                      _saveToLocalDatabase();
+                      Navigator.of(context).pop();
                     },
                     child: const BaseText(StringConstants.save,
                         color: ColorConstants.primary),
@@ -439,6 +417,41 @@ class _TopicPageState extends State<TopicPage> {
               ),
             )) ??
             false;
+  }
+
+  void _saveToLocalDatabase() async {
+    // todo: add condition for empty topic field.
+    List<AttachmentDataDm> attachments =
+        context.read<AttachmentCubit>().state.data;
+    List<Map<String, dynamic>> jsonData =
+        attachments.map((e) => e.toJson()).toList();
+
+    // Creating the topic data.
+    final TopicDm data = TopicDm(
+      topic: _topicController.text,
+      attachments: jsonEncode(jsonData),
+      createdAt: widget.selectedDay.toString().replaceAll('Z', ''),
+      scheduledTo: widget.selectedDay.toString().replaceAll('Z', ''),
+      iteration: 1,
+    );
+
+    try {
+      await BaseSqlite.insert(
+        tableName: StringConstants.topicTable,
+        data: data,
+      );
+      if (!mounted) return;
+      baseSnackBar(context,
+          message: StringConstants.savedSuccessfully,
+          leading: IconConstants.success);
+      Navigator.of(context).pop();
+    } catch (e) {
+      debugPrint(e.toString());
+      baseSnackBar(context,
+          message: StringConstants.errorInSaving,
+          leading: IconConstants.failed);
+      Navigator.of(context).pop();
+    }
   }
 }
 
@@ -716,4 +729,12 @@ class _CommonTile extends StatelessWidget {
       debugPrint("Image path doesn't exist");
     }
   }
+}
+
+// Screen arguments.
+class TopicPageArguments {
+  final DateTime selectedDay;
+  final TopicDm? topicDm;
+
+  TopicPageArguments({required this.selectedDay, this.topicDm});
 }
