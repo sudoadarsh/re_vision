@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:favicon/favicon.dart';
@@ -9,17 +10,21 @@ import 'package:re_vision/base_widgets/base_alert_dialog.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
 import 'package:re_vision/base_widgets/base_image_builder.dart';
+import 'package:re_vision/base_widgets/base_snackbar.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
+import 'package:re_vision/constants/date_time_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/attachment_data_dm.dart';
+import 'package:re_vision/models/topic_dm.dart';
 import 'package:re_vision/state_management/save/save_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../base_sqlite/sqlite_helper.dart';
 import '../../base_widgets/base_underline_field.dart';
 import '../../models/attachment_dm.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,11 +33,16 @@ import '../../state_management/attachment/attachment_cubit.dart';
 
 // 1. The app bar.
 class _AppBar extends StatefulWidget with PreferredSizeWidget {
-  const _AppBar({Key? key, required this.title, required this.saveCubit})
+  const _AppBar(
+      {Key? key,
+      required this.title,
+      required this.saveCubit,
+      required this.topicController})
       : super(key: key);
 
   final String title;
   final SaveCubit saveCubit;
+  final TextEditingController topicController;
 
   @override
   State<_AppBar> createState() => _AppBarState();
@@ -51,6 +61,7 @@ class _AppBarState extends State<_AppBar> {
         TextButton(
           onPressed: () {
             widget.saveCubit.toggleSave();
+            _saveToLocalDatabase();
           },
           child: BlocBuilder<SaveCubit, SaveState>(
             bloc: widget.saveCubit,
@@ -63,6 +74,36 @@ class _AppBarState extends State<_AppBar> {
       ],
     );
   }
+
+  void _saveToLocalDatabase() async {
+    List<AttachmentDataDm> attachments = context.read<AttachmentCubit>().state.data;
+    List<Map<String, dynamic>> jsonData = attachments.map((e) => e.toJson()).toList();
+
+    // Creating the topic data.
+    final TopicDm data = TopicDm(
+      topic: widget.topicController.text,
+      attachments: jsonEncode(jsonData),
+      createdAt: DateTimeConstants.todayTime.toString(),
+      scheduledTo: DateTimeConstants.todayTime.toString(),
+      iteration: 0,
+    );
+
+    try {
+      await BaseSqlite.insert(
+        tableName: StringConstants.topicTable,
+        data: data,
+      );
+      if (!mounted) return;
+      baseSnackBar(context, message: StringConstants.savedSuccessfully, leading: IconConstants.success);
+      Navigator.of(context).pop();
+    } catch (e) {
+      debugPrint(e.toString());
+      baseSnackBar(context, message: StringConstants.errorInSaving, leading: IconConstants.failed);
+      Navigator.of(context).pop();
+    }
+  }
+
+
 }
 
 // 2. The Topic text field.
@@ -295,7 +336,11 @@ class _TopicPageState extends State<TopicPage> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: _AppBar(title: "Add Topic", saveCubit: _saveCubit),
+        appBar: _AppBar(
+          title: "Add Topic",
+          saveCubit: _saveCubit,
+          topicController: _topicController,
+        ),
         body: Column(
           children: [
             _TopicField(topicController: _topicController),
@@ -331,7 +376,8 @@ class _TopicPageState extends State<TopicPage> {
       context: context,
       builder: (context) => const BaseAlertDialog(
         title: StringConstants.saveArticles,
-        customContent: SizedBox(width: double.maxFinite, child: _PasteLink()),
+        customContent:
+            SizedBox(width: double.maxFinite, child: _PasteLinkDropdown()),
         contentPadding: EdgeInsets.only(left: 24.0),
         actionsPadding: SizeConstants.zeroPadding,
         actions: [],
@@ -397,16 +443,19 @@ class _TopicPageState extends State<TopicPage> {
 }
 
 // 3.1.1 Paste link.
-class _PasteLink extends StatefulWidget {
-  const _PasteLink({Key? key}) : super(key: key);
+class _PasteLinkDropdown extends StatefulWidget {
+  const _PasteLinkDropdown({Key? key}) : super(key: key);
 
   @override
-  State<_PasteLink> createState() => _PasteLinkState();
+  State<_PasteLinkDropdown> createState() => _PasteLinkDropdownState();
 }
 
-class _PasteLinkState extends State<_PasteLink> {
+class _PasteLinkDropdownState extends State<_PasteLinkDropdown> {
   late List<BaseUnderlineField> _fields;
   late List<TextEditingController> _controller;
+
+  // Form key to validate the text fields.
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -429,27 +478,30 @@ class _PasteLinkState extends State<_PasteLink> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Flexible(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: _fields.length,
-            itemBuilder: (context, index) {
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(child: _fields[index]),
-                  index == 0
-                      ? 50.0.separation(false)
-                      : IconButton(
-                          onPressed: () {
-                            _fields.removeAt(index);
-                            _controller.removeAt(index);
-                            setState(() {});
-                          },
-                          icon: IconConstants.delete,
-                        ),
-                ],
-              );
-            },
+          child: Form(
+            key: _formKey,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _fields.length,
+              itemBuilder: (context, index) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(child: _fields[index]),
+                    index == 0
+                        ? 50.0.separation(false)
+                        : IconButton(
+                            onPressed: () {
+                              _fields.removeAt(index);
+                              _controller.removeAt(index);
+                              setState(() {});
+                            },
+                            icon: IconConstants.delete,
+                          ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
         IconButton(
@@ -480,7 +532,7 @@ class _PasteLinkState extends State<_PasteLink> {
             ),
             // Save the added links.
             TextButton(
-              onPressed: _saveData,
+              onPressed: _saveLink,
               child: const BaseText(
                 StringConstants.save,
                 color: ColorConstants.primary,
@@ -496,20 +548,29 @@ class _PasteLinkState extends State<_PasteLink> {
     return BaseUnderlineField(
       hintText: StringConstants.pasteTheLinkHere,
       controller: controller,
+      validator: (value) {
+        if ((Uri.tryParse(value ?? '')?.hasAbsolutePath) ?? false) {
+          return null;
+        } else {
+          return StringConstants.invalidUrl;
+        }
+      },
     );
   }
 
   // --------------------------------Functions----------------------------------
-  void _saveData() {
-    List<AttachmentDataDm> data = _controller
-        .where((element) => element.text.isNotEmpty)
-        .map((e) =>
-            AttachmentDataDm(type: AttachmentType.article.value, data: e.text))
-        .toList();
-    for (AttachmentDataDm element in data) {
-      context.read<AttachmentCubit>().addAttachment(element);
+  void _saveLink() {
+    if (_formKey.currentState?.validate() ?? false) {
+      List<AttachmentDataDm> data = _controller
+          .where((element) => element.text.isNotEmpty)
+          .map((e) => AttachmentDataDm(
+              type: AttachmentType.article.value, data: e.text))
+          .toList();
+      for (AttachmentDataDm element in data) {
+        context.read<AttachmentCubit>().addAttachment(element);
+      }
+      Navigator.of(context).pop();
     }
-    Navigator.of(context).pop();
   }
 }
 

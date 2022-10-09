@@ -22,4 +22,10 @@ class DecorationConstants {
       bottomLeft: Radius.circular(10.0),
     ),
   );
+
+  /// Gives rounded border to a widget. Is passed to parameter [ShapeBorder].
+  static const RoundedRectangleBorder roundedRectangleBorder =
+      RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+  );
 }

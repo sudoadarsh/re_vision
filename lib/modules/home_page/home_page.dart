@@ -167,24 +167,20 @@ class _HomePageState extends State<HomePage> {
   );
 
   Future _createDatabase() async {
-    bool? exists =
-    BaseSharedPrefsSingleton.checkKey(StringConstants.localDbKey);
-
-    switch (exists) {
-      case true:
-        return null;
-      default:
-        debugPrint('Creating database.');
-        /* Set the shared prefs value that the database has been created. */
-        await BaseSharedPrefsSingleton.setValue(
-          StringConstants.localDbKey,
-          true,
-        );
-        /* Create the topic table. */
-        await BaseSqlite.createTable(
-          tableName: StringConstants.topicTable,
-          model: Schemas.topicSchema,
-        );
+    bool exists =
+    BaseSharedPrefsSingleton.getBool(StringConstants.localDbKey) ?? false;
+    if (!exists) {
+      debugPrint('Creating database.');
+      /* Set the shared prefs value that the database has been created. */
+      await BaseSharedPrefsSingleton.setValue(
+        StringConstants.localDbKey,
+        true,
+      );
+      /* Create the topic table. */
+      await BaseSqlite.createTable(
+        tableName: StringConstants.topicTable,
+        model: Schemas.topicSchema,
+      );
     }
   }
 

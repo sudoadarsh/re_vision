@@ -11,7 +11,7 @@ class BaseUnderlineField extends StatelessWidget {
     this.maxLines,
     this.expands,
     this.focusNode,
-    this.obscureText,
+    this.obscureText, this.validator,
   }) : super(key: key);
 
   final String? hintText;
@@ -23,6 +23,7 @@ class BaseUnderlineField extends StatelessWidget {
   final int? maxLines;
   final FocusNode? focusNode;
   final bool? obscureText;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +33,7 @@ class BaseUnderlineField extends StatelessWidget {
       obscureText: obscureText ?? false,
       controller: controller,
       maxLines: maxLines ?? 1,
+      validator: validator,
       style: Theme.of(context).primaryTextTheme.bodyMedium,
       cursorColor: Theme.of(context).primaryColor,
       decoration: InputDecoration(

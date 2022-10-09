@@ -46,4 +46,6 @@ class IconConstants {
   static const Icon save = Icon(Icons.save_outlined, color: ColorConstants.primary);
   static const Icon expand = Icon(Icons.keyboard_arrow_down_rounded);
   static const Icon collapse = Icon(Icons.keyboard_arrow_up_rounded);
+  static const Icon success = Icon(Icons.check_circle, color: ColorConstants.primary);
+  static const Icon failed = Icon(Icons.info, color: ColorConstants.secondary);
 }

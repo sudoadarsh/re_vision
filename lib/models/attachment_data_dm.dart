@@ -8,29 +8,38 @@ enum AttachmentType {
   video(3);
 
   const AttachmentType(this.value);
+
   final int value;
 }
 
 class AttachmentDataDm {
   AttachmentDataDm({
-      int? type, 
-      String? data,}){
+    int? type,
+    String? data,
+  }) {
     _type = type;
     _data = data;
-}
+  }
 
   AttachmentDataDm.fromJson(dynamic json) {
     _type = json['type'];
     _data = json['data'];
   }
+
   int? _type;
   String? _data;
-AttachmentDataDm copyWith({  int? type,
-  String? data,
-}) => AttachmentDataDm(  type: type ?? _type,
-  data: data ?? _data,
-);
+
+  AttachmentDataDm copyWith({
+    int? type,
+    String? data,
+  }) =>
+      AttachmentDataDm(
+        type: type ?? _type,
+        data: data ?? _data,
+      );
+
   int? get type => _type;
+
   String? get data => _data;
 
   Map<String, dynamic> toJson() {
@@ -39,5 +48,4 @@ AttachmentDataDm copyWith({  int? type,
     map['data'] = _data;
     return map;
   }
-
 }

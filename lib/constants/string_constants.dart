@@ -62,4 +62,8 @@ class StringConstants {
   static const String consequences = 'You have unsaved content, and will be lost unless you save it';
   static const String discard = 'Discard';
 
+  static const String invalidUrl = 'Invalid Url';
+  static const String savedSuccessfully = 'Saved Successfully';
+  static const String errorInSaving = 'Error while saving the topic!';
+
 }
