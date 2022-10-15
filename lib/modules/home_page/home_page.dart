@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:re_vision/base_widgets/base_cupertino_dialog.dart';
 import 'package:re_vision/base_widgets/base_cupertino_dialog_button.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
@@ -75,13 +76,15 @@ class _Cards extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).pushNamed(
-          RouteConstants.topicPage,
-          arguments: TopicPageArguments(
-            selectedDay: selectedDay,
-            topicDm: topic,
-          ),
-        ).then((value) => databaseCubit.fetchData());
+        Navigator.of(context)
+            .pushNamed(
+              RouteConstants.topicPage,
+              arguments: TopicPageArguments(
+                selectedDay: selectedDay,
+                topicDm: topic,
+              ),
+            )
+            .then((value) => databaseCubit.fetchData());
       },
       child: Card(
         child: Column(
@@ -110,12 +113,14 @@ class _Cards extends StatelessWidget {
                 // complete a task.
                 BaseElevatedRoundedButton(
                   onPressed: () async {
-                    bool done = await showDialog(
+                    bool? done = await showDialog(
                       context: context,
-                      builder: (_) => _confirmDialog(_,
-                          topic: topic.topic,
-                          description: StringConstants.completeAlert),
-                    );
+                      builder: (_) => _confirmDialog(
+                        _,
+                        title: StringConstants.completeAlert,
+                        assetName: StringConstants.lottieComplete,
+                      ),
+                    ) ?? false;
                     done ? _completeTask() : null;
                   },
                   child: IconConstants.complete,
@@ -123,12 +128,14 @@ class _Cards extends StatelessWidget {
                 // delete a task.
                 BaseElevatedRoundedButton(
                   onPressed: () async {
-                    bool done = await showDialog(
+                    bool? done = await showDialog(
                       context: context,
-                      builder: (_) => _confirmDialog(context,
-                          topic: topic.topic,
-                          description: StringConstants.deleteAlert),
-                    );
+                      builder: (_) => _confirmDialog(
+                        _,
+                        title: StringConstants.deleteAlert,
+                        assetName: StringConstants.lottieDelete,
+                      ),
+                    ) ?? false;
                     done ? _deleteTask() : null;
                   },
                   child: IconConstants.delete,
@@ -202,11 +209,14 @@ class _Cards extends StatelessWidget {
   }
 
   // The Dialog to display for confirmation of delete/completion.
-  BaseCupertinoDialog _confirmDialog(BuildContext context,
-      {required String? topic, required String description}) {
+  BaseCupertinoDialog _confirmDialog(
+    BuildContext context, {
+    required String assetName,
+    required String title,
+  }) {
     return BaseCupertinoDialog(
-      title: StringConstants.areYouSure,
-      description: "$description $topic",
+      title: title,
+      customContent: Lottie.asset(assetName, height: 80, width: 80),
       actions: [
         BaseCupertinoDialogButton(
             color: ColorConstants.primary,

@@ -27,7 +27,7 @@ class Root extends StatelessWidget {
       child: MaterialApp(
         theme: CustomThemeData.themeData,
         onGenerateRoute: RouteGenerator.generate,
-        initialRoute: RouteConstants.homePage,
+        initialRoute: RouteConstants.loginPage,
       ),
     );
   }

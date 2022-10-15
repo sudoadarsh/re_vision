@@ -50,6 +50,9 @@ class _FormState extends State<_Form> {
   // Instance variable to control the toggle of obscure text.
   bool _isVisible = false;
 
+  // To alter between sign-in and log-in.
+  bool loginIn = true;
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -79,6 +82,7 @@ class _FormState extends State<_Form> {
             );
           }),
           SizeConstants.spaceVertical10,
+          // The login button.
           BaseElevatedButton(
             backgroundColor: ColorConstants.loginButton,
             onPressed: () {},
@@ -86,9 +90,46 @@ class _FormState extends State<_Form> {
               StringConstants.login,
               color: ColorConstants.white,
             ),
-          )
+          ),
+          SizeConstants.spaceVertical10,
+          // Text with link.
+          StatefulBuilder(builder: (context, sst) {
+            return Theme(
+              data: ThemeData(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent),
+              child: InkWell(
+                onTap: () {
+                  sst(() {
+                    loginIn = !loginIn;
+                  });
+                },
+                child: loginIn
+                    ? _signLogin(
+                        title: StringConstants.doNotHaveAccount,
+                        link: StringConstants.signIn)
+                    : _signLogin(
+                        title: StringConstants.alreadyHaveAccount,
+                        link: StringConstants.login),
+              ),
+            );
+          })
         ],
       ).paddingDefault(),
+    );
+  }
+
+  // ---------------------------Widget functions--------------------------------
+
+  // The sign-In/ Log-In text with link.
+  Widget _signLogin({required String title, required String link}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        BaseText(title),
+        BaseText(link,
+            color: ColorConstants.link, decoration: TextDecoration.underline),
+      ],
     );
   }
 }
@@ -155,6 +196,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-
 }

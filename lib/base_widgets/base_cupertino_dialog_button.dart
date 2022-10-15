@@ -19,7 +19,8 @@ class BaseCupertinoDialogButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeData(
-        splashColor: Colors.transparent
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent
       ),
       child: InkWell(
         onTap: onTap,

@@ -9,7 +9,7 @@ class BaseText extends StatelessWidget {
     this.fontSize,
     this.overflow,
     this.textAlign,
-    this.fontFamily,
+    this.fontFamily, this.decoration,
   }) : super(key: key);
 
   final String text;
@@ -19,6 +19,7 @@ class BaseText extends StatelessWidget {
   final TextOverflow? overflow;
   final TextAlign? textAlign;
   final String? fontFamily;
+  final TextDecoration? decoration;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +31,7 @@ class BaseText extends StatelessWidget {
         fontSize: fontSize,
         overflow: overflow,
         fontFamily: fontFamily,
+        decoration: decoration,
       ),
       textAlign: textAlign,
     );

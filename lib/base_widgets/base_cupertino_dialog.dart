@@ -6,19 +6,20 @@ class BaseCupertinoDialog extends StatelessWidget {
   const BaseCupertinoDialog({
     Key? key,
     required this.title,
-    required this.description,
-    required this.actions,
+    this.description,
+    required this.actions, this.customContent,
   }) : super(key: key);
 
   final String title;
-  final String description;
+  final String? description;
+  final Widget? customContent;
   final List<Widget> actions;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: BaseText(title),
-      content: BaseText(description),
+      content: customContent ?? BaseText(description ?? ''),
       actionsPadding: const EdgeInsets.only(bottom: 12.0),
       actions: [
         ...actions.map((e) => Column(

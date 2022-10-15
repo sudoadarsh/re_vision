@@ -22,6 +22,8 @@ class StringConstants {
   static const String googlePath = 'images/google.png';
   static const String applePath = 'images/apple.png';
   static const String noFavIcon = 'images/no_favicon.png';
+  static const String lottieComplete = 'lottiefiles/topic_complete.json';
+  static const String lottieDelete = 'lottiefiles/topic_delete.json';
 
 
   // String constants in the login page.
@@ -31,13 +33,14 @@ class StringConstants {
   static const String username = 'Username';
   static const String password = 'Password';
   static const String orContinueWith = 'Or continue with';
+  static const String doNotHaveAccount = "Don't have an account? ";
+  static const String alreadyHaveAccount = 'Already have an account? ';
 
   // String constants in the home page.
   static const String homeTitle = empty;
   static const String tapToSeeMore = 'Tap to see more';
-  static const String areYouSure = 'Are you sure?';
-  static const String completeAlert = 'The following topic will be marked as completed: ';
-  static const String deleteAlert = 'The following topic will be deleted: ';
+  static const String completeAlert = 'Are you sure you want to mark this topic as completed?';
+  static const String deleteAlert = 'Are you sure you want to delete this topic?';
   static const String pleaseEnterATopic = 'Please enter a topic.';
 
 
