@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'base_text.dart';
 
-class BaseAlertDialog extends StatelessWidget {
-  const BaseAlertDialog({
+class BaseSkeletonDialog extends StatelessWidget {
+  const BaseSkeletonDialog({
     Key? key,
     required this.title,
     this.description,

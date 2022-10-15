@@ -13,6 +13,8 @@ class StringConstants {
 
   static const String topicTable = 'topic_table';
 
+  static const String done = 'done';
+
   // Path constants.
   static const String logoPath = 'images/revision.png';
   static const String google = 'google';
@@ -33,6 +35,10 @@ class StringConstants {
   // String constants in the home page.
   static const String homeTitle = empty;
   static const String tapToSeeMore = 'Tap to see more';
+  static const String areYouSure = 'Are you sure?';
+  static const String completeAlert = 'The following topic will be marked as completed: ';
+  static const String deleteAlert = 'The following topic will be deleted: ';
+
 
   // String constants in the topics page.
   static const String addTopic = 'Add topic';
@@ -51,14 +57,14 @@ class StringConstants {
   static const String link = 'link';
 
   static const String deleteAttachment = 'Delete this attachment?';
-  static const String ok = 'OK';
+  static const String ok = 'Okay';
 
   static const String saveArticles = 'Save article(s)';
   static const String separator  = '◈◈◈';
   static const String tapToOpenWeb = 'Tap to open web-view';
   static const String tapToOpenFile = 'Tap to open the file';
 
-  static const String areYouSure = 'Are you sure want to exit?';
+  static const String areYouSureExit = 'Are you sure want to exit?';
   static const String consequences = 'You have unsaved content, and will be lost unless you save it.';
   static const String discard = 'Discard';
 

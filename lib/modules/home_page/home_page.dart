@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:re_vision/base_widgets/base_cupertino_dialog.dart';
+import 'package:re_vision/base_widgets/base_cupertino_dialog_button.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/common_cubit/common__cubit.dart';
 import 'package:re_vision/constants/color_constants.dart';
@@ -37,10 +39,12 @@ class _AppBar extends StatelessWidget with PreferredSizeWidget {
       actions: [
         IconButton(
           onPressed: () {
-            Navigator.of(context).pushNamed(
-              RouteConstants.topicPage,
-              arguments: TopicPageArguments(selectedDay: selectedDay),
-            ).then((value) => databaseCubit.fetchData());
+            Navigator.of(context)
+                .pushNamed(
+                  RouteConstants.topicPage,
+                  arguments: TopicPageArguments(selectedDay: selectedDay),
+                )
+                .then((value) => databaseCubit.fetchData());
           },
           icon: const Icon(Icons.add_circle, color: ColorConstants.white),
         ),
@@ -53,62 +57,193 @@ class _AppBar extends StatelessWidget with PreferredSizeWidget {
 }
 
 class _Cards extends StatelessWidget {
-  const _Cards({Key? key, required this.topic}) : super(key: key);
+  const _Cards(
+      {Key? key,
+      required this.topic,
+      required this.databaseCubit,
+      required this.selectedDay})
+      : super(key: key);
 
   final TopicDm topic;
+  final CommonCubit databaseCubit;
+  final DateTime selectedDay;
 
   static const Widget _divider =
-  Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
+      Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _divider,
-              BaseText(
-                'Level ${topic.iteration}',
-                fontWeight: FontWeight.w300,
-                fontSize: 16.0,
-              ),
-              _divider
-            ],
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          RouteConstants.topicPage,
+          arguments: TopicPageArguments(
+            selectedDay: selectedDay,
+            topicDm: topic,
           ),
-          BaseText(topic.topic ?? ''),
-          const BaseText(
-            StringConstants.tapToSeeMore,
-            fontSize: 12.0,
-            fontWeight: FontWeight.w300,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              BaseElevatedRoundedButton(
-                  onPressed: () {}, child: IconConstants.complete),
-              BaseElevatedRoundedButton(
-                  onPressed: () {}, child: IconConstants.delete)
-            ],
-          )
-        ],
-      ).paddingDefault(),
+        ).then((value) => databaseCubit.fetchData());
+      },
+      child: Card(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                _divider,
+                BaseText(
+                  'Level ${topic.iteration}',
+                  fontWeight: FontWeight.w300,
+                  fontSize: 16.0,
+                ),
+                _divider
+              ],
+            ),
+            BaseText(topic.topic ?? ''),
+            const BaseText(
+              StringConstants.tapToSeeMore,
+              fontSize: 12.0,
+              fontWeight: FontWeight.w300,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // complete a task.
+                BaseElevatedRoundedButton(
+                  onPressed: () async {
+                    bool done = await showDialog(
+                      context: context,
+                      builder: (_) => _confirmDialog(_,
+                          topic: topic.topic,
+                          description: StringConstants.completeAlert),
+                    );
+                    done ? _completeTask() : null;
+                  },
+                  child: IconConstants.complete,
+                ),
+                // delete a task.
+                BaseElevatedRoundedButton(
+                  onPressed: () async {
+                    bool done = await showDialog(
+                      context: context,
+                      builder: (_) => _confirmDialog(context,
+                          topic: topic.topic,
+                          description: StringConstants.deleteAlert),
+                    );
+                    done ? _deleteTask() : null;
+                  },
+                  child: IconConstants.delete,
+                )
+              ],
+            ),
+          ],
+        ).paddingDefault(),
+      ),
+    );
+  }
+
+  // Complete the task.
+  Future<void> _completeTask() async {
+    try {
+      await BaseSqlite.update(
+        tableName: StringConstants.topicTable,
+        data: topic.iteration != 3
+            ? topic.copyWith(
+                iteration: (topic.iteration ?? 0) + 1,
+                scheduledTo: _getDuration(),
+              )
+            : topic.copyWith(scheduledTo: StringConstants.done),
+        where: StringConstants.id,
+        whereArgs: topic.id,
+      );
+      databaseCubit.fetchData();
+    } catch (e) {
+      debugPrint(e.toString());
+      // todo: handle error.
+    }
+  }
+
+  // Delete the task.
+  Future<void> _deleteTask() async {
+    try {
+      await BaseSqlite.delete(
+        tableName: StringConstants.topicTable,
+        where: StringConstants.id,
+        whereArgs: topic.id,
+      );
+      databaseCubit.fetchData();
+    } catch (e) {
+      debugPrint(e.toString());
+      // todo: catch error.
+    }
+  }
+
+  // To get scheduled to time.
+  String _getDuration() {
+    int iteration = topic.iteration ?? 1;
+
+    String returnString;
+
+    switch (iteration) {
+      case 1:
+        returnString = DateTime.parse(topic.scheduledTo!)
+            .add(const Duration(days: 1))
+            .toString();
+        break;
+      case 2:
+        returnString = DateTime.parse(topic.scheduledTo!)
+            .add(const Duration(days: 7))
+            .toString();
+        break;
+      default:
+        returnString = StringConstants.done;
+        break;
+    }
+    return returnString;
+  }
+
+  // The Dialog to display for confirmation of delete/completion.
+  BaseCupertinoDialog _confirmDialog(BuildContext context,
+      {required String? topic, required String description}) {
+    return BaseCupertinoDialog(
+      title: StringConstants.areYouSure,
+      description: "$description $topic",
+      actions: [
+        BaseCupertinoDialogButton(
+            color: ColorConstants.primary,
+            onTap: () {
+              Navigator.of(context).pop(true);
+            },
+            title: StringConstants.ok),
+        BaseCupertinoDialogButton(
+            color: ColorConstants.secondary,
+            onTap: () {
+              Navigator.of(context).pop(false);
+            },
+            title: StringConstants.cancel),
+      ],
     );
   }
 }
 
 class _TopicCards extends StatelessWidget {
   final List<TopicDm> topics;
+  final CommonCubit databaseCubit;
+  final DateTime selectedDay;
 
-  const _TopicCards({required this.topics});
+  const _TopicCards(
+      {required this.topics,
+      required this.databaseCubit,
+      required this.selectedDay});
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: topics.length,
       itemBuilder: (context, index) {
-        return _Cards(topic: topics[index]);
+        return _Cards(
+            topic: topics[index],
+            databaseCubit: databaseCubit,
+            selectedDay: selectedDay);
       },
     );
   }
@@ -153,29 +288,28 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           BaseTableCalendar(
-            selectedDay: _selectedDay,
-            focusedDay: _focusedDay,
-            calendarFormat: _calendarFormat,
-            onDaySelected: (selectedDay, focusedDay) {
-              _selectedDay = selectedDay;
-              _focusedDay = focusedDay;
-              sst();
-            },
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                _calendarFormat = format;
+              selectedDay: _selectedDay,
+              focusedDay: _focusedDay,
+              calendarFormat: _calendarFormat,
+              onDaySelected: (selectedDay, focusedDay) {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
                 sst();
-              }
-            },
-            onPageChanged: (focusedDay) {
-              _focusedDay = focusedDay;
-            },
-            calendarStyle: _calendarStyle,
-            eventLoader: (day) {
-              return filterTopics(day);
-            },
-            calendarBuilders : _calendarBuilders()
-          ),
+              },
+              onFormatChanged: (format) {
+                if (_calendarFormat != format) {
+                  _calendarFormat = format;
+                  sst();
+                }
+              },
+              onPageChanged: (focusedDay) {
+                _focusedDay = focusedDay;
+              },
+              calendarStyle: _calendarStyle,
+              eventLoader: (day) {
+                return filterTopics(day);
+              },
+              calendarBuilders: _calendarBuilders()),
           Flexible(
             child: BlocConsumer(
               bloc: _databaseCubit,
@@ -193,7 +327,11 @@ class _HomePageState extends State<HomePage> {
 
                 // Getting the filtered topics for the day.
                 List<TopicDm> filteredTopics = filterTopics(_selectedDay);
-                return _TopicCards(topics: filteredTopics);
+                return _TopicCards(
+                  topics: filteredTopics,
+                  databaseCubit: _databaseCubit,
+                  selectedDay: _selectedDay,
+                );
               },
             ),
           )
@@ -208,7 +346,7 @@ class _HomePageState extends State<HomePage> {
     selectedDecoration: DecorationConstants.circleShape
         .copyWith(color: ColorConstants.secondary),
     todayDecoration:
-    DecorationConstants.circleShape.copyWith(color: ColorConstants.primary),
+        DecorationConstants.circleShape.copyWith(color: ColorConstants.primary),
     markersAlignment: Alignment.bottomRight,
   );
 
@@ -235,7 +373,7 @@ class _HomePageState extends State<HomePage> {
   List<TopicDm> filterTopics(DateTime date) {
     List<TopicDm> filteredTasks = _topics
         .where((element) =>
-    element.scheduledTo == DateTimeConstants.reformatSelectedDate(date))
+            element.scheduledTo == DateTimeConstants.reformatSelectedDate(date))
         .toList();
     return filteredTasks;
   }
@@ -250,13 +388,12 @@ class _HomePageState extends State<HomePage> {
         ),
         child: events.isNotEmpty
             ? BaseText(
-          events.length.toString(),
-          fontSize: 12.0,
-          color: ColorConstants.secondary,
-        ).paddingAll4()
+                events.length.toString(),
+                fontSize: 12.0,
+                color: ColorConstants.secondary,
+              ).paddingAll4()
             : const SizedBox.shrink(),
       );
     });
   }
-
 }

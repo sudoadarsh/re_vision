@@ -6,7 +6,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:re_vision/base_widgets/base_alert_dialog.dart';
+import 'package:re_vision/base_widgets/base_cupertino_dialog.dart';
+import 'package:re_vision/base_widgets/base_skeleton_dialog.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
 import 'package:re_vision/base_widgets/base_image_builder.dart';
@@ -24,6 +25,7 @@ import 'package:re_vision/state_management/save/save_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../base_sqlite/sqlite_helper.dart';
+import '../../base_widgets/base_cupertino_dialog_button.dart';
 import '../../base_widgets/base_underline_field.dart';
 import '../../models/attachment_dm.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -245,7 +247,22 @@ class _TopicPageState extends State<TopicPage> {
           expandedView: _videoExpanded()),
     ];
 
+    _setInitialData();
+
     super.initState();
+  }
+
+  // For when this page is navigated through by tapping a topic card.
+  void _setInitialData() {
+    if (widget.topicDm != null) {
+      _topicController.text = widget.topicDm?.topic ?? '';
+      List decodedAttachments = jsonDecode(widget.topicDm?.attachments ?? '');
+      List<AttachmentDataDm> attachmentData =
+          decodedAttachments.map((e) => AttachmentDataDm.fromJson(e)).toList();
+      for (var element in attachmentData) {
+        context.read<AttachmentCubit>().addAttachment(element);
+      }
+    }
   }
 
   @override
@@ -351,7 +368,7 @@ class _TopicPageState extends State<TopicPage> {
   Future _pasteLink() async {
     return await showDialog(
       context: context,
-      builder: (context) => const BaseAlertDialog(
+      builder: (context) => const BaseSkeletonDialog(
         title: StringConstants.saveArticles,
         customContent:
             SizedBox(width: double.maxFinite, child: _PasteLinkDropdown()),
@@ -394,25 +411,24 @@ class _TopicPageState extends State<TopicPage> {
         ? true
         : (await showDialog(
               context: context,
-              builder: (context) => BaseAlertDialog(
-                title: StringConstants.areYouSure,
+              builder: (context) => BaseCupertinoDialog(
+                title: StringConstants.areYouSureExit,
                 description: StringConstants.consequences,
                 actions: [
-                  TextButton(
-                    onPressed: () {
+                  BaseCupertinoDialogButton(
+                    title: StringConstants.save,
+                    color: ColorConstants.primary,
+                    onTap: () {
+                      _saveToLocalDatabase();
+                    },
+                  ),
+                  BaseCupertinoDialogButton(
+                    title: StringConstants.discard,
+                    color: ColorConstants.secondary,
+                    onTap: () {
                       Navigator.of(context).pop(true);
                     },
-                    child: const BaseText(StringConstants.discard,
-                        color: ColorConstants.secondary),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      _saveToLocalDatabase();
-                      Navigator.of(context).pop();
-                    },
-                    child: const BaseText(StringConstants.save,
-                        color: ColorConstants.primary),
-                  )
                 ],
               ),
             )) ??
@@ -420,37 +436,66 @@ class _TopicPageState extends State<TopicPage> {
   }
 
   void _saveToLocalDatabase() async {
-    // todo: add condition for empty topic field.
     List<AttachmentDataDm> attachments =
         context.read<AttachmentCubit>().state.data;
     List<Map<String, dynamic>> jsonData =
         attachments.map((e) => e.toJson()).toList();
 
-    // Creating the topic data.
-    final TopicDm data = TopicDm(
-      topic: _topicController.text,
-      attachments: jsonEncode(jsonData),
-      createdAt: widget.selectedDay.toString().replaceAll('Z', ''),
-      scheduledTo: widget.selectedDay.toString().replaceAll('Z', ''),
-      iteration: 1,
-    );
-
-    try {
-      await BaseSqlite.insert(
-        tableName: StringConstants.topicTable,
-        data: data,
+    if (widget.topicDm == null) {
+      // todo: add condition for empty topic field.
+      // Creating the topic data.
+      final TopicDm data = TopicDm(
+        topic: _topicController.text,
+        attachments: jsonEncode(jsonData),
+        createdAt: widget.selectedDay.toString().replaceAll('Z', ''),
+        scheduledTo: widget.selectedDay.toString().replaceAll('Z', ''),
+        iteration: 1,
       );
-      if (!mounted) return;
-      baseSnackBar(context,
-          message: StringConstants.savedSuccessfully,
-          leading: IconConstants.success);
-      Navigator.of(context).pop();
-    } catch (e) {
-      debugPrint(e.toString());
-      baseSnackBar(context,
-          message: StringConstants.errorInSaving,
-          leading: IconConstants.failed);
-      Navigator.of(context).pop();
+
+      try {
+        await BaseSqlite.insert(
+          tableName: StringConstants.topicTable,
+          data: data,
+        );
+        if (!mounted) return;
+        baseSnackBar(context,
+            message: StringConstants.savedSuccessfully,
+            leading: IconConstants.success);
+        Navigator.of(context).pop(true);
+      } catch (e) {
+        debugPrint(e.toString());
+        baseSnackBar(context,
+            message: StringConstants.errorInSaving,
+            leading: IconConstants.failed);
+        Navigator.of(context).pop(true);
+      }
+    } else {
+      // Creating the topic data.
+      final TopicDm? data = widget.topicDm?.copyWith(
+        topic: _topicController.text,
+        attachments: jsonEncode(jsonData),
+      );
+
+      // Updating the database.
+      try {
+        await BaseSqlite.update(
+          tableName: StringConstants.topicTable,
+          data: data ?? TopicDm(),
+          where: StringConstants.id,
+          whereArgs: data?.id,
+        );
+        if (!mounted) return;
+        baseSnackBar(context,
+            message: StringConstants.savedSuccessfully,
+            leading: IconConstants.success);
+        Navigator.of(context).pop(true);
+      } catch (e) {
+        debugPrint(e.toString());
+        baseSnackBar(context,
+            message: StringConstants.errorInSaving,
+            leading: IconConstants.failed);
+        Navigator.of(context).pop(true);
+      }
     }
   }
 }
