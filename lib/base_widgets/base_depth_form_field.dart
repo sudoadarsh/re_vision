@@ -9,7 +9,7 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
     this.suffixIcon,
     this.controller,
     this.maxLines,
-    this.expands, this.focusNode, this.obscureText,
+    this.expands, this.focusNode, this.obscureText, this.validator,
   }) : super(key: key);
 
   final String? hintText;
@@ -21,6 +21,7 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
   final int? maxLines;
   final FocusNode? focusNode;
   final bool? obscureText;
+  final String? Function(String? value)? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +31,7 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
       obscureText: obscureText ?? false,
       controller: controller,
       maxLines: maxLines ?? 1,
+      validator: validator,
       style: Theme.of(context)
           .primaryTextTheme
           .bodyMedium,

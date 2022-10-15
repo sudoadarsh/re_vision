@@ -76,16 +76,27 @@ class _AppBarState extends State<_AppBar> {
 
 // 2. The Topic text field.
 class _TopicField extends StatelessWidget {
-  const _TopicField({Key? key, required this.topicController})
-      : super(key: key);
+  const _TopicField({
+    Key? key,
+    required this.topicController,
+    required this.focusNode,
+  }) : super(key: key);
 
   final TextEditingController topicController;
+  final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
     return BaseTextFormFieldWithDepth(
+      focusNode: focusNode,
       controller: topicController,
       labelText: StringConstants.topicLabel,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return StringConstants.pleaseEnterATopic;
+        }
+        return null;
+      }
     );
   }
 }
@@ -321,6 +332,10 @@ class _TopicPageState extends State<TopicPage> {
     );
   }
 
+  // The form key.
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FocusNode _focusNode = FocusNode();
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -332,32 +347,43 @@ class _TopicPageState extends State<TopicPage> {
               : StringConstants.updateTopic,
           saveCubit: _saveCubit,
           onSaveButtonTap: () {
-            _saveToLocalDatabase();
+            if (_formKey.currentState?.validate() ?? false) {
+              _saveToLocalDatabase();
+            }
           },
         ),
-        body: Column(
-          children: [
-            _TopicField(topicController: _topicController),
-            SizeConstants.spaceVertical20,
-            const _Separator(title: StringConstants.addAttachment),
-            SizeConstants.spaceVertical20,
-            Expanded(
-              child: ListView.separated(
-                itemCount: _list.length,
-                itemBuilder: (context, index) {
-                  return _Attachments(
-                    title: _list[index].title,
-                    leadingIcon: _list[index].leadingIcon,
-                    expandedView: _list[index].expandedView,
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const _Separator(title: StringConstants.separator);
-                },
+        body: GestureDetector(
+          onTap: () {
+            _focusNode.unfocus();
+          },
+          child: Column(
+            children: [
+              Form(
+                key: _formKey,
+                child: _TopicField(
+                    topicController: _topicController, focusNode: _focusNode),
               ),
-            ),
-          ],
-        ).paddingDefault(),
+              SizeConstants.spaceVertical20,
+              const _Separator(title: StringConstants.addAttachment),
+              SizeConstants.spaceVertical20,
+              Expanded(
+                child: ListView.separated(
+                  itemCount: _list.length,
+                  itemBuilder: (context, index) {
+                    return _Attachments(
+                      title: _list[index].title,
+                      leadingIcon: _list[index].leadingIcon,
+                      expandedView: _list[index].expandedView,
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return const _Separator(title: StringConstants.separator);
+                  },
+                ),
+              ),
+            ],
+          ).paddingDefault(),
+        ),
       ),
     );
   }
@@ -419,7 +445,11 @@ class _TopicPageState extends State<TopicPage> {
                     title: StringConstants.save,
                     color: ColorConstants.primary,
                     onTap: () {
-                      _saveToLocalDatabase();
+                      if (_formKey.currentState?.validate() ?? false) {
+                        _saveToLocalDatabase();
+                      } else {
+                        Navigator.of(context).pop();
+                      }
                     },
                   ),
                   BaseCupertinoDialogButton(

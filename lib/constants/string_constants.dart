@@ -38,6 +38,7 @@ class StringConstants {
   static const String areYouSure = 'Are you sure?';
   static const String completeAlert = 'The following topic will be marked as completed: ';
   static const String deleteAlert = 'The following topic will be deleted: ';
+  static const String pleaseEnterATopic = 'Please enter a topic.';
 
 
   // String constants in the topics page.
