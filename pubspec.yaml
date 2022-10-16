@@ -46,6 +46,8 @@ dependencies:
   file_picker: ^5.2.0+1
   open_filex: ^4.1.1
   lottie: ^1.4.3
+  firebase_auth: ^3.11.2
+  google_sign_in: ^5.4.2
 
 dev_dependencies:
   flutter_test:

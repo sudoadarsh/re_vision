@@ -17,13 +17,12 @@ class StringConstants {
 
   // Path constants.
   static const String logoPath = 'images/revision.png';
-  static const String google = 'google';
-  static const String apple = 'apple';
   static const String googlePath = 'images/google.png';
   static const String applePath = 'images/apple.png';
   static const String noFavIcon = 'images/no_favicon.png';
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
+  static const String lottieSign = 'lottiefiles/sign_in.json';
 
 
   // String constants in the login page.
@@ -35,6 +34,10 @@ class StringConstants {
   static const String orContinueWith = 'Or continue with';
   static const String doNotHaveAccount = "Don't have an account? ";
   static const String alreadyHaveAccount = 'Already have an account? ';
+
+  // String constants in the sign-in page.
+  static const String gmail = 'G-mail';
+  static const String apple = 'Apple';
 
   // String constants in the home page.
   static const String homeTitle = empty;

@@ -6,6 +6,7 @@ import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/utils/app_config.dart';
 
 import '../../base_widgets/base_depth_form_field.dart';
@@ -50,9 +51,6 @@ class _FormState extends State<_Form> {
   // Instance variable to control the toggle of obscure text.
   bool _isVisible = false;
 
-  // To alter between sign-in and log-in.
-  bool loginIn = true;
-
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -93,27 +91,18 @@ class _FormState extends State<_Form> {
           ),
           SizeConstants.spaceVertical10,
           // Text with link.
-          StatefulBuilder(builder: (context, sst) {
-            return Theme(
-              data: ThemeData(
-                  splashColor: Colors.transparent,
-                  highlightColor: Colors.transparent),
-              child: InkWell(
-                onTap: () {
-                  sst(() {
-                    loginIn = !loginIn;
-                  });
-                },
-                child: loginIn
-                    ? _signLogin(
-                        title: StringConstants.doNotHaveAccount,
-                        link: StringConstants.signIn)
-                    : _signLogin(
-                        title: StringConstants.alreadyHaveAccount,
-                        link: StringConstants.login),
-              ),
-            );
-          })
+          Theme(
+            data: ThemeData(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent),
+            child: InkWell(
+              onTap: () =>
+                  Navigator.of(context).pushNamed(RouteConstants.signPage),
+              child: _signLogin(
+                  title: StringConstants.doNotHaveAccount,
+                  link: StringConstants.signIn),
+            ),
+          ),
         ],
       ).paddingDefault(),
     );

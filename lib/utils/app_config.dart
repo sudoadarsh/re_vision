@@ -6,4 +6,8 @@ class AppConfig {
         MediaQuery.of(context).padding.top -
         MediaQuery.of(context).padding.bottom;
   }
+
+  static double width(BuildContext context) {
+    return MediaQuery.of(context).size.width;
+  }
 }
