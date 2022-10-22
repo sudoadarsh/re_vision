@@ -6,13 +6,17 @@ class BaseImageBuilder extends StatelessWidget {
   const BaseImageBuilder({
     Key? key,
     required this.url,
-    required this.error, this.height, this.width,
+    required this.error,
+    this.height,
+    this.width, this.borderRadius, this.boxShape,
   }) : super(key: key);
 
   final String url;
   final Widget error;
   final double? height;
   final double? width;
+  final BorderRadius? borderRadius;
+  final BoxShape? boxShape;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +24,11 @@ class BaseImageBuilder extends StatelessWidget {
       imageUrl: url,
       imageBuilder: (context, image) {
         return Container(
-          decoration: BoxDecoration(image: DecorationImage(image: image)),
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            shape: boxShape ?? BoxShape.rectangle,
+            image: DecorationImage(image: image),
+          ),
         );
       },
       placeholder: (context, url) => const CupertinoActivityIndicator(),

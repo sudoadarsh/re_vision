@@ -13,10 +13,10 @@ class CommonCubit extends Cubit<CommonCubitState> {
 
   CommonCubit(this.baseCubitRepo) : super(CommonCubitInitial());
 
-  void fetchData({var data}) async {
+  void fetchData<T>({var data}) async {
     try {
       emit(CommonCubitStateLoading());
-      List fetchedData = await baseCubitRepo.fetchData(data: data);
+      List<T> fetchedData = await baseCubitRepo.fetchData(data: data);
       emit(CommonCubitStateLoaded(data: fetchedData));
     } catch (e) {
       emit(CommonCubitStateError(error: e.toString()));

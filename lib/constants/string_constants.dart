@@ -23,21 +23,23 @@ class StringConstants {
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
   static const String lottieSign = 'lottiefiles/sign_in.json';
+  static const String mainLogo = 'images/revision.png';
 
 
-  // String constants in the login page.
+  // String constants in the login/ sign-in page.
   static const String login = 'Login';
   static const String signIn= "Sign-In";
   static const String appName = 'Re-Vision';
-  static const String username = 'Username';
-  static const String password = 'Password';
-  static const String orContinueWith = 'Or continue with';
   static const String doNotHaveAccount = "Don't have an account? ";
   static const String alreadyHaveAccount = 'Already have an account? ';
+  static const String gmail = 'Goggle';
+  static const String apple = 'Apple ';
+  static const String continueWith = 'Continue with...';
 
-  // String constants in the sign-in page.
-  static const String gmail = 'G-mail';
-  static const String apple = 'Apple';
+  // String constants used in the dashboard.
+  static const String dashboard = 'Dashboard';
+  static const String overview = 'Overview';
+  static const String completedRevision = "Completed Revision(s)";
 
   // String constants in the home page.
   static const String homeTitle = empty;

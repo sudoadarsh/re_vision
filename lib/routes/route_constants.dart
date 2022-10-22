@@ -1,6 +1,6 @@
 class RouteConstants {
-  static const String loginPage = '/';
-  static const String signPage = '/sign';
+  static const String signPage = '/sign_page';
   static const String homePage = '/home_page';
   static const String topicPage = '/topic_page';
+  static const String dashboard = '/';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 
 import '../constants/decoration_constants.dart';
@@ -8,7 +9,8 @@ class BaseSocialButton extends StatelessWidget {
   const BaseSocialButton({
     Key? key,
     required this.icon,
-    required this.title, required this.onPressed,
+    required this.title,
+    required this.onPressed,
   }) : super(key: key);
 
   final Widget icon;
@@ -19,12 +21,18 @@ class BaseSocialButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialButton(
       shape: DecorationConstants.roundedRectangleBorder,
-      color: const Color.fromRGBO(255, 255, 255, 1.0),
+      color: ColorConstants.loginButton,
       elevation: 4.0,
       onPressed: onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: [icon, BaseText(' Continue with $title')],
+        children: [
+          icon,
+          BaseText(
+            '  $title',
+            color: ColorConstants.white,
+          )
+        ],
       ).paddingAll4(),
     ).paddingAll4();
   }

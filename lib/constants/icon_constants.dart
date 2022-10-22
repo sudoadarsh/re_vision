@@ -3,6 +3,10 @@ import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 
 class IconConstants {
+
+  // The main logo.
+  static final Widget mainLogo = Image.asset(StringConstants.mainLogo, scale: 8);
+
   // Icons used in the login page.
   static const Icon username = Icon(
     Icons.person,
@@ -21,6 +25,9 @@ class IconConstants {
       Icon(Icons.visibility, color: ColorConstants.primary);
   static const Icon visibilityOff =
       Icon(Icons.visibility_off, color: ColorConstants.primary);
+
+  // Icons used in the dashboard.
+  static const Icon settings = Icon(Icons.settings);
 
   // Icons used in the home page.
   static const Icon add = Icon(Icons.add, color: ColorConstants.primary);
