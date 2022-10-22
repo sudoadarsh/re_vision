@@ -20,6 +20,8 @@ class StringConstants {
   static const String googlePath = 'images/google.png';
   static const String applePath = 'images/apple.png';
   static const String noFavIcon = 'images/no_favicon.png';
+  static const String star = 'images/star.png';
+
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
   static const String lottieSign = 'lottiefiles/sign_in.json';
@@ -40,7 +42,8 @@ class StringConstants {
   // String constants used in the dashboard.
   static const String dashboard = 'Dashboard';
   static const String overview = 'Overview';
-  static const String completedRevision = "Completed Revision(s)";
+  static const String pending = "Pending Today";
+  static const String stars = 'Stars';
 
   // String constants in the home page.
   static const String homeTitle = empty;

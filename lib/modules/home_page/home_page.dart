@@ -290,6 +290,7 @@ class _HomePageState extends State<HomePage> {
     _databaseCubit.fetchData();
 
     _createDatabase();
+
     super.initState();
   }
 
@@ -314,8 +315,8 @@ class _HomePageState extends State<HomePage> {
                         )
                         .then((value) => _databaseCubit.fetchData());
                   },
-                  icon:
-                      const Icon(Icons.add_circle, color: ColorConstants.white),
+                  icon: const Icon(Icons.add_circle,
+                      color: ColorConstants.primary),
                 ),
               ],
             ),

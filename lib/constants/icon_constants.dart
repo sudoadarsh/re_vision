@@ -33,6 +33,8 @@ class IconConstants {
   static const Icon rising = Icon(Icons.auto_graph_rounded);
   static const Icon todo = Icon(Icons.list_alt_rounded);
 
+  static final Widget star = Image.asset(StringConstants.star);
+
   // Icons used in the home page.
   static const Icon add = Icon(Icons.add, color: ColorConstants.primary);
   static const Icon complete = Icon(Icons.done, color: ColorConstants.primary);

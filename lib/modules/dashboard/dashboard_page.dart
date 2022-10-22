@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:re_vision/base_widgets/base_insta_story.dart';
@@ -64,35 +65,76 @@ class DashBoard extends StatelessWidget {
                 ),
                 _heading(StringConstants.overview),
                 SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 100,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 3,
-                      itemBuilder: (context, state) => Card(
-                        child: SizedBox(
-                          width: 220,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                width: 50,
-                                height: 50,
-                                child: CustomPaint(
-                                  painter: const BaseArcPainter(
-                                    progress: 0.8,
-                                    startColor: ColorConstants.primary,
-                                    endColor: ColorConstants.secondary,
-                                    width: 4.0,
-                                  ),
-                                  child: const BaseText('80%').center(),
-                                ),
-                              ),
-                              SizeConstants.spaceHorizontal5,
-                              const BaseText(StringConstants.completedRevision)
-                            ],
-                          ).paddingDefault(),
+                  child: CarouselSlider.builder(
+                    options: CarouselOptions(
+                      enableInfiniteScroll: false,
+                      enlargeCenterPage: true,
+                      aspectRatio: 16 / 9,
+                      viewportFraction: 0.7,
+                      initialPage: 1,
+                    ),
+                    itemCount: 3,
+                    itemBuilder: (context, itemIndex, pageIndex) => Card(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Row(
+                              children: const [
+                                _divider,
+                                BaseText(
+                                  StringConstants.revision,
+                                  fontWeight: FontWeight.w300,
+                                  fontSize: 16.0,
+                                ),
+                                _divider
+                              ],
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: CustomPaint(
+                                    painter: const BaseArcPainter(
+                                      progress: 0.8,
+                                      startColor: Colors.red,
+                                      endColor: ColorConstants.secondary,
+                                      width: 4.0,
+                                    ),
+                                    child: const BaseText('80%').center(),
+                                  ),
+                                ),
+                                SizeConstants.spaceHorizontal10,
+                                const BaseText(
+                                  StringConstants.pending,
+                                  color: ColorConstants.subtitle,
+                                  fontWeight: FontWeight.w300,
+                                )
+                              ],
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: IconConstants.star,
+                                ),
+                                SizeConstants.spaceHorizontal10,
+                                BaseText(
+                                  StringConstants.stars.padRight(20, ' '),
+                                  color: ColorConstants.subtitle,
+                                  fontWeight: FontWeight.w300,
+                                )
+                              ],
+                            ),
+                          ],
+                        ).paddingDefault(),
                       ),
                     ),
                   ),
@@ -117,7 +159,8 @@ class DashBoard extends StatelessWidget {
                         backgroundColor: ColorConstants.loginButton,
                         child: IconConstants.mainLogo,
                         onPressed: () {
-                          Navigator.of(context).pushNamed(RouteConstants.homePage);
+                          Navigator.of(context)
+                              .pushNamed(RouteConstants.homePage);
                         },
                       ),
                     ),
@@ -170,6 +213,9 @@ class DashBoard extends StatelessWidget {
       ),
     );
   }
+
+  static const Widget _divider =
+      Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
 }
 
 class CustomNavigationPainter extends CustomPainter {
