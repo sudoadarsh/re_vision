@@ -19,7 +19,7 @@ void main() async {
   // Initialise the sharedPref.
   await BaseSharedPrefsSingleton.init();
   // Initialise the google auth.
-  await GoogleAuth.init();
+  await BaseAuth.init();
 
   runApp(const Root());
 }

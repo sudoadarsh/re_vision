@@ -9,6 +9,7 @@ import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/utils/app_config.dart';
 
 import '../../base_widgets/base_arc_painter.dart';
@@ -115,7 +116,9 @@ class DashBoard extends StatelessWidget {
                       child: BaseElevatedRoundedButton(
                         backgroundColor: ColorConstants.loginButton,
                         child: IconConstants.mainLogo,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(RouteConstants.homePage);
+                        },
                       ),
                     ),
                     SizedBox(
@@ -126,23 +129,23 @@ class DashBoard extends StatelessWidget {
                         children: [
                           IconButton(
                             onPressed: () {},
-                            icon: const Icon(Icons.person_rounded),
+                            icon: IconConstants.habits,
                             color: Colors.white,
                           ),
                           IconButton(
                             onPressed: () {},
-                            icon: const Icon(Icons.explore),
+                            icon: IconConstants.todo,
                             color: Colors.white,
                           ),
                           (AppConfig.width(context) * 0.20).separation(false),
                           IconButton(
                             onPressed: () {},
-                            icon: const Icon(Icons.favorite),
+                            icon: IconConstants.lover,
                             color: Colors.white,
                           ),
                           IconButton(
                             onPressed: () {},
-                            icon: const Icon(Icons.auto_graph_rounded),
+                            icon: IconConstants.rising,
                             color: Colors.white,
                           )
                         ],

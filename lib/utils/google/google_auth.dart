@@ -4,17 +4,17 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:re_vision/base_widgets/base_snackbar.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 
-class GoogleAuth {
-  static FirebaseAuth? _firebaseAuth;
+class BaseAuth {
+  static FirebaseAuth? _fireInst;
 
-  /// Initialise the [GoogleAuth] in the main function before using it.
+  /// Initialise the [BaseAuth] in the main function before using it.
   ///
   static Future<FirebaseAuth?> init() async {
-    _firebaseAuth = FirebaseAuth.instance;
-    return _firebaseAuth;
+    _fireInst = FirebaseAuth.instance;
+    return _fireInst;
   }
 
-  /// Sign-in the user with credentials.
+  /// Sign-in the user with credentials. For google.
   static Future<User?> signIn(BuildContext context) async {
     User? user;
 
@@ -35,7 +35,7 @@ class GoogleAuth {
       try {
         // Once signed in, get the user credential.
         final UserCredential? userCredential =
-            await _firebaseAuth?.signInWithCredential(credential);
+            await _fireInst?.signInWithCredential(credential);
         user = userCredential?.user;
       } on FirebaseAuthException catch (e) {
         // ignore: use_build_context_synchronously
@@ -47,6 +47,30 @@ class GoogleAuth {
             message: 'Error occurred using Google Sign-In. Try again.',
             leading: IconConstants.failed);
       }
+    }
+
+    return user;
+  }
+
+  static Future<User?> login(
+    BuildContext context, {
+    required String email,
+    required String password,
+  }) async {
+    User? user;
+    try {
+      final UserCredential? credential = await _fireInst
+          ?.signInWithEmailAndPassword(email: email, password: password);
+      user = credential?.user;
+    } on FirebaseAuthException catch (e) {
+      _firebaseAuthException(e, context);
+    } catch (e) {
+      debugPrint(e.toString());
+      baseSnackBar(
+        context,
+        message: 'Error occurred using Google Sign-In. Try again.',
+        leading: IconConstants.failed,
+      );
     }
 
     return user;

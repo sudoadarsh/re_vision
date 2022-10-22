@@ -24,6 +24,9 @@ class RouteGenerator {
         final args = settings.arguments as TopicPageArguments;
         page = TopicPage(selectedDay: args.selectedDay, topicDm: args.topicDm);
         break;
+      // case RouteConstants.loginPage:
+      //   page = const LoginPage();
+      //   break;
       default:
         page = const Scaffold(
           body: SizedBox.shrink(),

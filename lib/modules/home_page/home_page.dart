@@ -24,38 +24,38 @@ import '../../constants/date_time_constants.dart';
 import '../../constants/decoration_constants.dart';
 import '../../models/schemas.dart';
 
-class _AppBar extends StatelessWidget with PreferredSizeWidget {
-  const _AppBar(
-      {Key? key, required this.selectedDay, required this.databaseCubit})
-      : super(key: key);
-
-  final DateTime selectedDay;
-  final CommonCubit databaseCubit;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      title: const BaseText(StringConstants.empty),
-      backgroundColor: ColorConstants.primary,
-      actions: [
-        IconButton(
-          onPressed: () {
-            Navigator.of(context)
-                .pushNamed(
-                  RouteConstants.topicPage,
-                  arguments: TopicPageArguments(selectedDay: selectedDay),
-                )
-                .then((value) => databaseCubit.fetchData());
-          },
-          icon: const Icon(Icons.add_circle, color: ColorConstants.white),
-        ),
-      ],
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(56.0);
-}
+// class _AppBar extends StatelessWidget with PreferredSizeWidget {
+//   const _AppBar(
+//       {Key? key, required this.selectedDay, required this.databaseCubit})
+//       : super(key: key);
+//
+//   final DateTime selectedDay;
+//   final CommonCubit databaseCubit;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return AppBar(
+//       title: const BaseText(StringConstants.empty),
+//       backgroundColor: ColorConstants.primary,
+//       actions: [
+//         IconButton(
+//           onPressed: () {
+//             Navigator.of(context)
+//                 .pushNamed(
+//                   RouteConstants.topicPage,
+//                   arguments: TopicPageArguments(selectedDay: selectedDay),
+//                 )
+//                 .then((value) => databaseCubit.fetchData());
+//           },
+//           icon: const Icon(Icons.add_circle, color: ColorConstants.white),
+//         ),
+//       ],
+//     );
+//   }
+//
+//   @override
+//   Size get preferredSize => const Size.fromHeight(56.0);
+// }
 
 class _Cards extends StatelessWidget {
   const _Cards(
@@ -114,13 +114,14 @@ class _Cards extends StatelessWidget {
                 BaseElevatedRoundedButton(
                   onPressed: () async {
                     bool? done = await showDialog(
-                      context: context,
-                      builder: (_) => _confirmDialog(
-                        _,
-                        title: StringConstants.completeAlert,
-                        assetName: StringConstants.lottieComplete,
-                      ),
-                    ) ?? false;
+                          context: context,
+                          builder: (_) => _confirmDialog(
+                            _,
+                            title: StringConstants.completeAlert,
+                            assetName: StringConstants.lottieComplete,
+                          ),
+                        ) ??
+                        false;
                     done ? _completeTask() : null;
                   },
                   child: IconConstants.complete,
@@ -129,13 +130,14 @@ class _Cards extends StatelessWidget {
                 BaseElevatedRoundedButton(
                   onPressed: () async {
                     bool? done = await showDialog(
-                      context: context,
-                      builder: (_) => _confirmDialog(
-                        _,
-                        title: StringConstants.deleteAlert,
-                        assetName: StringConstants.lottieDelete,
-                      ),
-                    ) ?? false;
+                          context: context,
+                          builder: (_) => _confirmDialog(
+                            _,
+                            title: StringConstants.deleteAlert,
+                            assetName: StringConstants.lottieDelete,
+                          ),
+                        ) ??
+                        false;
                     done ? _deleteTask() : null;
                   },
                   child: IconConstants.delete,
@@ -294,58 +296,79 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _AppBar(selectedDay: _selectedDay, databaseCubit: _databaseCubit),
-      body: Column(
-        children: [
-          BaseTableCalendar(
-              selectedDay: _selectedDay,
-              focusedDay: _focusedDay,
-              calendarFormat: _calendarFormat,
-              onDaySelected: (selectedDay, focusedDay) {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-                sst();
-              },
-              onFormatChanged: (format) {
-                if (_calendarFormat != format) {
-                  _calendarFormat = format;
-                  sst();
-                }
-              },
-              onPageChanged: (focusedDay) {
-                _focusedDay = focusedDay;
-              },
-              calendarStyle: _calendarStyle,
-              eventLoader: (day) {
-                return filterTopics(day);
-              },
-              calendarBuilders: _calendarBuilders()),
-          Flexible(
-            child: BlocConsumer(
-              bloc: _databaseCubit,
-              listener: (context, state) {
-                if (state is CommonCubitStateLoaded) {
-                  List data = state.data;
-                  _topics = data.map((e) => TopicDm.fromJson(e)).toList();
-                  sst();
-                }
-              },
-              builder: (context, state) {
-                if (state is CommonCubitStateLoading) {
-                  return const CupertinoActivityIndicator().center();
-                }
-
-                // Getting the filtered topics for the day.
-                List<TopicDm> filteredTopics = filterTopics(_selectedDay);
-                return _TopicCards(
-                  topics: filteredTopics,
-                  databaseCubit: _databaseCubit,
-                  selectedDay: _selectedDay,
-                );
-              },
+      // appBar: _AppBar(selectedDay: _selectedDay, databaseCubit: _databaseCubit),
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool isInnerScrolled) {
+          return [
+            SliverAppBar.large(
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              title: const BaseText(StringConstants.revision),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamed(
+                          RouteConstants.topicPage,
+                          arguments:
+                              TopicPageArguments(selectedDay: _selectedDay),
+                        )
+                        .then((value) => _databaseCubit.fetchData());
+                  },
+                  icon:
+                      const Icon(Icons.add_circle, color: ColorConstants.white),
+                ),
+              ],
             ),
-          )
-        ],
+            SliverToBoxAdapter(
+              child: BaseTableCalendar(
+                  selectedDay: _selectedDay,
+                  focusedDay: _focusedDay,
+                  calendarFormat: _calendarFormat,
+                  onDaySelected: (selectedDay, focusedDay) {
+                    _selectedDay = selectedDay;
+                    _focusedDay = focusedDay;
+                    sst();
+                  },
+                  onFormatChanged: (format) {
+                    if (_calendarFormat != format) {
+                      _calendarFormat = format;
+                      sst();
+                    }
+                  },
+                  onPageChanged: (focusedDay) {
+                    _focusedDay = focusedDay;
+                  },
+                  calendarStyle: _calendarStyle,
+                  eventLoader: (day) {
+                    return filterTopics(day);
+                  },
+                  calendarBuilders: _calendarBuilders()),
+            ),
+          ];
+        },
+        body: BlocConsumer(
+          bloc: _databaseCubit,
+          listener: (context, state) {
+            if (state is CommonCubitStateLoaded) {
+              List data = state.data;
+              _topics = data.map((e) => TopicDm.fromJson(e)).toList();
+              sst();
+            }
+          },
+          builder: (context, state) {
+            if (state is CommonCubitStateLoading) {
+              return const CupertinoActivityIndicator().center();
+            }
+
+            // Getting the filtered topics for the day.
+            List<TopicDm> filteredTopics = filterTopics(_selectedDay);
+            return _TopicCards(
+              topics: filteredTopics,
+              databaseCubit: _databaseCubit,
+              selectedDay: _selectedDay,
+            );
+          },
+        ),
       ),
     );
   }

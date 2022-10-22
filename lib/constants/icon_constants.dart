@@ -5,10 +5,10 @@ import 'package:re_vision/constants/string_constants.dart';
 class IconConstants {
 
   // The main logo.
-  static final Widget mainLogo = Image.asset(StringConstants.mainLogo, scale: 8);
+  static final Widget mainLogo = Image.asset(StringConstants.logoPath, scale: 8);
 
   // Icons used in the login page.
-  static const Icon username = Icon(
+  static const Icon user = Icon(
     Icons.person,
     color: ColorConstants.primary,
   );
@@ -28,6 +28,10 @@ class IconConstants {
 
   // Icons used in the dashboard.
   static const Icon settings = Icon(Icons.settings);
+  static const Icon habits = Icon(Icons.event_repeat);
+  static const Icon lover = Icon(Icons.favorite);
+  static const Icon rising = Icon(Icons.auto_graph_rounded);
+  static const Icon todo = Icon(Icons.list_alt_rounded);
 
   // Icons used in the home page.
   static const Icon add = Icon(Icons.add, color: ColorConstants.primary);

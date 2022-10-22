@@ -20,7 +20,6 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +36,7 @@ class _SignInPageState extends State<SignInPage> {
           Lottie.asset(StringConstants.lottieSign,
               height: AppConfig.height(context) * 0.5),
           const BaseText(
-            StringConstants.continueWith,
+            StringConstants.welcome,
             fontWeight: FontWeight.w300,
             fontSize: 20.0,
             textAlign: TextAlign.center,
@@ -45,9 +44,14 @@ class _SignInPageState extends State<SignInPage> {
           const _GoogleSingInButton(),
           BaseSocialButton(
             icon: IconConstants.apple,
-            title: StringConstants.apple,
+            title: StringConstants.continueWithApple,
             onPressed: () {},
           ),
+          // const LinkToPage(
+          //   title: StringConstants.alreadyHaveAccount,
+          //   pageName: StringConstants.login,
+          //   route: RouteConstants.loginPage,
+          // ),
         ],
       ).paddingHorizontal8(),
     );
@@ -63,7 +67,6 @@ class _GoogleSingInButton extends StatefulWidget {
 }
 
 class _GoogleSingInButtonState extends State<_GoogleSingInButton> {
-
   @override
   void initState() {
     super.initState();
@@ -98,7 +101,7 @@ class _GoogleSingInButtonState extends State<_GoogleSingInButton> {
         // Button to login in with google.
         return BaseSocialButton(
           icon: IconConstants.google,
-          title: StringConstants.gmail,
+          title: StringConstants.continueWithGoogle,
           onPressed: () {
             _googleCubit.fetchData(data: context);
           },

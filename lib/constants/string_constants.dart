@@ -23,7 +23,6 @@ class StringConstants {
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
   static const String lottieSign = 'lottiefiles/sign_in.json';
-  static const String mainLogo = 'images/revision.png';
 
 
   // String constants in the login/ sign-in page.
@@ -31,10 +30,12 @@ class StringConstants {
   static const String signIn= "Sign-In";
   static const String appName = 'Re-Vision';
   static const String doNotHaveAccount = "Don't have an account? ";
-  static const String alreadyHaveAccount = 'Already have an account? ';
-  static const String gmail = 'Goggle';
-  static const String apple = 'Apple ';
-  static const String continueWith = 'Continue with...';
+  static const String alreadyHaveAccount = 'Already have an account?';
+  static const String continueWithGoogle = 'Continue with Goggle';
+  static const String emailOrAppleId = 'Email or Apple Id';
+  static const String password = 'Password';
+  static const String continueWithApple = 'Continue with Apple ';
+  static const String welcome = 'Welcome...';
 
   // String constants used in the dashboard.
   static const String dashboard = 'Dashboard';
@@ -47,6 +48,7 @@ class StringConstants {
   static const String completeAlert = 'Are you sure you want to mark this topic as completed?';
   static const String deleteAlert = 'Are you sure you want to delete this topic?';
   static const String pleaseEnterATopic = 'Please enter a topic.';
+  static const String revision = "Revision";
 
 
   // String constants in the topics page.

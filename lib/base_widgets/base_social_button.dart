@@ -30,7 +30,9 @@ class BaseSocialButton extends StatelessWidget {
           icon,
           BaseText(
             '  $title',
-            color: ColorConstants.white,
+            color: Colors.white,
+            fontSize: 16.0,
+            fontWeight: FontWeight.w400,
           )
         ],
       ).paddingAll4(),
