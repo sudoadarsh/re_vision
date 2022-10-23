@@ -58,8 +58,9 @@ class StringConstants {
   static const String addTopic = 'Add topic';
   static const String updateTopic = 'Update Topic';
   static const String topicLabel = 'Topic';
-  static const String addAttachment = 'Add Attachments';
+  static const String addAttachment = 'Attachments';
   static const String selectAttachmentType = 'Select Attachment Type';
+  static const String note = 'Note';
 
   static const String article = 'Article';
   static const String pdf = 'Documents';

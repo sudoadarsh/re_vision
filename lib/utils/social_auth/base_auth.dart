@@ -7,6 +7,11 @@ import 'package:re_vision/constants/icon_constants.dart';
 class BaseAuth {
   static FirebaseAuth? _fireInst;
 
+  /// Gets a app wide reference for the currently logged in user.
+  static currentUser() {
+    return _fireInst!.currentUser;
+  }
+
   /// Initialise the [BaseAuth] in the main function before using it.
   ///
   static Future<FirebaseAuth?> init() async {

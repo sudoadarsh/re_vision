@@ -8,6 +8,9 @@ extension WidgetEx on Widget {
   Widget paddingAll4() =>
       Padding(padding: const EdgeInsets.all(4.0), child: this);
 
+  Widget paddingVertical8() =>
+      Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: this);
+
   Widget paddingHorizontal8() =>
       Padding(padding: const EdgeInsets.all(8.0), child: this);
 
@@ -21,7 +24,10 @@ extension WidgetEx on Widget {
           {double? top, double? bottom, double? left, double? right}) =>
       Padding(
           padding: EdgeInsets.only(
-              top: top ?? 0.0, bottom: bottom ?? 0.0, right: right ?? 0.0, left: left ?? 0.0),
+              top: top ?? 0.0,
+              bottom: bottom ?? 0.0,
+              right: right ?? 0.0,
+              left: left ?? 0.0),
           child: this);
 
   // Center a widget.

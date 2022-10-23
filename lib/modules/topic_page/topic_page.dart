@@ -5,6 +5,8 @@ import 'package:favicon/favicon.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/extensions.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:re_vision/base_widgets/base_cupertino_dialog.dart';
 import 'package:re_vision/base_widgets/base_skeleton_dialog.dart';
@@ -88,16 +90,15 @@ class _TopicField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseTextFormFieldWithDepth(
-      focusNode: focusNode,
-      controller: topicController,
-      labelText: StringConstants.topicLabel,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return StringConstants.pleaseEnterATopic;
-        }
-        return null;
-      }
-    );
+        focusNode: focusNode,
+        controller: topicController,
+        labelText: StringConstants.topicLabel,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return StringConstants.pleaseEnterATopic;
+          }
+          return null;
+        });
   }
 }
 
@@ -209,6 +210,61 @@ class _ExpandedView extends StatelessWidget {
   }
 }
 
+/// The note editor from package flutter_quill.
+class _NoteEditor extends StatefulWidget {
+  const _NoteEditor({Key? key, required this.qc}) : super(key: key);
+
+  final QuillController qc;
+
+  @override
+  State<_NoteEditor> createState() => _NoteEditorState();
+}
+
+class _NoteEditorState extends State<_NoteEditor> {
+  // The quill controller.
+  QuillController get _qc => widget.qc;
+
+  // Focus node for the editor.
+  late final FocusNode _fNode;
+
+  @override
+  void initState() {
+    super.initState();
+    _fNode = FocusNode();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          QuillToolbar.basic(controller: _qc),
+          Expanded(
+            child: Card(
+              child: QuillEditor(
+                controller: _qc,
+                scrollController: ScrollController(),
+                scrollable: true,
+                focusNode: _fNode,
+                autoFocus: false,
+                readOnly: false,
+                placeholder: 'Add Note',
+                enableSelectionToolbar: isMobile(),
+                expands: true,
+                padding: const EdgeInsets.all(8.0),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Enum to control the current tab.
+enum _TopicEnum { attachment, notes }
+
 class TopicPage extends StatefulWidget {
   const TopicPage({
     Key? key,
@@ -230,12 +286,19 @@ class _TopicPageState extends State<TopicPage> {
   // 1. Controller for the topic field.
   late final TextEditingController _topicController;
 
+  // The quill controller.
+  late final QuillController _qc;
+
   // 2. The list of Attachment types.
   late final List<AttachmentDm> _list;
+
+  // The current tab.
+  _TopicEnum _currentTab = _TopicEnum.notes;
 
   @override
   void initState() {
     _topicController = TextEditingController();
+    _qc = QuillController.basic();
 
     _saveCubit = SaveCubit();
 
@@ -279,6 +342,7 @@ class _TopicPageState extends State<TopicPage> {
   @override
   void dispose() {
     _topicController.dispose();
+    _qc.dispose();
     _saveCubit.close();
     super.dispose();
   }
@@ -364,23 +428,68 @@ class _TopicPageState extends State<TopicPage> {
                     topicController: _topicController, focusNode: _focusNode),
               ),
               SizeConstants.spaceVertical20,
-              const _Separator(title: StringConstants.addAttachment),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _currentTab == _TopicEnum.attachment
+                            ? null
+                            : ColorConstants.primary,
+                      ),
+                      onPressed: () {
+                        _currentTab = _TopicEnum.notes;
+                        setState(() {});
+                      },
+                      child: BaseText(
+                        StringConstants.note,
+                        color: _currentTab == _TopicEnum.attachment
+                            ? null
+                            : Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizeConstants.spaceHorizontal5,
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _currentTab == _TopicEnum.attachment
+                            ? ColorConstants.primary
+                            : null,
+                      ),
+                      onPressed: () {
+                        _currentTab = _TopicEnum.attachment;
+                        setState(() {});
+                      },
+                      child: BaseText(
+                        StringConstants.addAttachment,
+                        color: _currentTab == _TopicEnum.attachment
+                            ? Colors.white
+                            : null,
+                      ),
+                    ),
+                  ),
+                ],
+              ).paddingHorizontal8(),
               SizeConstants.spaceVertical20,
-              Expanded(
-                child: ListView.separated(
-                  itemCount: _list.length,
-                  itemBuilder: (context, index) {
-                    return _Attachments(
-                      title: _list[index].title,
-                      leadingIcon: _list[index].leadingIcon,
-                      expandedView: _list[index].expandedView,
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return const _Separator(title: StringConstants.separator);
-                  },
-                ),
-              ),
+              _currentTab == _TopicEnum.attachment
+                  ? Expanded(
+                      child: ListView.separated(
+                        itemCount: _list.length,
+                        itemBuilder: (context, index) {
+                          return _Attachments(
+                            title: _list[index].title,
+                            leadingIcon: _list[index].leadingIcon,
+                            expandedView: _list[index].expandedView,
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return const _Separator(
+                              title: StringConstants.separator);
+                        },
+                      ),
+                    )
+                  : _NoteEditor(qc: _qc),
             ],
           ).paddingDefault(),
         ),

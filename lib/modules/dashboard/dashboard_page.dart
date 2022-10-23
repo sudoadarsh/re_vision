@@ -61,7 +61,7 @@ class DashBoard extends StatelessWidget {
                         );
                       },
                     ),
-                  ).paddingTop8(),
+                  ).paddingOnly(top: 8.0, left: 14.0),
                 ),
                 _heading(StringConstants.overview),
                 SliverToBoxAdapter(
@@ -75,6 +75,7 @@ class DashBoard extends StatelessWidget {
                     ),
                     itemCount: 3,
                     itemBuilder: (context, itemIndex, pageIndex) => Card(
+                      elevation: 4.0,
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.0),
@@ -140,7 +141,7 @@ class DashBoard extends StatelessWidget {
                   ),
                 ),
               ],
-            ).paddingOnly(left: 8.0),
+            ),
             Positioned(
               left: 0,
               bottom: 0,
@@ -207,7 +208,7 @@ class DashBoard extends StatelessWidget {
   // -----------------------Functions-------------------------------------------
   SliverPadding _heading(String title) {
     return SliverPadding(
-      padding: const EdgeInsets.only(top: 25.0, bottom: 8.0),
+      padding: const EdgeInsets.only(top: 25.0, bottom: 8.0, left: 16.0),
       sliver: SliverToBoxAdapter(
         child: BaseText(title, fontSize: 20.0, fontWeight: FontWeight.w300),
       ),

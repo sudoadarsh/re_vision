@@ -6,8 +6,9 @@ import 'package:re_vision/base_sqlite/sqlite_helper.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/routes/route_generator.dart';
 import 'package:re_vision/state_management/attachment/attachment_cubit.dart';
+import 'package:re_vision/utils/cloud/base_cloud.dart';
 import 'package:re_vision/utils/custom_theme_data.dart';
-import 'package:re_vision/utils/google/google_auth.dart';
+import 'package:re_vision/utils/social_auth/base_auth.dart';
 
 
 void main() async {
@@ -20,6 +21,8 @@ void main() async {
   await BaseSharedPrefsSingleton.init();
   // Initialise the google auth.
   await BaseAuth.init();
+  // Initialise the firebase cloud.
+  BaseCloud.init();
 
   runApp(const Root());
 }

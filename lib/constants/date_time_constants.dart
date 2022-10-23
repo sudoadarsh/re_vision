@@ -29,4 +29,7 @@ class DateTimeConstants {
       return false;
     }
   }
+
+  /// Constant duration of 500 ms.
+  static const Duration cd500 = Duration(milliseconds: 500);
 }

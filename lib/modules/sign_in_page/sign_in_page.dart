@@ -6,8 +6,11 @@ import 'package:re_vision/base_widgets/base_social_button.dart';
 import 'package:re_vision/common_button_cubit/common_button_cubit.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/models/user_dm.dart';
 import 'package:re_vision/state_management/sign_in/sign_in_repo.dart';
 import 'package:re_vision/utils/app_config.dart';
+import 'package:re_vision/utils/cloud/base_cloud.dart';
+import 'package:re_vision/utils/cloud/cloud_constants.dart';
 
 import '../../base_widgets/base_text.dart';
 import '../../constants/icon_constants.dart';
@@ -94,7 +97,10 @@ class _GoogleSingInButtonState extends State<_GoogleSingInButton> {
 
           if (user != null) {
             // Navigate to dashboard.
-            // print(user.displayName);
+            // todo: maybe add app singleton here.
+
+            // Save user data to the database.
+            saveUserToCloud(user);
           }
         }
 
@@ -107,6 +113,21 @@ class _GoogleSingInButtonState extends State<_GoogleSingInButton> {
           },
         );
       },
+    );
+  }
+
+  Future<void> saveUserToCloud(User user) async {
+
+    // Modelling the data.
+    UserDm dataToSave = UserDm(
+      name: user.displayName,
+      profilePic: user.photoURL
+    );
+
+    BaseCloud.create(
+      collection: CloudConstants.usersCollection,
+      document: user.uid,
+      data: dataToSave.toJson(),
     );
   }
 }
