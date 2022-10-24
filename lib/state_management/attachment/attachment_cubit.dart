@@ -18,4 +18,8 @@ class AttachmentCubit extends Cubit<AttachmentState> {
     List<AttachmentDataDm> modified = state.data.where((element) => element.data != newData.data).toList();
     emit (AttachmentState(data: modified));
   }
+
+  void clear() {
+    emit (AttachmentState(data: []));
+  }
 }

@@ -297,8 +297,10 @@ class _TopicPageState extends State<TopicPage> {
 
   @override
   void initState() {
+
     _topicController = TextEditingController();
-    _qc = QuillController.basic();
+
+    _setInitialData();
 
     _saveCubit = SaveCubit();
 
@@ -321,14 +323,17 @@ class _TopicPageState extends State<TopicPage> {
           expandedView: _videoExpanded()),
     ];
 
-    _setInitialData();
-
     super.initState();
   }
 
   // For when this page is navigated through by tapping a topic card.
   void _setInitialData() {
+
+    context.read<AttachmentCubit>().clear();
+
     if (widget.topicDm != null) {
+      // todo: add try and catch block.
+      // Setting the topic and the attachments.
       _topicController.text = widget.topicDm?.topic ?? '';
       List decodedAttachments = jsonDecode(widget.topicDm?.attachments ?? '');
       List<AttachmentDataDm> attachmentData =
@@ -336,6 +341,15 @@ class _TopicPageState extends State<TopicPage> {
       for (var element in attachmentData) {
         context.read<AttachmentCubit>().addAttachment(element);
       }
+
+      // Setting up the notes.
+      List<dynamic> quillData = jsonDecode(widget.topicDm?.notes ?? '');
+      _qc = QuillController(
+        document: Document.fromJson(quillData),
+        selection: const TextSelection.collapsed(offset: 0),
+      );
+    } else {
+      _qc = QuillController.basic();
     }
   }
 
@@ -458,6 +472,7 @@ class _TopicPageState extends State<TopicPage> {
                             : null,
                       ),
                       onPressed: () {
+                        FocusManager.instance.primaryFocus?.unfocus();
                         _currentTab = _TopicEnum.attachment;
                         setState(() {});
                       },
@@ -575,10 +590,14 @@ class _TopicPageState extends State<TopicPage> {
   }
 
   void _saveToLocalDatabase() async {
+    // Mapping the attachments.
     List<AttachmentDataDm> attachments =
         context.read<AttachmentCubit>().state.data;
     List<Map<String, dynamic>> jsonData =
         attachments.map((e) => e.toJson()).toList();
+
+    // Mapping the notes.
+    List<dynamic> jsonQuill = _qc.document.toDelta().toJson();
 
     if (widget.topicDm == null) {
       // todo: add condition for empty topic field.
@@ -586,6 +605,7 @@ class _TopicPageState extends State<TopicPage> {
       final TopicDm data = TopicDm(
         topic: _topicController.text,
         attachments: jsonEncode(jsonData),
+        notes: jsonEncode(jsonQuill),
         createdAt: widget.selectedDay.toString().replaceAll('Z', ''),
         scheduledTo: widget.selectedDay.toString().replaceAll('Z', ''),
         iteration: 1,
@@ -611,9 +631,9 @@ class _TopicPageState extends State<TopicPage> {
     } else {
       // Creating the topic data.
       final TopicDm? data = widget.topicDm?.copyWith(
-        topic: _topicController.text,
-        attachments: jsonEncode(jsonData),
-      );
+          topic: _topicController.text,
+          attachments: jsonEncode(jsonData),
+          notes: jsonEncode(jsonQuill));
 
       // Updating the database.
       try {
@@ -636,6 +656,10 @@ class _TopicPageState extends State<TopicPage> {
         Navigator.of(context).pop(true);
       }
     }
+
+    // Clearing the cubit.
+    if (!mounted) return;
+    context.read<AttachmentCubit>().clear();
   }
 }
 

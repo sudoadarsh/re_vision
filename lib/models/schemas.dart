@@ -21,6 +21,9 @@ class Schemas {
       /// The attachment column.
       DbColumn(columnName: StringConstants.attachments, datatype: DbDataType.text),
 
+      /// The attachment column.
+      DbColumn(columnName: StringConstants.notes, datatype: DbDataType.text),
+
       /// The created at column. This will store the time at which the task was
       /// first created.
       DbColumn(

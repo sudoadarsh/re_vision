@@ -6,6 +6,7 @@ class StringConstants {
   static const String id = 'id';
   static const String topic = 'topic';
   static const String attachments = 'attachments';
+  static const String notes = "notes";
   static const String createdAt = 'created_at';
   static const String scheduledTo = 'scheduled_to';
   static const String iteration = 'iteration';
