@@ -3,6 +3,6 @@ import 'package:re_vision/constants/string_constants.dart';
 
 class TopicProvider {
   Future readFromDatabase() async {
-    return BaseSqlite.selectWithoutArgs(tableName: StringConstants.topicTable);
+    return BaseSqlite.selectWithoutArgs(tableName: StringC.topicTable);
   }
 }

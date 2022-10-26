@@ -1,6 +1,12 @@
 import 'package:flutter/cupertino.dart';
 
 class DecorationConstants {
+
+  /// Gives rounded border radius. Passed to [borderRadius].
+  static BorderRadius roundedBorderRadius(double radius) {
+    return BorderRadius.all(Radius.circular(radius));
+  }
+
   /// Gives circle shape to the widget.
   static const BoxDecoration circleShape =
       BoxDecoration(shape: BoxShape.circle);
@@ -28,4 +34,19 @@ class DecorationConstants {
       RoundedRectangleBorder(
     borderRadius: BorderRadius.all(Radius.circular(10.0)),
   );
+
+  /// Gives depth effect to the widget. Is passed to parameter [BoxShadow].
+  static List<BoxShadow> depthEffect(double spreadRadius, double blurRadius,
+      {required Color shadowColor, required Color backgroundColor}) {
+    return [
+      BoxShadow(
+        color: shadowColor,
+      ),
+      BoxShadow(
+        color: backgroundColor,
+        spreadRadius: spreadRadius,
+        blurRadius: blurRadius,
+      ),
+    ];
+  }
 }

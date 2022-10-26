@@ -1,12 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'package:re_vision/base_shared_prefs/base_shared_prefs.dart';
 import 'package:re_vision/base_widgets/base_social_button.dart';
 import 'package:re_vision/common_button_cubit/common_button_cubit.dart';
+import 'package:re_vision/common_cubit/common__cubit.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/user_dm.dart';
+import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/state_management/sign_in/sign_in_repo.dart';
 import 'package:re_vision/utils/app_config.dart';
 import 'package:re_vision/utils/cloud/base_cloud.dart';
@@ -31,23 +35,23 @@ class _SignInPageState extends State<SignInPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const BaseText(
-            StringConstants.appName,
+            StringC.appName,
             fontWeight: FontWeight.w300,
             fontSize: 34.0,
             textAlign: TextAlign.center,
           ),
-          Lottie.asset(StringConstants.lottieSign,
+          Lottie.asset(StringC.lottieSign,
               height: AppConfig.height(context) * 0.5),
           const BaseText(
-            StringConstants.welcome,
+            StringC.welcome,
             fontWeight: FontWeight.w300,
             fontSize: 20.0,
             textAlign: TextAlign.center,
           ),
           const _GoogleSingInButton(),
           BaseSocialButton(
-            icon: IconConstants.apple,
-            title: StringConstants.continueWithApple,
+            icon: IconC.apple,
+            title: StringC.continueWithApple,
             onPressed: () {},
           ),
           // const LinkToPage(
@@ -89,25 +93,33 @@ class _GoogleSingInButtonState extends State<_GoogleSingInButton> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder(
+    return BlocConsumer(
       bloc: _googleCubit,
-      builder: (context, state) {
+      listener: (context, state) {
         if (state is CommonButtonSuccess) {
           User? user = state.data;
 
           if (user != null) {
-            // Navigate to dashboard.
-            // todo: maybe add app singleton here.
-
             // Save user data to the database.
             saveUserToCloud(user);
+            // Save the auth state.
+            BaseSharedPrefsSingleton.setValue("auth", 1);
+            // Navigate to dashboard.
+            Navigator.of(context).pushNamed(RouteConstants.dashboard);
           }
+        }
+      },
+      builder: (context, state) {
+
+        // Loading.
+        if (state is CommonCubitStateLoading) {
+          return const CupertinoActivityIndicator().center();
         }
 
         // Button to login in with google.
         return BaseSocialButton(
-          icon: IconConstants.google,
-          title: StringConstants.continueWithGoogle,
+          icon: IconC.google,
+          title: StringC.continueWithGoogle,
           onPressed: () {
             _googleCubit.fetchData(data: context);
           },
@@ -119,7 +131,7 @@ class _GoogleSingInButtonState extends State<_GoogleSingInButton> {
   Future<void> saveUserToCloud(User user) async {
 
     // Modelling the data.
-    UserDm dataToSave = UserDm(
+    UserFBDm dataToSave = UserFBDm(
       name: user.displayName,
       profilePic: user.photoURL
     );

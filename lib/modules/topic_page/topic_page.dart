@@ -9,6 +9,7 @@ import 'package:flutter_quill/extensions.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:re_vision/base_widgets/base_cupertino_dialog.dart';
+import 'package:re_vision/base_widgets/base_separator.dart';
 import 'package:re_vision/base_widgets/base_skeleton_dialog.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
@@ -16,6 +17,7 @@ import 'package:re_vision/base_widgets/base_image_builder.dart';
 import 'package:re_vision/base_widgets/base_snackbar.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
+import 'package:re_vision/constants/decoration_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
@@ -28,6 +30,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../base_sqlite/sqlite_helper.dart';
 import '../../base_widgets/base_cupertino_dialog_button.dart';
+import '../../base_widgets/base_elevated_button.dart';
 import '../../base_widgets/base_underline_field.dart';
 import '../../models/attachment_dm.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -58,7 +61,7 @@ class _AppBarState extends State<_AppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: ColorConstants.button,
+      backgroundColor: ColorC.button,
       title: BaseText(widget.title),
       actions: [
         TextButton(
@@ -66,8 +69,8 @@ class _AppBarState extends State<_AppBar> {
           child: BlocBuilder<SaveCubit, SaveState>(
             bloc: widget.saveCubit,
             builder: (context, state) {
-              return BaseText(StringConstants.save,
-                  color: state.isSaved ? ColorConstants.primary : null);
+              return BaseText(StringC.save,
+                  color: state.isSaved ? ColorC.primary : null);
             },
           ),
         ),
@@ -92,36 +95,17 @@ class _TopicField extends StatelessWidget {
     return BaseTextFormFieldWithDepth(
         focusNode: focusNode,
         controller: topicController,
-        labelText: StringConstants.topicLabel,
+        labelText: StringC.topicLabel,
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return StringConstants.pleaseEnterATopic;
+            return StringC.pleaseEnterATopic;
           }
           return null;
         });
   }
 }
 
-// 3. Separator widget.
-class _Separator extends StatelessWidget {
-  const _Separator({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  static const Widget _divider =
-      Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _divider,
-        BaseText(title),
-        _divider,
-      ],
-    );
-  }
-}
+// 3. Separator widget. (moved to base class).
 
 // 4. To add attachments.
 class _Attachments extends StatefulWidget {
@@ -160,7 +144,7 @@ class _AttachmentsState extends State<_Attachments> {
                 leading: widget.leadingIcon,
                 title: BaseText(widget.title),
                 trailing:
-                    !_expand ? IconConstants.expand : IconConstants.collapse,
+                    !_expand ? IconC.expand : IconC.collapse,
               ),
             ),
             BaseExpandedSection(expand: _expand, child: widget.expandedView)
@@ -194,7 +178,7 @@ class _ExpandedView extends StatelessWidget {
         }),
         IconButton(
           onPressed: add,
-          icon: IconConstants.add,
+          icon: IconC.add,
         ).center(),
       ],
     );
@@ -241,7 +225,13 @@ class _NoteEditorState extends State<_NoteEditor> {
         children: [
           QuillToolbar.basic(controller: _qc),
           Expanded(
-            child: Card(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: DecorationConstants.roundedBorderRadius(10.0),
+                boxShadow: DecorationConstants.depthEffect(-4.0, 3.0,
+                    shadowColor: ColorC.shadowColor,
+                    backgroundColor: Theme.of(context).scaffoldBackgroundColor),
+              ),
               child: QuillEditor(
                 controller: _qc,
                 scrollController: ScrollController(),
@@ -297,7 +287,6 @@ class _TopicPageState extends State<TopicPage> {
 
   @override
   void initState() {
-
     _topicController = TextEditingController();
 
     _setInitialData();
@@ -306,20 +295,20 @@ class _TopicPageState extends State<TopicPage> {
 
     _list = [
       AttachmentDm(
-          title: StringConstants.article,
-          leadingIcon: IconConstants.article,
+          title: StringC.article,
+          leadingIcon: IconC.article,
           expandedView: _articleExpanded()),
       AttachmentDm(
-          title: StringConstants.image,
-          leadingIcon: IconConstants.image,
+          title: StringC.image,
+          leadingIcon: IconC.image,
           expandedView: _imageExpanded()),
       AttachmentDm(
-          title: StringConstants.pdf,
-          leadingIcon: IconConstants.pdf,
+          title: StringC.pdf,
+          leadingIcon: IconC.pdf,
           expandedView: _pdfExpanded()),
       AttachmentDm(
-          title: StringConstants.video,
-          leadingIcon: IconConstants.video,
+          title: StringC.video,
+          leadingIcon: IconC.video,
           expandedView: _videoExpanded()),
     ];
 
@@ -328,7 +317,6 @@ class _TopicPageState extends State<TopicPage> {
 
   // For when this page is navigated through by tapping a topic card.
   void _setInitialData() {
-
     context.read<AttachmentCubit>().clear();
 
     if (widget.topicDm != null) {
@@ -420,9 +408,8 @@ class _TopicPageState extends State<TopicPage> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: _AppBar(
-          title: widget.topicDm == null
-              ? StringConstants.addTopic
-              : StringConstants.updateTopic,
+          title:
+              widget.topicDm == null ? StringC.addTopic : StringC.updateTopic,
           saveCubit: _saveCubit,
           onSaveButtonTap: () {
             if (_formKey.currentState?.validate() ?? false) {
@@ -441,43 +428,41 @@ class _TopicPageState extends State<TopicPage> {
                 child: _TopicField(
                     topicController: _topicController, focusNode: _focusNode),
               ),
-              SizeConstants.spaceVertical20,
+              SizeC.spaceVertical20,
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _currentTab == _TopicEnum.attachment
-                            ? null
-                            : ColorConstants.primary,
-                      ),
+                    child: BaseElevatedButton(
+                      size: const Size.fromHeight(40.0),
+                      backgroundColor: _currentTab == _TopicEnum.attachment
+                          ? null
+                          : ColorC.primary,
                       onPressed: () {
                         _currentTab = _TopicEnum.notes;
                         setState(() {});
                       },
                       child: BaseText(
-                        StringConstants.note,
+                        StringC.note,
                         color: _currentTab == _TopicEnum.attachment
                             ? null
                             : Colors.white,
                       ),
                     ),
                   ),
-                  SizeConstants.spaceHorizontal5,
+                  SizeC.spaceHorizontal5,
                   Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _currentTab == _TopicEnum.attachment
-                            ? ColorConstants.primary
-                            : null,
-                      ),
+                    child: BaseElevatedButton(
+                      size: const Size.fromHeight(40.0),
+                      backgroundColor: _currentTab == _TopicEnum.attachment
+                          ? ColorC.primary
+                          : null,
                       onPressed: () {
                         FocusManager.instance.primaryFocus?.unfocus();
                         _currentTab = _TopicEnum.attachment;
                         setState(() {});
                       },
                       child: BaseText(
-                        StringConstants.addAttachment,
+                        StringC.addAttachment,
                         color: _currentTab == _TopicEnum.attachment
                             ? Colors.white
                             : null,
@@ -486,7 +471,7 @@ class _TopicPageState extends State<TopicPage> {
                   ),
                 ],
               ).paddingHorizontal8(),
-              SizeConstants.spaceVertical20,
+              SizeC.spaceVertical20,
               _currentTab == _TopicEnum.attachment
                   ? Expanded(
                       child: ListView.separated(
@@ -499,8 +484,7 @@ class _TopicPageState extends State<TopicPage> {
                           );
                         },
                         separatorBuilder: (context, index) {
-                          return const _Separator(
-                              title: StringConstants.separator);
+                          return const BaseSeparator(title: StringC.separator);
                         },
                       ),
                     )
@@ -519,11 +503,11 @@ class _TopicPageState extends State<TopicPage> {
     return await showDialog(
       context: context,
       builder: (context) => const BaseSkeletonDialog(
-        title: StringConstants.saveArticles,
+        title: StringC.saveArticles,
         customContent:
             SizedBox(width: double.maxFinite, child: _PasteLinkDropdown()),
         contentPadding: EdgeInsets.only(left: 24.0),
-        actionsPadding: SizeConstants.zeroPadding,
+        actionsPadding: SizeC.zeroPadding,
         actions: [],
       ),
     );
@@ -562,12 +546,12 @@ class _TopicPageState extends State<TopicPage> {
         : (await showDialog(
               context: context,
               builder: (context) => BaseCupertinoDialog(
-                title: StringConstants.areYouSureExit,
-                description: StringConstants.consequences,
+                title: StringC.areYouSureExit,
+                description: StringC.consequences,
                 actions: [
                   BaseCupertinoDialogButton(
-                    title: StringConstants.save,
-                    color: ColorConstants.primary,
+                    title: StringC.save,
+                    color: ColorC.primary,
                     onTap: () {
                       if (_formKey.currentState?.validate() ?? false) {
                         _saveToLocalDatabase();
@@ -577,8 +561,8 @@ class _TopicPageState extends State<TopicPage> {
                     },
                   ),
                   BaseCupertinoDialogButton(
-                    title: StringConstants.discard,
-                    color: ColorConstants.secondary,
+                    title: StringC.discard,
+                    color: ColorC.secondary,
                     onTap: () {
                       Navigator.of(context).pop(true);
                     },
@@ -613,19 +597,17 @@ class _TopicPageState extends State<TopicPage> {
 
       try {
         await BaseSqlite.insert(
-          tableName: StringConstants.topicTable,
+          tableName: StringC.topicTable,
           data: data,
         );
         if (!mounted) return;
         baseSnackBar(context,
-            message: StringConstants.savedSuccessfully,
-            leading: IconConstants.success);
+            message: StringC.savedSuccessfully, leading: IconC.success);
         Navigator.of(context).pop(true);
       } catch (e) {
         debugPrint(e.toString());
         baseSnackBar(context,
-            message: StringConstants.errorInSaving,
-            leading: IconConstants.failed);
+            message: StringC.errorInSaving, leading: IconC.failed);
         Navigator.of(context).pop(true);
       }
     } else {
@@ -638,21 +620,19 @@ class _TopicPageState extends State<TopicPage> {
       // Updating the database.
       try {
         await BaseSqlite.update(
-          tableName: StringConstants.topicTable,
+          tableName: StringC.topicTable,
           data: data ?? TopicDm(),
-          where: StringConstants.id,
+          where: StringC.id,
           whereArgs: data?.id,
         );
         if (!mounted) return;
         baseSnackBar(context,
-            message: StringConstants.savedSuccessfully,
-            leading: IconConstants.success);
+            message: StringC.savedSuccessfully, leading: IconC.success);
         Navigator.of(context).pop(true);
       } catch (e) {
         debugPrint(e.toString());
         baseSnackBar(context,
-            message: StringConstants.errorInSaving,
-            leading: IconConstants.failed);
+            message: StringC.errorInSaving, leading: IconC.failed);
         Navigator.of(context).pop(true);
       }
     }
@@ -717,7 +697,7 @@ class _PasteLinkDropdownState extends State<_PasteLinkDropdown> {
                               _controller.removeAt(index);
                               setState(() {});
                             },
-                            icon: IconConstants.delete,
+                            icon: IconC.delete,
                           ),
                   ],
                 );
@@ -735,7 +715,7 @@ class _PasteLinkDropdownState extends State<_PasteLinkDropdown> {
 
             setState(() {});
           },
-          icon: IconConstants.add,
+          icon: IconC.add,
         ).center(),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -747,16 +727,16 @@ class _PasteLinkDropdownState extends State<_PasteLinkDropdown> {
                 Navigator.of(context).pop();
               },
               child: const BaseText(
-                StringConstants.cancel,
-                color: ColorConstants.secondary,
+                StringC.cancel,
+                color: ColorC.secondary,
               ),
             ),
             // Save the added links.
             TextButton(
               onPressed: _saveLink,
               child: const BaseText(
-                StringConstants.save,
-                color: ColorConstants.primary,
+                StringC.save,
+                color: ColorC.primary,
               ),
             ),
           ],
@@ -767,13 +747,13 @@ class _PasteLinkDropdownState extends State<_PasteLinkDropdown> {
 
   BaseUnderlineField _field(TextEditingController controller) {
     return BaseUnderlineField(
-      hintText: StringConstants.pasteTheLinkHere,
+      hintText: StringC.pasteTheLinkHere,
       controller: controller,
       validator: (value) {
         if ((Uri.tryParse(value ?? '')?.hasAbsolutePath) ?? false) {
           return null;
         } else {
-          return StringConstants.invalidUrl;
+          return StringC.invalidUrl;
         }
       },
     );
@@ -837,20 +817,20 @@ class _ArticleTile extends StatelessWidget {
             if (snapshot.hasData) {
               return BaseImageBuilder(
                 url: snapshot.data!,
-                error: IconConstants.link,
+                error: IconC.link,
                 height: 20,
                 width: 20,
               ).center();
             } else if (snapshot.connectionState == ConnectionState.waiting) {
               return const CupertinoActivityIndicator();
             }
-            return IconConstants.link;
+            return IconC.link;
           },
         ),
       ),
       title: BaseText(getWebsiteName()),
       subtitle: const BaseText(
-        StringConstants.tapToOpenWeb,
+        StringC.tapToOpenWeb,
         fontWeight: FontWeight.w300,
         fontSize: 12,
       ),
@@ -858,7 +838,7 @@ class _ArticleTile extends StatelessWidget {
         onPressed: () {
           context.read<AttachmentCubit>().removeAttachment(data);
         },
-        icon: IconConstants.delete,
+        icon: IconC.delete,
       ),
       onTap: () {
         try {
@@ -885,12 +865,12 @@ class _CommonTile extends StatelessWidget {
       leading: _getLeading(),
       title: BaseText(_getFileName()),
       subtitle: const BaseText(
-        StringConstants.tapToOpenFile,
+        StringC.tapToOpenFile,
         fontWeight: FontWeight.w300,
         fontSize: 12,
       ),
       trailing: IconButton(
-        icon: IconConstants.delete,
+        icon: IconC.delete,
         onPressed: () {
           context.read<AttachmentCubit>().removeAttachment(data);
           _deleteFile();
@@ -905,11 +885,11 @@ class _CommonTile extends StatelessWidget {
   // To get the leading.
   Widget _getLeading() {
     if (data.type == 1) {
-      return IconConstants.image;
+      return IconC.image;
     } else if (data.type == 2) {
-      return IconConstants.pdf;
+      return IconC.pdf;
     } else {
-      return IconConstants.video;
+      return IconC.video;
     }
   }
 

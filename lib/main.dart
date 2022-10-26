@@ -10,13 +10,13 @@ import 'package:re_vision/utils/cloud/base_cloud.dart';
 import 'package:re_vision/utils/custom_theme_data.dart';
 import 'package:re_vision/utils/social_auth/base_auth.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialise the firebase.
   await Firebase.initializeApp();
   // Initialise the sqflite.
   await BaseSqlite.init();
+
   // Initialise the sharedPref.
   await BaseSharedPrefsSingleton.init();
   // Initialise the google auth.
@@ -32,12 +32,17 @@ class Root extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int authState = BaseSharedPrefsSingleton.getInt("auth") ?? 0;
+
     return BlocProvider(
       create: (context) => AttachmentCubit(),
       child: MaterialApp(
         theme: CustomThemeData.themeData,
         onGenerateRoute: RouteGenerator.generate,
-        initialRoute: RouteConstants.dashboard,
+        initialRoute: authState == 1
+            ? RouteConstants.dashboard
+            : RouteConstants.signPage,
+        // initialRoute: RouteConstants.profilePage,
       ),
     );
   }

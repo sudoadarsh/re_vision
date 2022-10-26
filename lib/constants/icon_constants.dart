@@ -2,44 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 
-class IconConstants {
-
+class IconC {
   // The main logo.
-  static final Widget mainLogo = Image.asset(StringConstants.logoPath, scale: 8);
+  static final Widget mainLogo = Image.asset(StringC.logoPath, scale: 8);
 
   // Icons used in the login page.
   static const Icon user = Icon(
     Icons.person,
-    color: ColorConstants.primary,
+    color: ColorC.primary,
   );
-  static const Icon password = Icon(Icons.lock, color: ColorConstants.primary);
+  static const Icon password = Icon(Icons.lock, color: ColorC.primary);
   static final Widget google = Image.asset(
-    StringConstants.googlePath,
+    StringC.googlePath,
     scale: 15,
   );
   static final Widget apple = Image.asset(
-    StringConstants.applePath,
+    StringC.applePath,
     scale: 15,
   );
-  static const Icon visible =
-      Icon(Icons.visibility, color: ColorConstants.primary);
+  static const Icon visible = Icon(Icons.visibility, color: ColorC.primary);
   static const Icon visibilityOff =
-      Icon(Icons.visibility_off, color: ColorConstants.primary);
+      Icon(Icons.visibility_off, color: ColorC.primary);
 
   // Icons used in the dashboard.
+  static const Icon dashboard = Icon(Icons.home);
   static const Icon settings = Icon(Icons.settings);
   static const Icon habits = Icon(Icons.event_repeat);
-  static const Icon lover = Icon(Icons.favorite);
-  static const Icon rising = Icon(Icons.auto_graph_rounded);
+  static const Icon notification = Icon(Icons.favorite);
   static const Icon todo = Icon(Icons.list_alt_rounded);
 
-  static final Widget star = Image.asset(StringConstants.star);
+  static final Widget star = Image.asset(StringC.star);
 
   // Icons used in the home page.
-  static const Icon add = Icon(Icons.add, color: ColorConstants.primary);
-  static const Icon complete = Icon(Icons.done, color: ColorConstants.primary);
-  static const Icon delete =
-      Icon(Icons.delete, color: ColorConstants.secondary);
+  static const Icon add = Icon(Icons.add, color: ColorC.primary);
+  static const Icon complete = Icon(Icons.done, color: ColorC.primary);
+  static const Icon delete = Icon(Icons.delete, color: ColorC.secondary);
 
   // Icons used in the topic page.
   static const Icon article = Icon(Icons.article_outlined);
@@ -49,16 +46,23 @@ class IconConstants {
   static const Icon link = Icon(Icons.link);
   static const Widget close = CircleAvatar(
     radius: 18,
-    backgroundColor: ColorConstants.secondary,
-    child: Icon(Icons.close, color: ColorConstants.white, size: 18),
+    backgroundColor: ColorC.secondary,
+    child: Icon(Icons.close, color: ColorC.white, size: 18),
   );
   static final Widget noFavIcon = Image.asset(
-    StringConstants.noFavIcon,
+    StringC.noFavIcon,
     scale: 15,
   );
-  static const Icon save = Icon(Icons.save_outlined, color: ColorConstants.primary);
+  static const Icon save = Icon(Icons.save_outlined, color: ColorC.primary);
   static const Icon expand = Icon(Icons.keyboard_arrow_down_rounded);
   static const Icon collapse = Icon(Icons.keyboard_arrow_up_rounded);
-  static const Icon success = Icon(Icons.check_circle, color: ColorConstants.primary);
-  static const Icon failed = Icon(Icons.info, color: ColorConstants.secondary);
+  static const Icon success = Icon(Icons.check_circle, color: ColorC.primary);
+  static const Icon failed = Icon(Icons.info, color: ColorC.secondary);
+
+  // Icons used in the profile page.
+  static const Icon profile = Icon(
+    Icons.person_pin,
+    color: ColorC.white,
+  );
+  static const Icon pfCardTrailing = Icon(Icons.arrow_forward_ios);
 }

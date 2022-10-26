@@ -1,5 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:re_vision/base_widgets/base_insta_story.dart';
 import 'package:re_vision/base_widgets/base_rounded_elevated_button.dart';
@@ -15,16 +14,20 @@ import 'package:re_vision/utils/app_config.dart';
 
 import '../../base_widgets/base_arc_painter.dart';
 
-class DashBoardArguments {
-  final User? user;
+enum CurrentS { dashboard, todo, habits, notifications }
 
-  DashBoardArguments(this.user);
+class DashBoard extends StatefulWidget {
+  const DashBoard({Key? key}) : super(key: key);
+
+  @override
+  State<DashBoard> createState() => _DashBoardState();
+
+  static const Widget _divider =
+      Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
 }
 
-class DashBoard extends StatelessWidget {
-  const DashBoard({Key? key, this.user}) : super(key: key);
-
-  final User? user;
+class _DashBoardState extends State<DashBoard> {
+  CurrentS _currentS = CurrentS.dashboard;
 
   @override
   Widget build(BuildContext context) {
@@ -32,116 +35,7 @@ class DashBoard extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            CustomScrollView(
-              slivers: [
-                SliverAppBar.large(
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  title: const BaseText(StringConstants.dashboard),
-                  actions: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: IconConstants.settings,
-                    ),
-                  ],
-                ),
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: 100,
-                    child: ListView.separated(
-                      separatorBuilder: (context, state) {
-                        return SizeConstants.spaceHorizontal5;
-                      },
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        return BaseInstaStory(
-                          imageUrl:
-                              "https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_28dp.png",
-                          onTap: () {},
-                        );
-                      },
-                    ),
-                  ).paddingOnly(top: 8.0, left: 14.0),
-                ),
-                _heading(StringConstants.overview),
-                SliverToBoxAdapter(
-                  child: CarouselSlider.builder(
-                    options: CarouselOptions(
-                      enableInfiniteScroll: false,
-                      enlargeCenterPage: true,
-                      aspectRatio: 16 / 9,
-                      viewportFraction: 0.7,
-                      initialPage: 1,
-                    ),
-                    itemCount: 3,
-                    itemBuilder: (context, itemIndex, pageIndex) => Card(
-                      elevation: 4.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Row(
-                              children: const [
-                                _divider,
-                                BaseText(
-                                  StringConstants.revision,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 16.0,
-                                ),
-                                _divider
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 50,
-                                  height: 50,
-                                  child: CustomPaint(
-                                    painter: const BaseArcPainter(
-                                      progress: 0.8,
-                                      startColor: Colors.red,
-                                      endColor: ColorConstants.secondary,
-                                      width: 4.0,
-                                    ),
-                                    child: const BaseText('80%').center(),
-                                  ),
-                                ),
-                                SizeConstants.spaceHorizontal10,
-                                const BaseText(
-                                  StringConstants.pending,
-                                  color: ColorConstants.subtitle,
-                                  fontWeight: FontWeight.w300,
-                                )
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 50,
-                                  height: 50,
-                                  child: IconConstants.star,
-                                ),
-                                SizeConstants.spaceHorizontal10,
-                                BaseText(
-                                  StringConstants.stars.padRight(20, ' '),
-                                  color: ColorConstants.subtitle,
-                                  fontWeight: FontWeight.w300,
-                                )
-                              ],
-                            ),
-                          ],
-                        ).paddingDefault(),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            _getS(),
             Positioned(
               left: 0,
               bottom: 0,
@@ -157,8 +51,8 @@ class DashBoard extends StatelessWidget {
                     Center(
                       heightFactor: 0.6,
                       child: BaseElevatedRoundedButton(
-                        backgroundColor: ColorConstants.loginButton,
-                        child: IconConstants.mainLogo,
+                        backgroundColor: ColorC.loginButton,
+                        child: IconC.mainLogo,
                         onPressed: () {
                           Navigator.of(context)
                               .pushNamed(RouteConstants.homePage);
@@ -171,27 +65,31 @@ class DashBoard extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: IconConstants.habits,
-                            color: Colors.white,
+                          // Dashboard.
+                          _bottomNavButton(
+                            CurrentS.dashboard,
+                            _currentS,
+                            icon: IconC.dashboard,
                           ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: IconConstants.todo,
-                            color: Colors.white,
+                          // To-do.
+                          _bottomNavButton(
+                            CurrentS.todo,
+                            _currentS,
+                            icon: IconC.todo,
                           ),
                           (AppConfig.width(context) * 0.20).separation(false),
-                          IconButton(
-                            onPressed: () {},
-                            icon: IconConstants.lover,
-                            color: Colors.white,
+                          // Habits.
+                          _bottomNavButton(
+                            CurrentS.habits,
+                            _currentS,
+                            icon: IconC.habits,
                           ),
-                          IconButton(
-                            onPressed: () {},
-                            icon: IconConstants.rising,
-                            color: Colors.white,
-                          )
+                          // Notifications.
+                          _bottomNavButton(
+                            CurrentS.notifications,
+                            _currentS,
+                            icon: IconC.notification,
+                          ),
                         ],
                       ),
                     )
@@ -205,7 +103,153 @@ class DashBoard extends StatelessWidget {
     );
   }
 
+  IconButton _bottomNavButton(CurrentS val, CurrentS grpVal,
+      {required Icon icon}) {
+    return IconButton(
+      onPressed: () {
+        _currentS = val;
+        setState(() {});
+      },
+      icon: icon,
+      color: val == grpVal ? ColorC.button : ColorC.white,
+    );
+  }
+
+  // Dashboard.
+  CustomScrollView _dashboard(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar.large(
+          automaticallyImplyLeading: false,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          title: const BaseText(StringC.dashboard),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(RouteConstants.profilePage);
+              },
+              icon: IconC.user,
+            ),
+          ],
+        ),
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 100,
+            child: ListView.separated(
+              separatorBuilder: (context, state) {
+                return SizeC.spaceHorizontal5;
+              },
+              scrollDirection: Axis.horizontal,
+              itemCount: 5,
+              itemBuilder: (context, index) {
+                return BaseInstaStory(
+                  imageUrl:
+                      "https://www.gstatic.com/mobilesdk/160503_mobilesdk/logo/2x/firebase_28dp.png",
+                  onTap: () {},
+                );
+              },
+            ),
+          ).paddingOnly(top: 8.0, left: 14.0),
+        ),
+        _heading(StringC.overview),
+        SliverToBoxAdapter(
+          child: CarouselSlider.builder(
+            options: CarouselOptions(
+              enableInfiniteScroll: false,
+              enlargeCenterPage: true,
+              aspectRatio: 16 / 9,
+              viewportFraction: 0.7,
+              initialPage: 1,
+            ),
+            itemCount: 3,
+            itemBuilder: (context, itemIndex, pageIndex) => Card(
+              elevation: 4.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Row(
+                      children: const [
+                        DashBoard._divider,
+                        BaseText(
+                          StringC.revision,
+                          fontWeight: FontWeight.w300,
+                          fontSize: 16.0,
+                        ),
+                        DashBoard._divider
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: CustomPaint(
+                            painter: const BaseArcPainter(
+                              progress: 0.8,
+                              startColor: Colors.red,
+                              endColor: ColorC.secondary,
+                              width: 4.0,
+                            ),
+                            child: const BaseText('80%').center(),
+                          ),
+                        ),
+                        SizeC.spaceHorizontal10,
+                        const BaseText(
+                          StringC.pending,
+                          color: ColorC.subtitle,
+                          fontWeight: FontWeight.w300,
+                        )
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: IconC.star,
+                        ),
+                        SizeC.spaceHorizontal10,
+                        BaseText(
+                          StringC.stars.padRight(20, ' '),
+                          color: ColorC.subtitle,
+                          fontWeight: FontWeight.w300,
+                        )
+                      ],
+                    ),
+                  ],
+                ).paddingDefault(),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   // -----------------------Functions-------------------------------------------
+
+  // To get the current screen.
+  Widget _getS() {
+    switch (_currentS) {
+      case CurrentS.dashboard:
+        return _dashboard(context);
+      case CurrentS.todo:
+        return Container();
+      case CurrentS.habits:
+        return Container();
+      case CurrentS.notifications:
+        return Container();
+      default:
+        return _dashboard(context);
+    }
+  }
+
   SliverPadding _heading(String title) {
     return SliverPadding(
       padding: const EdgeInsets.only(top: 25.0, bottom: 8.0, left: 16.0),
@@ -214,9 +258,6 @@ class DashBoard extends StatelessWidget {
       ),
     );
   }
-
-  static const Widget _divider =
-      Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
 }
 
 class CustomNavigationPainter extends CustomPainter {
@@ -226,7 +267,7 @@ class CustomNavigationPainter extends CustomPainter {
     final double y = size.height;
 
     Paint paint = Paint()
-      ..color = ColorConstants.primary
+      ..color = ColorC.primary
       ..style = PaintingStyle.fill;
 
     Path path = Path()..moveTo(0, 20);

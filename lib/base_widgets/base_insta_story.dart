@@ -25,7 +25,7 @@ class BaseInstaStory extends StatelessWidget {
         alignment: Alignment.center,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-              colors: [ColorConstants.primary, ColorConstants.secondary]),
+              colors: [ColorC.primary, ColorC.secondary]),
           shape: BoxShape.circle,
         ),
         child: SizedBox(
@@ -34,7 +34,7 @@ class BaseInstaStory extends StatelessWidget {
           child: BaseImageBuilder(
             url: imageUrl,
             boxShape: BoxShape.circle,
-            error: IconConstants.failed,
+            error: IconC.failed,
           ).center(),
         ),
       ),

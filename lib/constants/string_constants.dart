@@ -1,4 +1,4 @@
-class StringConstants {
+class StringC {
   // Common string constants.
   static const String empty = '';
 
@@ -88,4 +88,9 @@ class StringConstants {
   static const String savedSuccessfully = 'Saved Successfully';
   static const String errorInSaving = 'Error while saving the topic!';
 
+  // String constants used in profile page.
+  static const String starsProf = "Stars";
+  static const String friends = 'Friends';
+  static const String editProfile = "Profile";
+  static const String findFriends = "Find Friends";
 }

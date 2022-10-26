@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:re_vision/modules/dashboard/dashboard_page.dart';
+import 'package:re_vision/modules/profile/profile_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 
 import '../modules/home_page/home_page.dart';
@@ -27,6 +28,9 @@ class RouteGenerator {
       // case RouteConstants.loginPage:
       //   page = const LoginPage();
       //   break;
+      case RouteConstants.profilePage:
+        page = const ProfilePage();
+        break;
       default:
         page = const Scaffold(
           body: SizedBox.shrink(),

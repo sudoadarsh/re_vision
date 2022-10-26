@@ -8,8 +8,8 @@ class BaseAuth {
   static FirebaseAuth? _fireInst;
 
   /// Gets a app wide reference for the currently logged in user.
-  static currentUser() {
-    return _fireInst!.currentUser;
+  static User? currentUser() {
+    return _fireInst?.currentUser;
   }
 
   /// Initialise the [BaseAuth] in the main function before using it.
@@ -50,7 +50,7 @@ class BaseAuth {
         // ignore: use_build_context_synchronously
         baseSnackBar(context,
             message: 'Error occurred using Google Sign-In. Try again.',
-            leading: IconConstants.failed);
+            leading: IconC.failed);
       }
     }
 
@@ -74,7 +74,7 @@ class BaseAuth {
       baseSnackBar(
         context,
         message: 'Error occurred using Google Sign-In. Try again.',
-        leading: IconConstants.failed,
+        leading: IconC.failed,
       );
     }
 
@@ -91,7 +91,7 @@ class BaseAuth {
     } catch (e) {
       baseSnackBar(context,
           message: 'Error signing out. Try again.',
-          leading: IconConstants.failed);
+          leading: IconC.failed);
     }
   }
 
@@ -101,11 +101,11 @@ class BaseAuth {
     if (e.code == 'account-exists-with-different-credential') {
       baseSnackBar(context,
           message: 'The account already exists with a different credential.',
-          leading: IconConstants.failed);
+          leading: IconC.failed);
     } else if (e.code == 'invalid-credential') {
       baseSnackBar(context,
           message: 'Error occurred while accessing credentials. Try again.',
-          leading: IconConstants.failed);
+          leading: IconC.failed);
     }
   }
 }

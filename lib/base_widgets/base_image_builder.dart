@@ -32,7 +32,7 @@ class BaseImageBuilder extends StatelessWidget {
         );
       },
       placeholder: (context, url) => const CupertinoActivityIndicator(),
-      errorWidget: (context, url, error) => IconConstants.noFavIcon,
+      errorWidget: (context, url, error) => IconC.noFavIcon,
     );
   }
 }

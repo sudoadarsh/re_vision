@@ -103,7 +103,7 @@ class _Cards extends StatelessWidget {
             ),
             BaseText(topic.topic ?? ''),
             const BaseText(
-              StringConstants.tapToSeeMore,
+              StringC.tapToSeeMore,
               fontSize: 12.0,
               fontWeight: FontWeight.w300,
             ),
@@ -117,14 +117,14 @@ class _Cards extends StatelessWidget {
                           context: context,
                           builder: (_) => _confirmDialog(
                             _,
-                            title: StringConstants.completeAlert,
-                            assetName: StringConstants.lottieComplete,
+                            title: StringC.completeAlert,
+                            assetName: StringC.lottieComplete,
                           ),
                         ) ??
                         false;
                     done ? _completeTask() : null;
                   },
-                  child: IconConstants.complete,
+                  child: IconC.complete,
                 ),
                 // delete a task.
                 BaseElevatedRoundedButton(
@@ -133,14 +133,14 @@ class _Cards extends StatelessWidget {
                           context: context,
                           builder: (_) => _confirmDialog(
                             _,
-                            title: StringConstants.deleteAlert,
-                            assetName: StringConstants.lottieDelete,
+                            title: StringC.deleteAlert,
+                            assetName: StringC.lottieDelete,
                           ),
                         ) ??
                         false;
                     done ? _deleteTask() : null;
                   },
-                  child: IconConstants.delete,
+                  child: IconC.delete,
                 )
               ],
             ),
@@ -154,14 +154,14 @@ class _Cards extends StatelessWidget {
   Future<void> _completeTask() async {
     try {
       await BaseSqlite.update(
-        tableName: StringConstants.topicTable,
+        tableName: StringC.topicTable,
         data: topic.iteration != 3
             ? topic.copyWith(
                 iteration: (topic.iteration ?? 0) + 1,
                 scheduledTo: _getDuration(),
               )
-            : topic.copyWith(scheduledTo: StringConstants.done),
-        where: StringConstants.id,
+            : topic.copyWith(scheduledTo: StringC.done),
+        where: StringC.id,
         whereArgs: topic.id,
       );
       databaseCubit.fetchData();
@@ -175,8 +175,8 @@ class _Cards extends StatelessWidget {
   Future<void> _deleteTask() async {
     try {
       await BaseSqlite.delete(
-        tableName: StringConstants.topicTable,
-        where: StringConstants.id,
+        tableName: StringC.topicTable,
+        where: StringC.id,
         whereArgs: topic.id,
       );
       databaseCubit.fetchData();
@@ -204,7 +204,7 @@ class _Cards extends StatelessWidget {
             .toString();
         break;
       default:
-        returnString = StringConstants.done;
+        returnString = StringC.done;
         break;
     }
     return returnString;
@@ -221,17 +221,17 @@ class _Cards extends StatelessWidget {
       customContent: Lottie.asset(assetName, height: 80, width: 80),
       actions: [
         BaseCupertinoDialogButton(
-            color: ColorConstants.primary,
+            color: ColorC.primary,
             onTap: () {
               Navigator.of(context).pop(true);
             },
-            title: StringConstants.ok),
+            title: StringC.ok),
         BaseCupertinoDialogButton(
-            color: ColorConstants.secondary,
+            color: ColorC.secondary,
             onTap: () {
               Navigator.of(context).pop(false);
             },
-            title: StringConstants.cancel),
+            title: StringC.cancel),
       ],
     );
   }
@@ -303,7 +303,7 @@ class _HomePageState extends State<HomePage> {
           return [
             SliverAppBar.large(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              title: const BaseText(StringConstants.revision),
+              title: const BaseText(StringC.revision),
               actions: [
                 IconButton(
                   onPressed: () {
@@ -316,7 +316,7 @@ class _HomePageState extends State<HomePage> {
                         .then((value) => _databaseCubit.fetchData());
                   },
                   icon: const Icon(Icons.add_circle,
-                      color: ColorConstants.primary),
+                      color: ColorC.primary),
                 ),
               ],
             ),
@@ -378,26 +378,26 @@ class _HomePageState extends State<HomePage> {
 
   final CalendarStyle _calendarStyle = CalendarStyle(
     selectedDecoration: DecorationConstants.circleShape
-        .copyWith(color: ColorConstants.secondary),
+        .copyWith(color: ColorC.secondary),
     todayDecoration:
-        DecorationConstants.circleShape.copyWith(color: ColorConstants.primary),
+        DecorationConstants.circleShape.copyWith(color: ColorC.primary),
     markersAlignment: Alignment.bottomRight,
   );
 
   // To create the database.
   Future _createDatabase() async {
     bool exists =
-        BaseSharedPrefsSingleton.getBool(StringConstants.localDbKey) ?? false;
+        BaseSharedPrefsSingleton.getBool(StringC.localDbKey) ?? false;
     if (!exists) {
       debugPrint('Creating database.');
       /* Set the shared prefs value that the database has been created. */
       await BaseSharedPrefsSingleton.setValue(
-        StringConstants.localDbKey,
+        StringC.localDbKey,
         true,
       );
       /* Create the topic table. */
       await BaseSqlite.createTable(
-        tableName: StringConstants.topicTable,
+        tableName: StringC.topicTable,
         model: Schemas.topicSchema,
       );
     }
@@ -418,13 +418,13 @@ class _HomePageState extends State<HomePage> {
       return Container(
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          color: ColorConstants.button,
+          color: ColorC.button,
         ),
         child: events.isNotEmpty
             ? BaseText(
                 events.length.toString(),
                 fontSize: 12.0,
-                color: ColorConstants.secondary,
+                color: ColorC.secondary,
               ).paddingAll4()
             : const SizedBox.shrink(),
       );
