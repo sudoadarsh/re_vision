@@ -11,7 +11,7 @@ void baseSnackBar(
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       behavior: SnackBarBehavior.floating,
-      shape: DecorationConstants.roundedRectangleBorder.copyWith(
+      shape: DecorC.roundedRectangleBorder.copyWith(
         side: const BorderSide(color: Colors.black12),
       ),
       padding: const EdgeInsets.all(4.0),

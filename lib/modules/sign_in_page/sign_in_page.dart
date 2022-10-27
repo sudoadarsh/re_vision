@@ -105,7 +105,7 @@ class _GoogleSingInButtonState extends State<_GoogleSingInButton> {
             // Save the auth state.
             BaseSharedPrefsSingleton.setValue("auth", 1);
             // Navigate to dashboard.
-            Navigator.of(context).pushNamed(RouteConstants.dashboard);
+            Navigator.of(context).pushNamed(RouteC.dashboard);
           }
         }
       },
@@ -133,7 +133,11 @@ class _GoogleSingInButtonState extends State<_GoogleSingInButton> {
     // Modelling the data.
     UserFBDm dataToSave = UserFBDm(
       name: user.displayName,
-      profilePic: user.photoURL
+      email: user.email,
+      uuid: user.uid,
+      requestR: [],
+      requestS: [],
+      friends: []
     );
 
     BaseCloud.create(

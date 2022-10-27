@@ -27,10 +27,12 @@ class IconC {
   // Icons used in the dashboard.
   static const Icon dashboard = Icon(Icons.home);
   static const Icon settings = Icon(Icons.settings);
-  static const Icon habits = Icon(Icons.event_repeat);
   static const Icon notification = Icon(Icons.favorite);
-  static const Icon todo = Icon(Icons.list_alt_rounded);
-
+  static const Icon search = Icon(Icons.search);
+  static const Icon profile = Icon(
+    Icons.person_pin,
+    color: ColorC.white,
+  );
   static final Widget star = Image.asset(StringC.star);
 
   // Icons used in the home page.
@@ -59,10 +61,7 @@ class IconC {
   static const Icon success = Icon(Icons.check_circle, color: ColorC.primary);
   static const Icon failed = Icon(Icons.info, color: ColorC.secondary);
 
-  // Icons used in the profile page.
-  static const Icon profile = Icon(
-    Icons.person_pin,
-    color: ColorC.white,
-  );
+  // Icon constants in the profile page.
   static const Icon pfCardTrailing = Icon(Icons.arrow_forward_ios);
+  static const Icon logout = Icon(Icons.logout, color: ColorC.secondary);
 }

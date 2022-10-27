@@ -40,9 +40,9 @@ class Root extends StatelessWidget {
         theme: CustomThemeData.themeData,
         onGenerateRoute: RouteGenerator.generate,
         initialRoute: authState == 1
-            ? RouteConstants.dashboard
-            : RouteConstants.signPage,
-        // initialRoute: RouteConstants.profilePage,
+            ? RouteC.dashboard
+            : RouteC.signPage,
+        // initialRoute: RouteC.profilePage,
       ),
     );
   }

@@ -91,6 +91,9 @@ class StringC {
   // String constants used in profile page.
   static const String starsProf = "Stars";
   static const String friends = 'Friends';
-  static const String editProfile = "Profile";
+  static const String editProfile = "Edit Profile";
   static const String findFriends = "Find Friends";
+  static const String search = 'Search Friends by their email';
+  static const String logout = 'Logout';
+  static const String logoutDesc = "Are you sure want to logout of Re-vision?";
 }

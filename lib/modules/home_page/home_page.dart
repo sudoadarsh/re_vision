@@ -78,7 +78,7 @@ class _Cards extends StatelessWidget {
       onTap: () {
         Navigator.of(context)
             .pushNamed(
-              RouteConstants.topicPage,
+              RouteC.topicPage,
               arguments: TopicPageArguments(
                 selectedDay: selectedDay,
                 topicDm: topic,
@@ -309,7 +309,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.of(context)
                         .pushNamed(
-                          RouteConstants.topicPage,
+                          RouteC.topicPage,
                           arguments:
                               TopicPageArguments(selectedDay: _selectedDay),
                         )
@@ -377,10 +377,10 @@ class _HomePageState extends State<HomePage> {
   void sst() => setState(() {});
 
   final CalendarStyle _calendarStyle = CalendarStyle(
-    selectedDecoration: DecorationConstants.circleShape
+    selectedDecoration: DecorC.circleShape
         .copyWith(color: ColorC.secondary),
     todayDecoration:
-        DecorationConstants.circleShape.copyWith(color: ColorC.primary),
+        DecorC.circleShape.copyWith(color: ColorC.primary),
     markersAlignment: Alignment.bottomRight,
   );
 

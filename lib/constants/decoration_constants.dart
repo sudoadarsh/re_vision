@@ -1,6 +1,17 @@
 import 'package:flutter/cupertino.dart';
 
-class DecorationConstants {
+class DecorC {
+  /// BoxDecoration with rounded top or bottom corners.
+  static BoxDecoration boxDecorTB(bool top, {required double radius}) {
+    return BoxDecoration(
+      borderRadius: BorderRadius.only(
+        topRight: top? Radius.circular(radius) : Radius.zero,
+        topLeft: top? Radius.circular(radius) : Radius.zero,
+        bottomRight: !top? Radius.circular(radius) : Radius.zero,
+        bottomLeft: !top? Radius.circular(radius) : Radius.zero
+      ),
+    );
+  }
 
   /// Gives rounded border radius. Passed to [borderRadius].
   static BorderRadius roundedBorderRadius(double radius) {

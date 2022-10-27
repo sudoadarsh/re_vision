@@ -9,12 +9,13 @@ import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/modules/search_page/search_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/utils/app_config.dart';
 
 import '../../base_widgets/base_arc_painter.dart';
 
-enum CurrentS { dashboard, todo, habits, notifications }
+enum CurrentS { dashboard, search, notifications, profile}
 
 class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
@@ -27,11 +28,12 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
-  CurrentS _currentS = CurrentS.dashboard;
+  CurrentS _currentS = CurrentS.search;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Stack(
           children: [
@@ -55,7 +57,7 @@ class _DashBoardState extends State<DashBoard> {
                         child: IconC.mainLogo,
                         onPressed: () {
                           Navigator.of(context)
-                              .pushNamed(RouteConstants.homePage);
+                              .pushNamed(RouteC.homePage);
                         },
                       ),
                     ),
@@ -71,24 +73,24 @@ class _DashBoardState extends State<DashBoard> {
                             _currentS,
                             icon: IconC.dashboard,
                           ),
-                          // To-do.
+                          // Search.
                           _bottomNavButton(
-                            CurrentS.todo,
+                            CurrentS.search,
                             _currentS,
-                            icon: IconC.todo,
+                            icon: IconC.search,
                           ),
                           (AppConfig.width(context) * 0.20).separation(false),
-                          // Habits.
-                          _bottomNavButton(
-                            CurrentS.habits,
-                            _currentS,
-                            icon: IconC.habits,
-                          ),
                           // Notifications.
                           _bottomNavButton(
                             CurrentS.notifications,
                             _currentS,
                             icon: IconC.notification,
+                          ),
+                          // Profile.
+                          _bottomNavButton(
+                            CurrentS.profile,
+                            _currentS,
+                            icon: IconC.profile,
                           ),
                         ],
                       ),
@@ -126,9 +128,9 @@ class _DashBoardState extends State<DashBoard> {
           actions: [
             IconButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(RouteConstants.profilePage);
+
               },
-              icon: IconC.user,
+              icon: IconC.settings,
             ),
           ],
         ),
@@ -239,9 +241,9 @@ class _DashBoardState extends State<DashBoard> {
     switch (_currentS) {
       case CurrentS.dashboard:
         return _dashboard(context);
-      case CurrentS.todo:
-        return Container();
-      case CurrentS.habits:
+      case CurrentS.search:
+        return const SearchPage();
+      case CurrentS.profile:
         return Container();
       case CurrentS.notifications:
         return Container();

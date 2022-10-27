@@ -12,23 +12,23 @@ class RouteGenerator {
     Widget page;
 
     switch (settings.name) {
-      case RouteConstants.signPage:
+      case RouteC.signPage:
         page = const SignInPage();
         break;
-      case RouteConstants.dashboard:
+      case RouteC.dashboard:
         page = const DashBoard();
         break;
-      case RouteConstants.homePage:
+      case RouteC.homePage:
         page = const HomePage();
         break;
-      case RouteConstants.topicPage:
+      case RouteC.topicPage:
         final args = settings.arguments as TopicPageArguments;
         page = TopicPage(selectedDay: args.selectedDay, topicDm: args.topicDm);
         break;
       // case RouteConstants.loginPage:
       //   page = const LoginPage();
       //   break;
-      case RouteConstants.profilePage:
+      case RouteC.profilePage:
         page = const ProfilePage();
         break;
       default:

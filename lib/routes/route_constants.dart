@@ -1,4 +1,4 @@
-class RouteConstants {
+class RouteC {
   static const String signPage = '/sign_page';
   static const String homePage = '/home_page';
   static const String topicPage = '/topic_page';

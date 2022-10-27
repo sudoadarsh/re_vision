@@ -3,12 +3,12 @@ import 'package:flutter/cupertino.dart';
 
 class BaseCloud {
   // Initialise the cloud firestore.
-  static FirebaseFirestore? _db;
+  static FirebaseFirestore? db;
 
   /// Ensure this [BaseCloud.init] is called before using any of its methods.
   static FirebaseFirestore? init() {
-    _db = FirebaseFirestore.instance;
-    return _db;
+    db = FirebaseFirestore.instance;
+    return db;
   }
 
   /// To add data into a collection.
@@ -19,7 +19,7 @@ class BaseCloud {
   }) async {
     try {
       // Add the map data into specified collection.
-      final docRef = _db?.collection(collection).doc(document);
+      final docRef = db?.collection(collection).doc(document);
       // Set the data. Will create a document and collection if they does not exist otherwise
       // overwrites the existing data.
       await docRef?.set(data);
@@ -29,13 +29,24 @@ class BaseCloud {
   }
 
   /// To read the document from a single collection.
-  Future<DocumentSnapshot?> readC({
+  Future<DocumentSnapshot?> readD({
     required String collection,
     required String document,
   }) async {
     DocumentSnapshot? snap;
     try {
-      snap = await _db?.collection(collection).doc().get();
+      snap = await db?.collection(collection).doc(document).get();
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return snap;
+  }
+
+  /// Read the entire collection.
+  Future<QuerySnapshot<Map<String, dynamic>>?> readC(String collection) async {
+    QuerySnapshot<Map<String, dynamic>>? snap;
+    try {
+      snap = await db?.collection(collection).get();
     } catch (e) {
       debugPrint(e.toString());
     }

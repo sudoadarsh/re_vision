@@ -227,8 +227,8 @@ class _NoteEditorState extends State<_NoteEditor> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: DecorationConstants.roundedBorderRadius(10.0),
-                boxShadow: DecorationConstants.depthEffect(-4.0, 3.0,
+                borderRadius: DecorC.roundedBorderRadius(10.0),
+                boxShadow: DecorC.depthEffect(-4.0, 3.0,
                     shadowColor: ColorC.shadowColor,
                     backgroundColor: Theme.of(context).scaffoldBackgroundColor),
               ),

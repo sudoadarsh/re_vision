@@ -17,7 +17,7 @@ class CommonCubit extends Cubit<CommonCubitState> {
     try {
       emit(CommonCubitStateLoading());
       List<T> fetchedData = await baseCubitRepo.fetchData(data: data);
-      emit(CommonCubitStateLoaded(data: fetchedData));
+      emit(CommonCubitStateLoaded<T>(data: fetchedData));
     } catch (e) {
       emit(CommonCubitStateError(error: e.toString()));
     }
