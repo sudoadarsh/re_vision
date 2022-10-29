@@ -121,10 +121,13 @@ class _UserResult extends StatefulWidget {
 }
 
 class _UserResultState extends State<_UserResult> {
+  /// Boolean to live update the button.
+  late Widget _currentButton;
+
   @override
   void initState() {
     super.initState();
-    _checkReq();
+    _currentButton = _checkReq();
   }
 
   @override
@@ -132,7 +135,7 @@ class _UserResultState extends State<_UserResult> {
     return ListTile(
       title: BaseText(widget.data.name ?? ""),
       subtitle: BaseText(widget.data.email ?? ""),
-      trailing: _checkReq(),
+      trailing: _currentButton,
     );
   }
 
@@ -151,6 +154,9 @@ class _UserResultState extends State<_UserResult> {
       document: widget.userId,
       data: {CloudC.requests: r},
     );
+
+    _currentButton = _requestedButton();
+    setState(() {});
   }
 
   void _removeRequest() {
@@ -160,9 +166,11 @@ class _UserResultState extends State<_UserResult> {
     List m;
 
     try {
-      m = r.where((element) => element["uuid"] != BaseAuth.currentUser()?.uid).toList();
+      m = r
+          .where((element) => element["uuid"] != BaseAuth.currentUser()?.uid)
+          .toList();
     } catch (e) {
-      m =[];
+      m = [];
     }
 
     BaseCloud.update(
@@ -170,6 +178,9 @@ class _UserResultState extends State<_UserResult> {
       document: widget.userId,
       data: {CloudC.requests: m},
     );
+
+    _currentButton = _requestButton();
+    setState(() {});
   }
 
   /// To check whether the searched user is already requested a request.
@@ -182,20 +193,28 @@ class _UserResultState extends State<_UserResult> {
     );
 
     if (res.status == 0) {
-      return BaseOutlineButton(
-        borderColor: Colors.black,
-        onPressed: _removeRequest,
-        child: const BaseText(StringC.requested),
-      );
+      return _requestedButton();
     } else if (res.status == 1) {
       return SizeC.none;
     } else {
-      return BaseElevatedButton(
-        backgroundColor: ColorC.elevatedButton,
-        size: const Size(50, 40),
-        onPressed: _friendRequest,
-        child: const BaseText(StringC.request),
-      );
+      return _requestButton();
     }
+  }
+
+  BaseElevatedButton _requestButton() {
+    return BaseElevatedButton(
+      backgroundColor: ColorC.elevatedButton,
+      size: const Size(50, 40),
+      onPressed: _friendRequest,
+      child: const BaseText(StringC.request),
+    );
+  }
+
+  BaseOutlineButton _requestedButton() {
+    return BaseOutlineButton(
+      borderColor: Colors.black,
+      onPressed: _removeRequest,
+      child: const BaseText(StringC.requested),
+    );
   }
 }

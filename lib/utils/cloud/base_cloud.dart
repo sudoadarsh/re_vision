@@ -44,8 +44,8 @@ class BaseCloud {
     }
   }
 
-  /// To read the document from a single collection.
-  Future<DocumentSnapshot?> readD({
+  /// To read a document from a single collection.
+  static Future<DocumentSnapshot?> readD({
     required String collection,
     required String document,
   }) async {
@@ -59,7 +59,7 @@ class BaseCloud {
   }
 
   /// Read the entire collection.
-  Future<QuerySnapshot<Map<String, dynamic>>?> readC(String collection) async {
+  static Future<QuerySnapshot<Map<String, dynamic>>?> readC(String collection) async {
     QuerySnapshot<Map<String, dynamic>>? snap;
     try {
       snap = await db?.collection(collection).get();

@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:re_vision/base_widgets/base_insta_story.dart';
 import 'package:re_vision/base_widgets/base_rounded_elevated_button.dart';
@@ -9,13 +10,17 @@ import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/models/user_dm.dart';
 import 'package:re_vision/modules/search_page/search_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/utils/app_config.dart';
+import 'package:re_vision/utils/cloud/base_cloud.dart';
+import 'package:re_vision/utils/cloud/cloud_constants.dart';
+import 'package:re_vision/utils/social_auth/base_auth.dart';
 
 import '../../base_widgets/base_arc_painter.dart';
 
-enum CurrentS { dashboard, search, notifications, profile}
+enum CurrentS { dashboard, search, notifications, profile }
 
 class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
@@ -56,8 +61,7 @@ class _DashBoardState extends State<DashBoard> {
                         backgroundColor: ColorC.elevatedButton,
                         child: IconC.mainLogo,
                         onPressed: () {
-                          Navigator.of(context)
-                              .pushNamed(RouteC.homePage);
+                          Navigator.of(context).pushNamed(RouteC.homePage);
                         },
                       ),
                     ),
@@ -81,10 +85,22 @@ class _DashBoardState extends State<DashBoard> {
                           ),
                           (AppConfig.width(context) * 0.20).separation(false),
                           // Notifications.
-                          _bottomNavButton(
-                            CurrentS.notifications,
-                            _currentS,
-                            icon: IconC.notification,
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              _bottomNavButton(
+                                CurrentS.notifications,
+                                _currentS,
+                                icon: IconC.notification,
+                              ),
+                              Positioned(
+                                bottom: -10,
+                                child: Container(
+                                  decoration: const BoxDecoration(shape: BoxShape.circle, color: ColorC.secondary),
+                                  height: 5, width: 5,
+                                ),
+                              )
+                            ],
                           ),
                           // Profile.
                           _bottomNavButton(
@@ -127,9 +143,7 @@ class _DashBoardState extends State<DashBoard> {
           title: const BaseText(StringC.dashboard),
           actions: [
             IconButton(
-              onPressed: () {
-
-              },
+              onPressed: () {},
               icon: IconC.settings,
             ),
           ],
@@ -221,7 +235,7 @@ class _DashBoardState extends State<DashBoard> {
                           StringC.stars.padRight(20, ' '),
                           color: ColorC.subtitle,
                           fontWeight: FontWeight.w300,
-                        )
+                        ),
                       ],
                     ),
                   ],
@@ -236,7 +250,31 @@ class _DashBoardState extends State<DashBoard> {
 
   // -----------------------Functions-------------------------------------------
 
-  // To get the current screen.
+  /// To get the friend requests.
+  void _getFRRequests() async {
+    DocumentSnapshot? snap = await BaseCloud.readD(
+      collection: CloudC.users,
+      document: BaseAuth.currentUser()?.uid ?? '',
+    );
+
+    if (snap != null) {
+      final Map<String, dynamic> snapD = snap.data() as Map<String, dynamic>;
+      UserFBDm snapM = UserFBDm.fromJson(snapD);
+
+      List <Requests> req = snapM.requests ?? [];
+
+      if (req.isNotEmpty) {
+        for (Requests e in req) {
+          if (e.seen == 0) {
+            // Show notification badge.
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  /// To get the current screen.
   Widget _getS() {
     switch (_currentS) {
       case CurrentS.dashboard:
@@ -252,6 +290,7 @@ class _DashBoardState extends State<DashBoard> {
     }
   }
 
+  /// The heading of each section in the [DashboardPage].
   SliverPadding _heading(String title) {
     return SliverPadding(
       padding: const EdgeInsets.only(top: 25.0, bottom: 8.0, left: 16.0),

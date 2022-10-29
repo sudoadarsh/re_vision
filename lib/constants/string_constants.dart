@@ -20,8 +20,9 @@ class StringC {
   static const String logoPath = 'images/revision.png';
   static const String googlePath = 'images/google.png';
   static const String applePath = 'images/apple.png';
-  static const String noFavIcon = 'images/no_favicon.png';
-  static const String star = 'images/star.png';
+  static const String noFavIconPath = 'images/no_favicon.png';
+  static const String starPath = 'images/star.png';
+  static const String friendPath = 'images/friend.png';
 
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
@@ -101,4 +102,7 @@ class StringC {
   static const String request = 'Request';
   static const String requested = 'Requested';
   static const String unfriend = "Unfriend";
+
+  // String constants used in notifications page.
+  static const String frRequests = "Friend Request(s)";
 }

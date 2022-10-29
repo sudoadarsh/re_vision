@@ -33,7 +33,7 @@ class IconC {
     Icons.person_pin,
     color: ColorC.white,
   );
-  static final Widget star = Image.asset(StringC.star);
+  static final Widget star = Image.asset(StringC.starPath);
 
   // Icons used in the home page.
   static const Icon add = Icon(Icons.add, color: ColorC.primary);
@@ -52,7 +52,7 @@ class IconC {
     child: Icon(Icons.close, color: ColorC.white, size: 18),
   );
   static final Widget noFavIcon = Image.asset(
-    StringC.noFavIcon,
+    StringC.noFavIconPath,
     scale: 15,
   );
   static const Icon save = Icon(Icons.save_outlined, color: ColorC.primary);
