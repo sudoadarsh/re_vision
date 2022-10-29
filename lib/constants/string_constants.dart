@@ -96,4 +96,9 @@ class StringC {
   static const String search = 'Search Friends by their email';
   static const String logout = 'Logout';
   static const String logoutDesc = "Are you sure want to logout of Re-vision?";
+
+  // String constants used in search page.
+  static const String request = 'Request';
+  static const String requested = 'Requested';
+  static const String unfriend = "Unfriend";
 }

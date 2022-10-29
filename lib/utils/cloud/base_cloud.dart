@@ -11,7 +11,7 @@ class BaseCloud {
     return db;
   }
 
-  /// To add data into a collection.
+  /// To add data into a collection document.
   static Future<void> create({
     required String collection,
     required String document,
@@ -23,6 +23,22 @@ class BaseCloud {
       // Set the data. Will create a document and collection if they does not exist otherwise
       // overwrites the existing data.
       await docRef?.set(data);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  /// To update data in a collection document.
+  static Future<void> update({
+    required String collection,
+    required String document,
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      // Get the reference of the document.
+      final docRef = db?.collection(collection).doc(document);
+      // Update a field in the document.
+      await docRef?.update(data);
     } catch (e) {
       debugPrint(e.toString());
     }

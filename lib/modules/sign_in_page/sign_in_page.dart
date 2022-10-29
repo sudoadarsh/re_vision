@@ -134,14 +134,12 @@ class _GoogleSingInButtonState extends State<_GoogleSingInButton> {
     UserFBDm dataToSave = UserFBDm(
       name: user.displayName,
       email: user.email,
-      uuid: user.uid,
-      requestR: [],
-      requestS: [],
+      requests: [],
       friends: []
     );
 
     BaseCloud.create(
-      collection: CloudConstants.usersCollection,
+      collection: CloudC.users,
       document: user.uid,
       data: dataToSave.toJson(),
     );

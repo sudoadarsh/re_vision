@@ -53,7 +53,7 @@ class _DashBoardState extends State<DashBoard> {
                     Center(
                       heightFactor: 0.6,
                       child: BaseElevatedRoundedButton(
-                        backgroundColor: ColorC.loginButton,
+                        backgroundColor: ColorC.elevatedButton,
                         child: IconC.mainLogo,
                         onPressed: () {
                           Navigator.of(context)
