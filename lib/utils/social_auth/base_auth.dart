@@ -20,7 +20,7 @@ class BaseAuth {
   }
 
   /// Sign-in the user with credentials. For google.
-  static Future<User?> signIn(BuildContext context) async {
+  static Future<User?> googleSignIn(BuildContext context) async {
     User? user;
 
     // Trigger the authentication flow.
@@ -63,20 +63,27 @@ class BaseAuth {
     required String password,
   }) async {
     User? user;
-    try {
       final UserCredential? credential = await _fireInst
           ?.signInWithEmailAndPassword(email: email, password: password);
       user = credential?.user;
-    } on FirebaseAuthException catch (e) {
-      _firebaseAuthException(e, context);
-    } catch (e) {
-      debugPrint(e.toString());
-      baseSnackBar(
-        context,
-        message: 'Error occurred using Google Sign-In. Try again.',
-        leading: IconC.failed,
-      );
-    }
+
+    return user;
+  }
+
+  static Future<User?> signIn(
+    BuildContext context, {
+    required String email,
+    required String password,
+  }) async {
+    User? user;
+
+    debugPrint("Sign in user");
+
+    final UserCredential? credentials = await _fireInst
+        ?.createUserWithEmailAndPassword(email: email, password: password);
+    user = credentials?.user;
+
+    debugPrint(user?.email);
 
     return user;
   }
@@ -90,8 +97,7 @@ class BaseAuth {
       await FirebaseAuth.instance.signOut();
     } catch (e) {
       baseSnackBar(context,
-          message: 'Error signing out. Try again.',
-          leading: IconC.failed);
+          message: 'Error signing out. Try again.', leading: IconC.failed);
     }
   }
 

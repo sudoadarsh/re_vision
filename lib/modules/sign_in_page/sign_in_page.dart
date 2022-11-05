@@ -11,7 +11,7 @@
 // import 'package:re_vision/extensions/widget_extensions.dart';
 // import 'package:re_vision/models/user_dm.dart';
 // import 'package:re_vision/routes/route_constants.dart';
-// import 'package:re_vision/state_management/sign_in/sign_in_repo.dart';
+// import 'package:re_vision/state_management/auth/auth_repo.dart';
 // import 'package:re_vision/utils/app_config.dart';
 // import 'package:re_vision/utils/cloud/base_cloud.dart';
 // import 'package:re_vision/utils/cloud/cloud_constants.dart';
@@ -63,7 +63,7 @@
 //   }
 // }
 //
-// // The google sign_in method.
+// // The google auth method.
 // class _GoogleSingInButton extends StatefulWidget {
 //   const _GoogleSingInButton({Key? key}) : super(key: key);
 //

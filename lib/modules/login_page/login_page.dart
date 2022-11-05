@@ -1,20 +1,26 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:re_vision/base_widgets/base_elevated_button.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/base_widgets/link_to_page.dart';
 import 'package:re_vision/constants/date_time_constants.dart';
 import 'package:re_vision/constants/decoration_constants.dart';
+import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/routes/route_constants.dart';
+import 'package:re_vision/state_management/auth/auth_repo.dart';
 import 'package:re_vision/utils/app_config.dart';
 
 import '../../base_widgets/base_depth_form_field.dart';
+import '../../common_button_cubit/common_button_cubit.dart';
 import '../../constants/color_constants.dart';
 import '../../constants/icon_constants.dart';
 import '../../constants/size_constants.dart';
 import '../../constants/string_constants.dart';
-import '../../utils/social_auth/base_auth.dart';
+import '../../models/auth_in_model.dart';
 
 /// Widget to get the logo of the application.
 ///
@@ -66,10 +72,15 @@ class _FormState extends State<_Form> {
   // To alter between login and sign-in.
   bool _loginState = true;
 
+  // Button cubit to handle authentication.
+  late final CommonButtonCubit _authCubit;
+
   @override
   void initState() {
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+
+    _authCubit = CommonButtonCubit(AuthRepo());
     super.initState();
   }
 
@@ -93,7 +104,7 @@ class _FormState extends State<_Form> {
             prefixIcon: IconC.user,
             labelText: StringC.emailOrAppleId,
           ),
-          SizeC.spaceVertical20,
+          SizeC.spaceVertical10,
           StatefulBuilder(builder: (context, sst) {
             return BaseTextFormFieldWithDepth(
               controller: _passwordController,
@@ -117,21 +128,53 @@ class _FormState extends State<_Form> {
                 ? CrossFadeState.showFirst
                 : CrossFadeState.showSecond,
           ),
+
+          // The Sign-in/ Log-in button.
           BaseElevatedButton(
             backgroundColor: ColorC.elevatedButton,
-            onPressed: () => loginNow(),
-            child: BaseText(
-              _loginState ? StringC.login : StringC.signIn,
-              color: ColorC.white,
+            onPressed: () {
+              _authCubit.fetchData<User?>(
+                data: AuthInModel(
+                  context: context,
+                  email: _emailController.text.trim(),
+                  password: _passwordController.text,
+                  login: _loginState,
+                ),
+              );
+            },
+            child: BlocConsumer(
+              bloc: _authCubit,
+              listener: (context, state) {
+                if (state is CommonButtonSuccess) {
+                  User? user = state.data;
+                  if (user != null) {
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                        RouteC.dashboard, (route) => false);
+                  }
+                } else if (state is CommonButtonFailure) {
+                  debugPrint(state.error.toString());
+                }
+              },
+              builder: (context, state) {
+                if (state is CommonButtonLoading) {
+                  return const CupertinoActivityIndicator().center();
+                }
+                return BaseText(
+                  _loginState ? StringC.login : StringC.createAccount,
+                  color: ColorC.white,
+                  fontWeight: FontWeight.w500,
+                );
+              },
             ),
           ),
           AnimatedCrossFade(
             duration: DateTimeC.cd200,
             firstChild: LinkToPage(
               title: StringC.doNotHaveAccount,
-              pageName: StringC.signIn,
+              pageName: StringC.createAccount,
               onTap: () {
                 _loginState = !_loginState;
+                _clearFields();
                 setState(() {});
               },
             ),
@@ -140,6 +183,7 @@ class _FormState extends State<_Form> {
               pageName: StringC.login,
               onTap: () {
                 _loginState = !_loginState;
+                _clearFields();
                 setState(() {});
               },
             ),
@@ -152,13 +196,10 @@ class _FormState extends State<_Form> {
     );
   }
 
-  // ----------------------------------Functions--------------------------------
-  Future<User?> loginNow() async {
-    return await BaseAuth.login(
-      context,
-      email: _emailController.text,
-      password: _passwordController.text,
-    );
+  // -------------------------------- Functions --------------------------------
+  void _clearFields() {
+    _passwordController.clear();
+    _emailController.clear();
   }
 }
 
@@ -204,6 +245,7 @@ class _LoginPageState extends State<LoginPage> {
     return Theme(
       data: ThemeData(
         dividerColor: Colors.transparent,
+        primaryColor: ColorC.primary,
       ),
       child: Scaffold(
         backgroundColor: ColorC.primary,
@@ -218,10 +260,12 @@ class _LoginPageState extends State<LoginPage> {
                         .copyWith(color: ColorC.white),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
-                        _Logo(),
-                        _Form(),
-                        SizedBox(),
+                      children: [
+                        (AppConfig.height(context) * 0.05).separation(true),
+                        const _Logo(),
+                        (AppConfig.height(context) * 0.05).separation(true),
+                        const _Form(),
+                        const SizedBox(),
                       ],
                     ).paddingDefault(),
                   ).paddingDefault(),

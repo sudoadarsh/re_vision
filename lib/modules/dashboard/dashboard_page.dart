@@ -275,19 +275,21 @@ class _DashBoardState extends State<DashBoard> {
     );
 
     if (snap != null) {
-      final Map<String, dynamic> snapD = snap.data() as Map<String, dynamic>;
-      UserFBDm snapM = UserFBDm.fromJson(snapD);
+      final Map<String, dynamic>? snapD = snap.data() as Map<String, dynamic>?;
+      if (snapD != null) {
+        UserFBDm snapM = UserFBDm.fromJson(snapD);
 
-      _req = snapM.requests ?? [];
-      _frs = snapM.friends ?? [];
+        _req = snapM.requests ?? [];
+        _frs = snapM.friends ?? [];
 
-      if (_req.isNotEmpty) {
-        for (Requests e in _req) {
-          if (e.seen == 0) {
-            // Show notification badge.
-            newNotifications = true;
-            setState(() {});
-            break;
+        if (_req.isNotEmpty) {
+          for (Requests e in _req) {
+            if (e.seen == 0) {
+              // Show notification badge.
+              newNotifications = true;
+              setState(() {});
+              break;
+            }
           }
         }
       }

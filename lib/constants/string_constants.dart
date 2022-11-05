@@ -30,7 +30,7 @@ class StringC {
 
   // String constants in the login/ sign-in page.
   static const String login = 'Login';
-  static const String signIn= "Sign-In";
+  static const String createAccount= "Create Account";
   static const String appName = 'Re-Vision';
   static const String doNotHaveAccount = "Don't have an account? ";
   static const String alreadyHaveAccount = 'Already have an account?';
