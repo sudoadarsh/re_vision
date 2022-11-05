@@ -58,16 +58,6 @@ class _SearchPageState extends State<SearchPage> {
               prefixIcon: IconC.search,
               onFieldSubmitted: (val) async {
                 _searchCubit.fetchData<QueryDocumentSnapshot>(data: val);
-                // await BaseCloud.db
-                //     ?.collection("users")
-                //     .where("email", isGreaterThanOrEqualTo: val?.trim())
-                //     .get()
-                //     .then((value) {
-                //       List docs = value.docs;
-                //       for (QueryDocumentSnapshot element in docs) {
-                //         print (element.data().toString());
-                //       }
-                //     });
               },
             ),
             BlocBuilder(
@@ -86,7 +76,7 @@ class _SearchPageState extends State<SearchPage> {
                       .toList();
                   return Expanded(
                     child: ListView.builder(
-                      itemCount: data.length,
+                      itemCount: filterD.length,
                       itemBuilder: (context, ind) {
                         UserFBDm filterM =
                             UserFBDm.fromJson(filterD[ind].data());
@@ -144,8 +134,13 @@ class _UserResultState extends State<_UserResult> {
     /// Update the requestR field of other user.
     List r = widget.data.requests?.map((e) => e.toJson()).toList() ?? [];
 
-    Requests rr =
-        Requests(uuid: BaseAuth.currentUser()?.uid, status: 0, seen: 0);
+    Requests rr = Requests(
+        uuid: BaseAuth.currentUser()?.uid,
+        status: 0,
+        seen: 0,
+        name: BaseAuth.currentUser()?.displayName,
+        email: BaseAuth.currentUser()?.email,
+        pic: BaseAuth.currentUser()?.photoURL);
 
     r.add(rr.toJson());
 
@@ -186,16 +181,24 @@ class _UserResultState extends State<_UserResult> {
   /// To check whether the searched user is already requested a request.
   Widget _checkReq() {
     List<Requests> req = widget.data.requests ?? [];
+    List<Friends> frs = widget.data.friends ?? [];
 
     Requests res = req.firstWhere(
       (element) => element.uuid == BaseAuth.currentUser()?.uid,
       orElse: () => Requests(),
     );
 
+    Friends fr = frs.firstWhere(
+      (element) => element.uuid == BaseAuth.currentUser()?.uid,
+      orElse: () => Friends(),
+    );
+
+    if (fr.uuid != null) {
+      return SizeC.none;
+    }
+
     if (res.status == 0) {
       return _requestedButton();
-    } else if (res.status == 1) {
-      return SizeC.none;
     } else {
       return _requestButton();
     }

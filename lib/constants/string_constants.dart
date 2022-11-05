@@ -26,7 +26,6 @@ class StringC {
 
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
-  static const String lottieSign = 'lottiefiles/sign_in.json';
 
 
   // String constants in the login/ sign-in page.
@@ -35,11 +34,10 @@ class StringC {
   static const String appName = 'Re-Vision';
   static const String doNotHaveAccount = "Don't have an account? ";
   static const String alreadyHaveAccount = 'Already have an account?';
-  static const String continueWithGoogle = 'Continue with Goggle';
   static const String emailOrAppleId = 'Email or Apple Id';
   static const String password = 'Password';
-  static const String continueWithApple = 'Continue with Apple ';
-  static const String welcome = 'Welcome...';
+  static const String welcome = 'Welcome to Re-vision...';
+  static const String forgor = 'Forgot Password?';
 
   // String constants used in the dashboard.
   static const String dashboard = 'Dashboard';
@@ -105,4 +103,6 @@ class StringC {
 
   // String constants used in notifications page.
   static const String frRequests = "Friend Request(s)";
+  static const String notifications = "Notifications";
+  static const String accept = "Accept";
 }

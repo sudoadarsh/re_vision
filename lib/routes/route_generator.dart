@@ -4,7 +4,7 @@ import 'package:re_vision/modules/profile/profile_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 
 import '../modules/home_page/home_page.dart';
-import '../modules/sign_in_page/sign_in_page.dart';
+import '../modules/login_page/login_page.dart';
 import '../modules/topic_page/topic_page.dart';
 
 class RouteGenerator {
@@ -12,9 +12,9 @@ class RouteGenerator {
     Widget page;
 
     switch (settings.name) {
-      case RouteC.signPage:
-        page = const SignInPage();
-        break;
+      // case RouteC.signPage:
+      //   page = const SignInPage();
+      //   break;
       case RouteC.dashboard:
         page = const DashBoard();
         break;
@@ -25,9 +25,9 @@ class RouteGenerator {
         final args = settings.arguments as TopicPageArguments;
         page = TopicPage(selectedDay: args.selectedDay, topicDm: args.topicDm);
         break;
-      // case RouteConstants.loginPage:
-      //   page = const LoginPage();
-      //   break;
+      case RouteC.loginPage:
+        page = const LoginPage();
+        break;
       case RouteC.profilePage:
         page = const ProfilePage();
         break;

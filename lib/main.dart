@@ -41,7 +41,7 @@ class Root extends StatelessWidget {
         onGenerateRoute: RouteGenerator.generate,
         initialRoute: authState == 1
             ? RouteC.dashboard
-            : RouteC.signPage,
+            : RouteC.loginPage,
         // initialRoute: RouteC.profilePage,
       ),
     );

@@ -7,12 +7,14 @@ class LinkToPage extends StatelessWidget {
     Key? key,
     required this.title,
     required this.pageName,
-    required this.route,
+    this.route,
+    this.onTap
   }) : super(key: key);
 
   final String title;
   final String pageName;
-  final String route;
+  final String? route;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +23,8 @@ class LinkToPage extends StatelessWidget {
       children: [
         BaseText(title),
         TextButton(
-          onPressed: () {
-            Navigator.of(context).pushNamed(route);
+          onPressed: route == null ? onTap : () {
+            Navigator.of(context).pushNamed(route!);
           },
           child: BaseText(pageName),
         )

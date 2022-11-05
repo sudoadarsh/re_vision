@@ -54,11 +54,11 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
             .bodyText1
             ?.copyWith(color: Colors.grey),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25.0),
+          borderRadius: BorderRadius.circular(10.0),
           borderSide: BorderSide(color: Theme.of(context).primaryColor),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(25.0),
+          borderRadius: BorderRadius.circular(10.0),
           borderSide: BorderSide(
             color: Theme.of(context).scaffoldBackgroundColor,
           ),

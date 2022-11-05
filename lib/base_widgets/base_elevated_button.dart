@@ -22,7 +22,7 @@ class BaseElevatedButton extends StatelessWidget {
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor,
         elevation: elevation,
-        minimumSize: size?? const Size(100, 55),
+        minimumSize: size?? const Size(100, 50),
       ),
       child: child,
     );

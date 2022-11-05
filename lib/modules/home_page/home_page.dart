@@ -281,8 +281,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    _focusedDay = DateTimeConstants.todayTime;
-    _selectedDay = DateTimeConstants.getTodayDateFormatted();
+    _focusedDay = DateTimeC.todayTime;
+    _selectedDay = DateTimeC.getTodayDateFormatted();
     _calendarFormat = CalendarFormat.week;
 
     _databaseCubit = CommonCubit(TopicRepo());
@@ -407,7 +407,7 @@ class _HomePageState extends State<HomePage> {
   List<TopicDm> filterTopics(DateTime date) {
     List<TopicDm> filteredTasks = _topics
         .where((element) =>
-            element.scheduledTo == DateTimeConstants.reformatSelectedDate(date))
+            element.scheduledTo == DateTimeC.reformatSelectedDate(date))
         .toList();
     return filteredTasks;
   }

@@ -1,4 +1,4 @@
-class DateTimeConstants {
+class DateTimeC {
   static DateTime todayTime = DateTime.now();
   static DateTime firstDay = DateTime.utc(2022, 08, 06);
   static DateTime lastDay = DateTime.utc(2030, 3, 14);
@@ -24,7 +24,7 @@ class DateTimeConstants {
     try {
       DateTime timeParsed = DateTime.parse(time ?? '');
       return timeParsed.isBefore(
-          DateTimeConstants.todayTime.subtract(const Duration(days: 1)));
+          DateTimeC.todayTime.subtract(const Duration(days: 1)));
     } catch (e) {
       return false;
     }
@@ -32,4 +32,7 @@ class DateTimeConstants {
 
   /// Constant duration of 500 ms.
   static const Duration cd500 = Duration(milliseconds: 500);
+
+  /// Constant duration of 500 ms.
+  static const Duration cd200 = Duration(milliseconds: 200);
 }

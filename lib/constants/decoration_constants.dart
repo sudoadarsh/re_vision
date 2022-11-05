@@ -13,6 +13,14 @@ class DecorC {
     );
   }
 
+  /// BoxDecoration with rounded corners.
+  static BoxDecoration boxDecorAll({required double radius}) {
+    return BoxDecoration(
+      borderRadius: BorderRadius.all(Radius.circular(radius))
+    );
+  }
+
+
   /// Gives rounded border radius. Passed to [borderRadius].
   static BorderRadius roundedBorderRadius(double radius) {
     return BorderRadius.all(Radius.circular(radius));

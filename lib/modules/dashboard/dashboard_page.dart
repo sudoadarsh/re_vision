@@ -11,6 +11,7 @@ import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/user_dm.dart';
+import 'package:re_vision/modules/notification/notifications_page.dart';
 import 'package:re_vision/modules/search_page/search_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/utils/app_config.dart';
@@ -34,6 +35,18 @@ class DashBoard extends StatefulWidget {
 
 class _DashBoardState extends State<DashBoard> {
   CurrentS _currentS = CurrentS.search;
+
+  List<Requests> _req = [];
+  List<Friends> _frs = [];
+
+  /// Boolean to control the notifications.
+  bool newNotifications = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _getFRRequests();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +99,7 @@ class _DashBoardState extends State<DashBoard> {
                           (AppConfig.width(context) * 0.20).separation(false),
                           // Notifications.
                           Stack(
+                            alignment: Alignment.center,
                             clipBehavior: Clip.none,
                             children: [
                               _bottomNavButton(
@@ -93,13 +107,16 @@ class _DashBoardState extends State<DashBoard> {
                                 _currentS,
                                 icon: IconC.notification,
                               ),
-                              Positioned(
-                                bottom: -10,
+                              newNotifications ? Positioned(
+                                bottom: -0,
                                 child: Container(
-                                  decoration: const BoxDecoration(shape: BoxShape.circle, color: ColorC.secondary),
-                                  height: 5, width: 5,
+                                  decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: ColorC.secondary),
+                                  height: 5,
+                                  width: 5,
                                 ),
-                              )
+                              ) : SizeC.none,
                             ],
                           ),
                           // Profile.
@@ -261,12 +278,15 @@ class _DashBoardState extends State<DashBoard> {
       final Map<String, dynamic> snapD = snap.data() as Map<String, dynamic>;
       UserFBDm snapM = UserFBDm.fromJson(snapD);
 
-      List <Requests> req = snapM.requests ?? [];
+      _req = snapM.requests ?? [];
+      _frs = snapM.friends ?? [];
 
-      if (req.isNotEmpty) {
-        for (Requests e in req) {
+      if (_req.isNotEmpty) {
+        for (Requests e in _req) {
           if (e.seen == 0) {
             // Show notification badge.
+            newNotifications = true;
+            setState(() {});
             break;
           }
         }
@@ -284,7 +304,7 @@ class _DashBoardState extends State<DashBoard> {
       case CurrentS.profile:
         return Container();
       case CurrentS.notifications:
-        return Container();
+        return NotificationsPage(req: _req, frs: _frs);
       default:
         return _dashboard(context);
     }
