@@ -181,21 +181,21 @@ class _UserResultState extends State<_UserResult> {
   /// To check whether the searched user is already requested a request.
   Widget _checkReq() {
     List<Requests> req = widget.data.requests ?? [];
-    List<Friends> frs = widget.data.friends ?? [];
+    // List<Friends> frs = widget.data.friends ?? [];
 
     Requests res = req.firstWhere(
       (element) => element.uuid == BaseAuth.currentUser()?.uid,
       orElse: () => Requests(),
     );
 
-    Friends fr = frs.firstWhere(
-      (element) => element.uuid == BaseAuth.currentUser()?.uid,
-      orElse: () => Friends(),
-    );
+    // Friends fr = frs.firstWhere(
+    //   (element) => element.uuid == BaseAuth.currentUser()?.uid,
+    //   orElse: () => Friends(),
+    // );
 
-    if (fr.uuid != null) {
-      return SizeC.none;
-    }
+    // if (fr.uuid != null) {
+    //   return SizeC.none;
+    // }
 
     if (res.status == 0) {
       return _requestedButton();

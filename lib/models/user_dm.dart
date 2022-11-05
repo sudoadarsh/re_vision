@@ -8,12 +8,10 @@ class UserFBDm {
     String? name,
     String? email,
     List<Requests>? requests,
-    List<Friends>? friends,
   }) {
     _name = name;
     _email = email;
     _requests = requests;
-    _friends = friends;
   }
 
   UserFBDm.fromJson(dynamic json) {
@@ -25,30 +23,21 @@ class UserFBDm {
         _requests?.add(Requests.fromJson(v));
       });
     }
-    if (json['friends'] != null) {
-      _friends = [];
-      json['friends'].forEach((v) {
-        _friends?.add(Friends.fromJson(v));
-      });
-    }
   }
 
   String? _name;
   String? _email;
   List<Requests>? _requests;
-  List<Friends>? _friends;
 
   UserFBDm copyWith({
     String? name,
     String? email,
     List<Requests>? requests,
-    List<Friends>? friends,
   }) =>
       UserFBDm(
         name: name ?? _name,
         email: email ?? _email,
         requests: requests ?? _requests,
-        friends: friends ?? _friends,
       );
 
   String? get name => _name;
@@ -57,8 +46,6 @@ class UserFBDm {
 
   List<Requests>? get requests => _requests;
 
-  List<Friends>? get friends => _friends;
-
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['name'] = _name;
@@ -66,40 +53,6 @@ class UserFBDm {
     if (_requests != null) {
       map['requests'] = _requests?.map((v) => v.toJson()).toList();
     }
-    if (_friends != null) {
-      map['friends'] = _friends?.map((v) => v.toJson()).toList();
-    }
-    return map;
-  }
-}
-
-/// uuid : ""
-
-class Friends {
-  Friends({
-    String? uuid,
-  }) {
-    _uuid = uuid;
-  }
-
-  Friends.fromJson(dynamic json) {
-    _uuid = json['uuid'];
-  }
-
-  String? _uuid;
-
-  Friends copyWith({
-    String? uuid,
-  }) =>
-      Friends(
-        uuid: uuid ?? _uuid,
-      );
-
-  String? get uuid => _uuid;
-
-  Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{};
-    map['uuid'] = _uuid;
     return map;
   }
 }

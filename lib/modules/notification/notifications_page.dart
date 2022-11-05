@@ -12,11 +12,10 @@ class NotificationsPage extends StatefulWidget {
   const NotificationsPage({
     Key? key,
     required this.req,
-    required this.frs,
   }) : super(key: key);
 
   final List<Requests> req;
-  final List<Friends> frs;
+  // final List<Friends> frs;
 
   @override
   State<NotificationsPage> createState() => _NotificationsPageState();
@@ -35,7 +34,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
             title: const BaseText(StringC.notifications),
           ),
           SliverToBoxAdapter(
-            child: _RequestsTile(req: widget.req, frs: widget.frs),
+            child: _RequestsTile(req: widget.req),
           ),
         ],
       ),
@@ -48,18 +47,18 @@ class _RequestsTile extends StatelessWidget {
   const _RequestsTile({
     Key? key,
     required this.req,
-    required this.frs,
+    // required this.frs,
   }) : super(key: key);
 
   final List<Requests> req;
-  final List<Friends> frs;
+  // final List<Friends> frs;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => RequestsPage(req: req, frs: frs)),
+          MaterialPageRoute(builder: (_) => RequestsPage(req: req)),
         );
       },
       leading: Stack(

@@ -44,7 +44,7 @@ class BaseCloud {
     }
   }
 
-  /// To read a document from a single collection.
+  /// To read a document from a single document.
   static Future<DocumentSnapshot?> readD({
     required String collection,
     required String document,
@@ -59,7 +59,8 @@ class BaseCloud {
   }
 
   /// Read the entire collection.
-  static Future<QuerySnapshot<Map<String, dynamic>>?> readC(String collection) async {
+  static Future<QuerySnapshot<Map<String, dynamic>>?> readC(
+      String collection) async {
     QuerySnapshot<Map<String, dynamic>>? snap;
     try {
       snap = await db?.collection(collection).get();
@@ -67,5 +68,29 @@ class BaseCloud {
       debugPrint(e.toString());
     }
     return snap;
+  }
+
+  /// To create a sub collection inside a document.
+  static Future<void> createSC({
+    required String collection,
+    required String document,
+    required String subCollection,
+    required String subDocument,
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      // Getting a reference of the sub collection document.
+      DocumentReference<Map<String, dynamic>>? ref =  db
+          ?.collection(collection)
+          .doc(document)
+          .collection(subCollection)
+          .doc(subCollection);
+
+      // Add data into the sub collection document.
+      ref?.set(data);
+
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 }

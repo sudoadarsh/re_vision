@@ -4,7 +4,6 @@ import 'package:re_vision/base_widgets/base_elevated_button.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
-import 'package:re_vision/utils/social_auth/base_auth.dart';
 
 import '../../models/user_dm.dart';
 import '../../utils/cloud/base_cloud.dart';
@@ -14,11 +13,9 @@ class RequestsPage extends StatefulWidget {
   const RequestsPage({
     Key? key,
     required this.req,
-    required this.frs,
   }) : super(key: key);
 
   final List<Requests> req;
-  final List<Friends> frs;
 
   @override
   State<RequestsPage> createState() => _RequestsPageState();
@@ -74,15 +71,15 @@ class _RequestsPageState extends State<RequestsPage> {
   }
 
   void _removeRequest(String? uuid) async {
-    List<Requests> reqU = _req.where((e) => e.uuid != uuid).toList();
-    widget.frs.add(Friends(uuid: uuid));
-    List frsJson = widget.frs.map((e) => e.toJson()).toList();
+    // List<Requests> reqU = _req.where((e) => e.uuid != uuid).toList();
+    // widget.frs.add(Friends(uuid: uuid));
+    // List frsJson = widget.frs.map((e) => e.toJson()).toList();
     try {
-      BaseCloud.update(
-        collection: CloudC.users,
-        document: BaseAuth.currentUser()?.uid ?? '',
-        data: {CloudC.requests: reqU, CloudC.friends : frsJson},
-      );
+      // BaseCloud.update(
+      //   collection: CloudC.users,
+      //   document: BaseAuth.currentUser()?.uid ?? '',
+      //   data: {CloudC.requests: reqU, CloudC.friends : frsJson},
+      // );
     } catch (e) {
       debugPrint("Error while updating data of CU: $e");
     }
@@ -93,16 +90,16 @@ class _RequestsPageState extends State<RequestsPage> {
         await BaseCloud.readD(collection: CloudC.users, document: uuid ?? '');
 
     if (snap != null) {
-      UserFBDm snapM = UserFBDm.fromJson(snap);
-      List<Friends> frs = snapM.friends ?? [];
-      frs.add(Friends(uuid: BaseAuth.currentUser()?.uid));
+      // UserFBDm snapM = UserFBDm.fromJson(snap);
+      // List<Friends> frs = snapM.friends ?? [];
+      // frs.add(Friends(uuid: BaseAuth.currentUser()?.uid));
 
       try {
-        BaseCloud.update(
-          collection: CloudC.users,
-          document: BaseAuth.currentUser()?.uid ?? '',
-          data: {CloudC.friends : frs},
-        );
+        // BaseCloud.update(
+        //   collection: CloudC.users,
+        //   document: BaseAuth.currentUser()?.uid ?? '',
+        //   data: {CloudC.friends : frs},
+        // );
       } catch (e) {
         debugPrint("Error while updating data of OU: $e");
       }

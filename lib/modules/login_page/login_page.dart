@@ -21,6 +21,9 @@ import '../../constants/icon_constants.dart';
 import '../../constants/size_constants.dart';
 import '../../constants/string_constants.dart';
 import '../../models/auth_in_model.dart';
+import '../../models/user_dm.dart';
+import '../../utils/cloud/base_cloud.dart';
+import '../../utils/cloud/cloud_constants.dart';
 
 /// Widget to get the logo of the application.
 ///
@@ -148,10 +151,12 @@ class _FormState extends State<_Form> {
                 if (state is CommonButtonSuccess) {
                   User? user = state.data;
                   if (user != null) {
+                    !_loginState ? _saveUserToCloud(user) : null;
                     Navigator.of(context).pushNamedAndRemoveUntil(
                         RouteC.dashboard, (route) => false);
                   }
                 } else if (state is CommonButtonFailure) {
+                  // todo: add firebase exception snack bars.
                   debugPrint(state.error.toString());
                 }
               },
@@ -200,6 +205,32 @@ class _FormState extends State<_Form> {
   void _clearFields() {
     _passwordController.clear();
     _emailController.clear();
+    FocusScope.of(context).unfocus();
+  }
+
+  Future<void> _saveUserToCloud(User user) async {
+    // Modelling the data.
+    UserFBDm dataToSave = UserFBDm(
+      name: user.displayName,
+      email: user.email,
+      requests: [],
+    );
+
+    // Creating the main collection.
+    BaseCloud.create(
+      collection: CloudC.users,
+      document: user.uid,
+      data: dataToSave.toJson(),
+    );
+
+    // Creating the sub collection for friends.
+    BaseCloud.createSC(
+      collection: CloudC.users,
+      document: user.uid,
+      subCollection: CloudC.friends,
+      subDocument: CloudC.friends,
+      data: {CloudC.friends : []},
+    );
   }
 }
 

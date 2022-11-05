@@ -37,7 +37,7 @@ class _DashBoardState extends State<DashBoard> {
   CurrentS _currentS = CurrentS.search;
 
   List<Requests> _req = [];
-  List<Friends> _frs = [];
+  // List<Friends> _frs = [];
 
   /// Boolean to control the notifications.
   bool newNotifications = false;
@@ -280,7 +280,7 @@ class _DashBoardState extends State<DashBoard> {
         UserFBDm snapM = UserFBDm.fromJson(snapD);
 
         _req = snapM.requests ?? [];
-        _frs = snapM.friends ?? [];
+        // _frs = snapM.friends ?? [];
 
         if (_req.isNotEmpty) {
           for (Requests e in _req) {
@@ -306,7 +306,7 @@ class _DashBoardState extends State<DashBoard> {
       case CurrentS.profile:
         return Container();
       case CurrentS.notifications:
-        return NotificationsPage(req: _req, frs: _frs);
+        return NotificationsPage(req: _req);
       default:
         return _dashboard(context);
     }
