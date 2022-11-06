@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:re_vision/base_shared_prefs/base_shared_prefs.dart';
 import 'package:re_vision/base_widgets/base_elevated_button.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/decoration_constants.dart';
@@ -183,6 +184,7 @@ class ProfilePage extends StatelessWidget {
           CupertinoDialogAction(
             child: const BaseText(StringC.ok),
             onPressed: () {
+              BaseSharedPrefsSingleton.clear();
               BaseAuth.signOut(context, to: RouteC.loginPage);
             },
           ),

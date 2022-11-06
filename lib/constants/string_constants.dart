@@ -38,7 +38,6 @@ class StringC {
   static const String emailOrAppleId = 'Email or Apple Id';
   static const String username = "Username";
   static const String password = 'Password';
-  static const String welcome = 'Welcome to Re-vision...';
   static const String forgor = 'Forgot Password?';
 
   // String constants used in the dashboard.
@@ -46,6 +45,9 @@ class StringC {
   static const String overview = 'Overview';
   static const String pending = "Pending Today";
   static const String stars = 'Stars';
+  static const String completed = "Completed";
+  static const String view = "View";
+  static const String missed = "Missed";
 
   // String constants in the home page.
   static const String homeTitle = empty;

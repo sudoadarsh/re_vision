@@ -42,7 +42,7 @@ class BaseSharedPrefsSingleton {
   /// Delete operations.
   static Future<bool?> delete(String key) async => await _prefs?.remove(key);
 
-  static Future<bool?> clear(String key) async => await _prefs?.clear();
+  static Future<bool?> clear() async => await _prefs?.clear();
 
   /// Check whether a key exists already in the shared prefs.
   static bool? checkKey(String key) => _prefs?.containsKey(key);

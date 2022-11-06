@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:re_vision/base_shared_prefs/base_shared_prefs.dart';
 
 import 'package:re_vision/base_widgets/base_elevated_button.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
@@ -166,6 +167,9 @@ class _FormState extends State<_Form> {
                   User? user = state.data;
                   if (user != null) {
                     !_loginState ? _saveUserToCloud(user) : null;
+                    // Save the auth state.
+                    BaseSharedPrefsSingleton.setValue("auth", 1);
+                    // Navigate to the dashboard.
                     Navigator.of(context).pushNamedAndRemoveUntil(
                         RouteC.dashboard, (route) => false);
                   }
