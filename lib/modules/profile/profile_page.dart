@@ -1,10 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:re_vision/base_widgets/base_outline_button.dart';
+import 'package:re_vision/base_widgets/base_elevated_button.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/decoration_constants.dart';
+import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/routes/route_constants.dart';
+import 'package:re_vision/utils/social_auth/base_auth.dart';
 
 import '../../base_widgets/base_text.dart';
 
@@ -44,10 +48,9 @@ class _EditProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BaseOutlineButton(
-      borderColor: Colors.black,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+    return BaseElevatedButton(
       onPressed: () {},
+      size: const Size(50, 30),
       child: const BaseText(StringC.editProfile),
     );
   }
@@ -93,6 +96,27 @@ class _UserStats extends StatelessWidget {
   }
 }
 
+/// The section header.
+///
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({
+    Key? key,
+    required this.header,
+  }) : super(key: key);
+
+  final String header;
+
+  @override
+  Widget build(BuildContext context) {
+    return BaseText(
+      header,
+      fontSize: 18,
+      fontWeight: FontWeight.w300,
+      color: ColorC.subtitle,
+    );
+  }
+}
+
 /// The profile page.
 
 class ProfilePage extends StatelessWidget {
@@ -103,6 +127,7 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               decoration: DecorC.boxDecorAll(radius: 10.0)
@@ -125,8 +150,49 @@ class ProfilePage extends StatelessWidget {
                 ],
               ).paddingDefault(),
             ),
+            SizeC.spaceVertical10,
+            Expanded(
+              child: ListView(
+                children: [
+                  const _SectionHeader(header: StringC.account),
+                  ListTile(
+                    onTap: () => _logoutAlert(context),
+                    contentPadding: EdgeInsets.zero,
+                    title: const BaseText(StringC.logout),
+                    trailing: IconC.logout,
+                  ),
+                ],
+              ),
+            )
           ],
         ).paddingDefault(),
+      ),
+    );
+  }
+
+  // ------------------------------ Functions ----------------------------------
+
+  /// Function to display the dialog alerting the user about the logout.
+  void _logoutAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => CupertinoAlertDialog(
+        title: const Text(StringC.logout),
+        content: const Text(StringC.logoutDesc),
+        actions: [
+          CupertinoDialogAction(
+            child: const BaseText(StringC.ok),
+            onPressed: () {
+              BaseAuth.signOut(context, to: RouteC.loginPage);
+            },
+          ),
+          CupertinoDialogAction(
+            child: const BaseText(StringC.cancel),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
       ),
     );
   }

@@ -89,12 +89,15 @@ class BaseAuth {
   }
 
   /// Sign-out the user.
-  static Future<void> signOut(BuildContext context) async {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
+  static Future<void> signOut(BuildContext context, {required String to}) async {
+    // final GoogleSignIn googleSignIn = GoogleSignIn();
+
+    final NavigatorState nav = Navigator.of(context);
 
     try {
-      await googleSignIn.signOut();
-      await FirebaseAuth.instance.signOut();
+      // await googleSignIn.signOut();
+      await _fireInst?.signOut();
+      nav.pushNamedAndRemoveUntil(to, (route) => false);
     } catch (e) {
       baseSnackBar(context,
           message: 'Error signing out. Try again.', leading: IconC.failed);
