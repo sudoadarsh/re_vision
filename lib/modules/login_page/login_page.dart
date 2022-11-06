@@ -71,6 +71,7 @@ class _FormState extends State<_Form> {
   // The text field controllers.
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+  late final TextEditingController _usernameController;
 
   // To alter between login and sign-in.
   bool _loginState = true;
@@ -82,6 +83,7 @@ class _FormState extends State<_Form> {
   void initState() {
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _usernameController = TextEditingController();
 
     _authCubit = CommonButtonCubit(AuthRepo());
     super.initState();
@@ -91,6 +93,10 @@ class _FormState extends State<_Form> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _usernameController.dispose();
+
+    _authCubit.close();
+
     super.dispose();
   }
 
@@ -104,10 +110,18 @@ class _FormState extends State<_Form> {
           SizeC.spaceVertical20,
           BaseTextFormFieldWithDepth(
             controller: _emailController,
-            prefixIcon: IconC.user,
+            prefixIcon: IconC.email,
             labelText: StringC.emailOrAppleId,
           ),
           SizeC.spaceVertical10,
+          if (!_loginState) ...[
+            BaseTextFormFieldWithDepth(
+              controller: _usernameController,
+              prefixIcon: IconC.user,
+              labelText: StringC.username,
+            ),
+            SizeC.spaceVertical10,
+          ],
           StatefulBuilder(builder: (context, sst) {
             return BaseTextFormFieldWithDepth(
               controller: _passwordController,
@@ -211,7 +225,7 @@ class _FormState extends State<_Form> {
   Future<void> _saveUserToCloud(User user) async {
     // Modelling the data.
     UserFBDm dataToSave = UserFBDm(
-      name: user.displayName,
+      name: _usernameController.text.trim(),
       email: user.email,
       requests: [],
     );
@@ -229,8 +243,11 @@ class _FormState extends State<_Form> {
       document: user.uid,
       subCollection: CloudC.friends,
       subDocument: CloudC.friends,
-      data: {CloudC.friends : []},
+      data: {CloudC.friends: []},
     );
+
+    // Update the user name of the user.
+    user.updateDisplayName(_usernameController.text.trim());
   }
 }
 

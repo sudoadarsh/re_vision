@@ -7,6 +7,10 @@ class IconC {
   static final Widget mainLogo = Image.asset(StringC.logoPath, scale: 8);
 
   // Icons used in the login page.
+  static const Icon email = Icon(
+    Icons.email,
+    color: ColorC.primary,
+  );
   static const Icon user = Icon(
     Icons.person,
     color: ColorC.primary,

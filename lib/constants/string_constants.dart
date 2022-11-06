@@ -35,6 +35,7 @@ class StringC {
   static const String doNotHaveAccount = "Don't have an account? ";
   static const String alreadyHaveAccount = 'Already have an account?';
   static const String emailOrAppleId = 'Email or Apple Id';
+  static const String username = "Username";
   static const String password = 'Password';
   static const String welcome = 'Welcome to Re-vision...';
   static const String forgor = 'Forgot Password?';
