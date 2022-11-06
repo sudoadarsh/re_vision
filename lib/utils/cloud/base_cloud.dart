@@ -44,6 +44,29 @@ class BaseCloud {
     }
   }
 
+  /// To update data in the sub-collection.
+  static Future<void> updateSC({
+    required String collection,
+    required String document,
+    required String subCollection,
+    required String subDocument,
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      // Getting a reference of the sub collection document.
+      DocumentReference<Map<String, dynamic>>? ref = db
+          ?.collection(collection)
+          .doc(document)
+          .collection(subCollection)
+          .doc(subCollection);
+
+      // Update the data in the sub collection.
+      ref?.update(data);
+    } catch (e) {
+      debugPrint("Error while updating data in the sub collection");
+    }
+  }
+
   /// To read a document from a single document.
   static Future<DocumentSnapshot?> readD({
     required String collection,
@@ -80,7 +103,7 @@ class BaseCloud {
   }) async {
     try {
       // Getting a reference of the sub collection document.
-      DocumentReference<Map<String, dynamic>>? ref =  db
+      DocumentReference<Map<String, dynamic>>? ref = db
           ?.collection(collection)
           .doc(document)
           .collection(subCollection)
@@ -88,7 +111,6 @@ class BaseCloud {
 
       // Add data into the sub collection document.
       ref?.set(data);
-
     } catch (e) {
       debugPrint(e.toString());
     }
