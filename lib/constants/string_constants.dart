@@ -23,6 +23,7 @@ class StringC {
   static const String noFavIconPath = 'images/no_favicon.png';
   static const String starPath = 'images/star.png';
   static const String friendPath = 'images/friend.png';
+  static const String defaultPPPath = 'images/default_profile.png';
 
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
@@ -90,6 +91,7 @@ class StringC {
 
   // String constants used in profile page.
   static const String starsProf = "Stars";
+  static const String revisionProf = 'Revisions';
   static const String friends = 'Friends';
   static const String editProfile = "Edit Profile";
   static const String findFriends = "Find Friends";

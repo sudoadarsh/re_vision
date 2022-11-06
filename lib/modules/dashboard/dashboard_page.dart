@@ -12,6 +12,7 @@ import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/user_dm.dart';
 import 'package:re_vision/modules/notification/notifications_page.dart';
+import 'package:re_vision/modules/profile/profile_page.dart';
 import 'package:re_vision/modules/search_page/search_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/utils/app_config.dart';
@@ -304,7 +305,7 @@ class _DashBoardState extends State<DashBoard> {
       case CurrentS.search:
         return const SearchPage();
       case CurrentS.profile:
-        return Container();
+        return const ProfilePage();
       case CurrentS.notifications:
         return NotificationsPage(req: _req);
       default:
