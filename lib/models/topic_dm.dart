@@ -9,7 +9,7 @@ import 'package:re_vision/base_sqlite/base_sqlite_model.dart';
 
 class TopicDm extends BaseSqliteModel {
   TopicDm({
-    int? id,
+    String? id,
     String? topic,
     String? attachments,
     String? notes,
@@ -36,7 +36,7 @@ class TopicDm extends BaseSqliteModel {
     _iteration = json['iteration'];
   }
 
-  int? _id;
+  String? _id;
   String? _topic;
   String? _attachments;
   String? _notes;
@@ -45,7 +45,7 @@ class TopicDm extends BaseSqliteModel {
   int? _iteration;
 
   TopicDm copyWith({
-    int? id,
+    String? id,
     String? topic,
     String? attachments,
     String? notes,
@@ -63,7 +63,7 @@ class TopicDm extends BaseSqliteModel {
         iteration: iteration ?? _iteration,
       );
 
-  int? get id => _id;
+  String? get id => _id;
 
   String? get topic => _topic;
 

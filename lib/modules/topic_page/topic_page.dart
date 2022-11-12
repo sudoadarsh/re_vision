@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:uuid/uuid.dart';
 import 'package:favicon/favicon.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -588,6 +588,7 @@ class _TopicPageState extends State<TopicPage> {
       // todo: add condition for empty topic field.
       // Creating the topic data.
       final TopicDm data = TopicDm(
+        id: const Uuid().v1(),
         topic: _topicController.text,
         attachments: jsonEncode(jsonData),
         notes: jsonEncode(jsonQuill),

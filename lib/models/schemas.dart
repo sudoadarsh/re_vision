@@ -7,10 +7,9 @@ class Schemas {
       /// The id column which is the primary key of our local database table.
       DbColumn(
         columnName: StringC.id,
-        datatype: DbDataType.integer,
+        datatype: DbDataType.text,
         dataAttributes: [
           DbDataAttr.primaryKey,
-          DbDataAttr.autoIncrement,
           DbDataAttr.notNull
         ],
       ),
