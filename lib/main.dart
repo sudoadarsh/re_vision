@@ -32,7 +32,7 @@ class Root extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int authState = BaseSharedPrefsSingleton.getInt("auth") ?? 0;
+    // int authState = BaseSharedPrefsSingleton.getInt("auth") ?? 0;
 
     return BlocProvider(
       create: (context) => AttachmentCubit(),
