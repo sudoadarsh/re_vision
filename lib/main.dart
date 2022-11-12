@@ -39,10 +39,10 @@ class Root extends StatelessWidget {
       child: MaterialApp(
         theme: CustomThemeData.themeData,
         onGenerateRoute: RouteGenerator.generate,
-        initialRoute: authState == 1
-            ? RouteC.dashboard
-            : RouteC.loginPage,
-        // initialRoute: RouteC.profilePage,
+        // initialRoute: authState == 1
+        //     ? RouteC.dashboard
+        //     : RouteC.loginPage,
+        initialRoute: RouteC.profilePage,
       ),
     );
   }
