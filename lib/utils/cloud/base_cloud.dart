@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
+typedef JSON = Map<String, dynamic>;
+
 class BaseCloud {
   // Initialise the cloud firestore.
   static FirebaseFirestore? db;
@@ -15,7 +17,7 @@ class BaseCloud {
   static Future<void> create({
     required String collection,
     required String document,
-    required Map<String, dynamic> data,
+    required JSON data,
   }) async {
     try {
       // Add the map data into specified collection.
@@ -32,7 +34,7 @@ class BaseCloud {
   static Future<void> update({
     required String collection,
     required String document,
-    required Map<String, dynamic> data,
+    required JSON data,
   }) async {
     try {
       // Get the reference of the document.
@@ -50,11 +52,11 @@ class BaseCloud {
     required String document,
     required String subCollection,
     required String subDocument,
-    required Map<String, dynamic> data,
+    required JSON data,
   }) async {
     try {
       // Getting a reference of the sub collection document.
-      DocumentReference<Map<String, dynamic>>? ref = db
+      DocumentReference<JSON>? ref = db
           ?.collection(collection)
           .doc(document)
           .collection(subCollection)
@@ -82,9 +84,8 @@ class BaseCloud {
   }
 
   /// Read the entire collection.
-  static Future<QuerySnapshot<Map<String, dynamic>>?> readC(
-      String collection) async {
-    QuerySnapshot<Map<String, dynamic>>? snap;
+  static Future<QuerySnapshot<JSON>?> readC(String collection) async {
+    QuerySnapshot<JSON>? snap;
     try {
       snap = await db?.collection(collection).get();
     } catch (e) {
@@ -99,20 +100,52 @@ class BaseCloud {
     required String document,
     required String subCollection,
     required String subDocument,
-    required Map<String, dynamic> data,
+    required JSON data,
   }) async {
     try {
       // Getting a reference of the sub collection document.
-      DocumentReference<Map<String, dynamic>>? ref = db
+      DocumentReference<JSON>? ref = db
           ?.collection(collection)
           .doc(document)
           .collection(subCollection)
-          .doc(subCollection);
+          .doc(subDocument);
 
       // Add data into the sub collection document.
       ref?.set(data);
+
     } catch (e) {
       debugPrint(e.toString());
     }
+  }
+
+  /// To read from a sub-collection.
+  static Future<List<String>> readSCIDs({
+    required String collection,
+    required String document,
+    required String subCollection,
+  }) async {
+    // The list of sub collection document ids.
+    List<String> ids = [];
+    try {
+      CollectionReference<JSON>? ref = db
+          ?.collection(collection)
+          .doc(document)
+          .collection(subCollection);
+
+      QuerySnapshot<JSON>? qSnap = await ref?.get();
+
+      // Guard the query snapshot.
+      if (qSnap == null || qSnap.docs.isEmpty) return ids;
+
+      List<QueryDocumentSnapshot> snaps = qSnap.docs;
+
+      ids = snaps.map((e) => e.id).toList();
+
+      return ids;
+
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return ids;
   }
 }

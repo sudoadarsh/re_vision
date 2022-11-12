@@ -64,8 +64,6 @@ class _RequestsPageState extends State<RequestsPage> {
 
   void _removeRequest(String? otherUUID) async {
     List<Requests> reqU = _req.where((e) => e.uuid != otherUUID).toList();
-    // widget.frs.add(Friends(uuid: uuid));
-    // List frsJson = widget.frs.map((e) => e.toJson()).toList();
     try {
       BaseCloud.update(
         collection: CloudC.users,
@@ -74,14 +72,12 @@ class _RequestsPageState extends State<RequestsPage> {
       );
 
       // Update the friends sub list of current user (Add the user).
-      BaseCloud.updateSC(
+      BaseCloud.createSC(
         collection: CloudC.users,
         document: BaseAuth.currentUser()?.uid ?? '',
         subCollection: CloudC.friends,
-        subDocument: CloudC.friends,
-        data: {
-          CloudC.friends: otherUUID,
-        },
+        subDocument: otherUUID ?? "",
+        data: {CloudC.uuid : otherUUID}
       );
     } catch (e) {
       debugPrint("Error while updating data of CU: $e");
@@ -91,13 +87,13 @@ class _RequestsPageState extends State<RequestsPage> {
   void _updateOU(String? uuid) async {
     try {
       // Update the friends sub list of other user (Add the current user).
-      BaseCloud.updateSC(
+      BaseCloud.createSC(
         collection: CloudC.users,
         document: uuid ?? '',
         subCollection: CloudC.friends,
-        subDocument: CloudC.friends,
+        subDocument: BaseAuth.currentUser()?.uid ?? "",
         data: {
-          CloudC.friends: BaseAuth.currentUser()?.uid,
+          CloudC.uuid: BaseAuth.currentUser()?.uid,
         },
       );
     } catch (e) {

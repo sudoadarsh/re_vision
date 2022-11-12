@@ -143,8 +143,7 @@ class _AttachmentsState extends State<_Attachments> {
                 }),
                 leading: widget.leadingIcon,
                 title: BaseText(widget.title),
-                trailing:
-                    !_expand ? IconC.expand : IconC.collapse,
+                trailing: !_expand ? IconC.expand : IconC.collapse,
               ),
             ),
             BaseExpandedSection(expand: _expand, child: widget.expandedView)
@@ -515,8 +514,10 @@ class _TopicPageState extends State<TopicPage> {
 
   // 4.1 File picker to pick image when the user wants to select an image.
   // todo: add info plist permissions.
-  Future _pickFile(
-      {required List<String> allowedExtensions, required int fileType}) async {
+  Future _pickFile({
+    required List<String> allowedExtensions,
+    required int fileType,
+  }) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,

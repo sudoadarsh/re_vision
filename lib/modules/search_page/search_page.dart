@@ -32,12 +32,15 @@ class _SearchPageState extends State<SearchPage> {
   /// The search cubit.
   late final CommonCubit _searchCubit;
 
+  /// The list of friends of the user.
+  late final List<String> _friends;
+
   @override
   void initState() {
     super.initState();
     _sc = TextEditingController();
-
     _searchCubit = CommonCubit(SearchRepo());
+    _getFriends();
   }
 
   @override
@@ -81,7 +84,10 @@ class _SearchPageState extends State<SearchPage> {
                         UserFBDm filterM =
                             UserFBDm.fromJson(filterD[ind].data());
                         return _UserResult(
-                            data: filterM, userId: filterD[ind].id);
+                          frs: _friends,
+                          data: filterM,
+                          userId: filterD[ind].id,
+                        );
                       },
                     ),
                   );
@@ -94,17 +100,33 @@ class _SearchPageState extends State<SearchPage> {
       ),
     );
   }
+
+  // -------------------------------- Functions --------------------------------
+
+  /// To get the friends of the current user.
+  Future<void> _getFriends() async {
+    _friends = await BaseCloud.readSCIDs(
+      collection: CloudC.users,
+      document: BaseAuth.currentUser()?.uid ?? "",
+      subCollection: CloudC.friends,
+    );
+  }
 }
 
 /// A [ListTile] representing the user results.
 ///
 
 class _UserResult extends StatefulWidget {
-  const _UserResult({Key? key, required this.data, required this.userId})
-      : super(key: key);
+  const _UserResult({
+    Key? key,
+    required this.data,
+    required this.userId,
+    required this.frs,
+  }) : super(key: key);
 
   final UserFBDm data;
   final String userId;
+  final List<String> frs;
 
   @override
   State<_UserResult> createState() => _UserResultState();
@@ -113,6 +135,9 @@ class _UserResult extends StatefulWidget {
 class _UserResultState extends State<_UserResult> {
   /// Boolean to live update the button.
   late Widget _currentButton;
+
+  /// The list of current friends of the user.
+  List<String> get _frs => widget.frs;
 
   @override
   void initState() {
@@ -131,7 +156,7 @@ class _UserResultState extends State<_UserResult> {
 
   /// Friend Request.
   void _friendRequest() {
-    /// Update the requestR field of other user.
+    /// Update the request field of other user.
     List r = widget.data.requests?.map((e) => e.toJson()).toList() ?? [];
 
     Requests rr = Requests(
@@ -181,21 +206,20 @@ class _UserResultState extends State<_UserResult> {
   /// To check whether the searched user is already requested a request.
   Widget _checkReq() {
     List<Requests> req = widget.data.requests ?? [];
-    // List<Friends> frs = widget.data.friends ?? [];
 
     Requests res = req.firstWhere(
       (element) => element.uuid == BaseAuth.currentUser()?.uid,
       orElse: () => Requests(),
     );
 
-    // Friends fr = frs.firstWhere(
-    //   (element) => element.uuid == BaseAuth.currentUser()?.uid,
-    //   orElse: () => Friends(),
-    // );
+    String fr = _frs.firstWhere(
+      (element) => element == widget.userId,
+      orElse: () => "",
+    );
 
-    // if (fr.uuid != null) {
-    //   return SizeC.none;
-    // }
+    if (fr.isNotEmpty) {
+      return SizeC.none;
+    }
 
     if (res.status == 0) {
       return _requestedButton();

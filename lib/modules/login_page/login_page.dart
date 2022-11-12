@@ -241,14 +241,12 @@ class _FormState extends State<_Form> {
       data: dataToSave.toJson(),
     );
 
-    // Creating the sub collection for friends.
+    /*// Creating the sub collection for friends.
     BaseCloud.createSC(
       collection: CloudC.users,
       document: user.uid,
-      subCollection: CloudC.friends,
-      subDocument: CloudC.friends,
-      data: {CloudC.friends: []},
-    );
+      subCollection: CloudC.friends
+    );*/
 
     // Update the user name of the user.
     user.updateDisplayName(_usernameController.text.trim());
