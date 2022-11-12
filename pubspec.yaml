@@ -52,6 +52,7 @@ dependencies:
   carousel_slider: ^4.1.1
   cloud_firestore: ^3.5.1
   flutter_quill: ^6.0.10
+  share_plus: ^6.2.0
 
 dev_dependencies:
   flutter_test:

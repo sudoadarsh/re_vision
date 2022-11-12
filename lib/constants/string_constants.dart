@@ -56,6 +56,10 @@ class StringC {
   static const String deleteAlert = 'Are you sure you want to delete this topic?';
   static const String pleaseEnterATopic = 'Please enter a topic.';
   static const String revision = "Revision";
+  static const String shareAttachments = "Share Attachments";
+  static const String shareRevision = "Share Revision";
+  static const String oops = "Oops!";
+  static const String errorShareAttach = 'Unable to share attachments.';
 
 
   // String constants in the topics page.

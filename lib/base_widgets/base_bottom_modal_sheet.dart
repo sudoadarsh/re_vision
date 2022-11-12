@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:re_vision/constants/color_constants.dart';
+import 'package:re_vision/constants/decoration_constants.dart';
+import 'package:re_vision/extensions/widget_extensions.dart';
 
-class BaseBottomModalSheet extends StatelessWidget {
-  const BaseBottomModalSheet({
+class BaseModalSheetWithNotch extends StatelessWidget {
+  const BaseModalSheetWithNotch({
     Key? key,
     required this.context,
     required this.child,
@@ -14,9 +17,20 @@ class BaseBottomModalSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: child,
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 50,
+              height: 8,
+              decoration: DecorC.boxDecorAll(radius: 10.0)
+                  .copyWith(color: ColorC.shadowColor),
+            ).paddingDefault(),
+            child
+          ],
+        ),
       ),
     );
   }

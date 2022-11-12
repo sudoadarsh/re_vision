@@ -42,8 +42,14 @@ class _SectionHeaders extends StatelessWidget {
 
 /// The Dashboard page.
 ///
-class _DashBoardPage extends StatelessWidget {
+class _DashBoardPage extends StatefulWidget {
   const _DashBoardPage({Key? key}) : super(key: key);
+
+  @override
+  State<_DashBoardPage> createState() => _DashBoardPageState();
+}
+
+class _DashBoardPageState extends State<_DashBoardPage> {
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +174,7 @@ class _DashBoardState extends State<DashBoard> {
   @override
   void initState() {
     super.initState();
-    _getFRRequests();
+    // _getFRRequests();
   }
 
   @override
@@ -319,6 +325,7 @@ class _DashBoardState extends State<DashBoard> {
   Widget _getS() {
     switch (_currentS) {
       case CurrentS.dashboard:
+        _getFRRequests();
         return const _DashBoardPage();
       case CurrentS.search:
         return const SearchPage();

@@ -42,7 +42,7 @@ class Root extends StatelessWidget {
         // initialRoute: authState == 1
         //     ? RouteC.dashboard
         //     : RouteC.loginPage,
-        initialRoute: RouteC.profilePage,
+        initialRoute: RouteC.homePage,
       ),
     );
   }

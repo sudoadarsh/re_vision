@@ -5,6 +5,7 @@ import 'package:re_vision/constants/string_constants.dart';
 class IconC {
   // The main logo.
   static final Widget mainLogo = Image.asset(StringC.logoPath, scale: 8);
+  static final Widget mainLogoMin = Image.asset(StringC.logoPath, scale: 15);
 
   // Icons used in the login page.
   static const Icon email = Icon(
@@ -43,6 +44,8 @@ class IconC {
   static const Icon add = Icon(Icons.add, color: ColorC.primary);
   static const Icon complete = Icon(Icons.done, color: ColorC.primary);
   static const Icon delete = Icon(Icons.delete, color: ColorC.secondary);
+  static const Icon share = Icon(Icons.share, color: Colors.cyan);
+  static const Icon attachments = Icon(Icons.attachment);
 
   // Icons used in the topic page.
   static const Icon article = Icon(Icons.article_outlined);
