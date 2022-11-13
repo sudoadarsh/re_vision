@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/attachment_data_dm.dart';
+import 'package:re_vision/models/friend_dm.dart';
 import 'package:re_vision/models/topic_dm.dart';
 import 'package:re_vision/modules/topic_page/topic_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
@@ -28,6 +30,9 @@ import '../../base_widgets/base_table_calendar.dart';
 import '../../constants/date_time_constants.dart';
 import '../../constants/decoration_constants.dart';
 import '../../models/schemas.dart';
+import '../../utils/cloud/base_cloud.dart';
+import '../../utils/cloud/cloud_constants.dart';
+import '../../utils/social_auth/base_auth.dart';
 
 // class _AppBar extends StatelessWidget with PreferredSizeWidget {
 //   const _AppBar(
@@ -63,16 +68,18 @@ import '../../models/schemas.dart';
 // }
 
 class _Cards extends StatelessWidget {
-  const _Cards(
-      {Key? key,
-      required this.topic,
-      required this.databaseCubit,
-      required this.selectedDay})
-      : super(key: key);
+  const _Cards({
+    Key? key,
+    required this.topic,
+    required this.databaseCubit,
+    required this.selectedDay,
+    required this.onRevisionShared,
+  }) : super(key: key);
 
   final TopicDm topic;
   final CommonCubit databaseCubit;
   final DateTime selectedDay;
+  final VoidCallback onRevisionShared;
 
   static const Widget _divider =
       Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
@@ -154,7 +161,10 @@ class _Cards extends StatelessWidget {
                       context: context,
                       builder: (_) => BaseModalSheetWithNotch(
                         context: _,
-                        child: _ShareOptions(topic: topic),
+                        child: _ShareOptions(
+                          topic: topic,
+                          onRevisionShare: onRevisionShared,
+                        ),
                       ),
                     );
                   },
@@ -258,9 +268,14 @@ class _Cards extends StatelessWidget {
 /// The share options.
 ///
 class _ShareOptions extends StatelessWidget {
-  const _ShareOptions({Key? key, required this.topic}) : super(key: key);
+  const _ShareOptions({
+    Key? key,
+    required this.topic,
+    required this.onRevisionShare,
+  }) : super(key: key);
 
   final TopicDm topic;
+  final VoidCallback onRevisionShare;
 
   @override
   Widget build(BuildContext context) {
@@ -272,7 +287,7 @@ class _ShareOptions extends StatelessWidget {
           ListTile(
             title: const BaseText(StringC.shareRevision),
             leading: IconC.mainLogoMin,
-            onTap: () {},
+            onTap: onRevisionShare,
           ),
           // To share attachments view other media.
           ListTile(
@@ -322,25 +337,43 @@ class _ShareOptions extends StatelessWidget {
   }
 }
 
-class _TopicCards extends StatelessWidget {
+class _TopicCards extends StatefulWidget {
   final List<TopicDm> topics;
   final CommonCubit databaseCubit;
   final DateTime selectedDay;
+  final List<QueryDocumentSnapshot<JSON>> friends;
 
-  const _TopicCards(
-      {required this.topics,
-      required this.databaseCubit,
-      required this.selectedDay});
+  const _TopicCards({
+    required this.topics,
+    required this.databaseCubit,
+    required this.selectedDay,
+    required this.friends,
+  });
+
+  @override
+  State<_TopicCards> createState() => _TopicCardsState();
+}
+
+class _TopicCardsState extends State<_TopicCards> {
+  late final List<FriendDm> data;
+
+  @override
+  void initState() {
+    super.initState();
+    data = widget.friends.map((e) => FriendDm.fromJson(e.data())).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: topics.length,
+      itemCount: widget.topics.length,
       itemBuilder: (context, index) {
         return _Cards(
-            topic: topics[index],
-            databaseCubit: databaseCubit,
-            selectedDay: selectedDay);
+          topic: widget.topics[index],
+          databaseCubit: widget.databaseCubit,
+          selectedDay: widget.selectedDay,
+          onRevisionShared: () {},
+        );
       },
     );
   }
@@ -364,9 +397,12 @@ class _HomePageState extends State<HomePage> {
   // To store the topics for all the days.
   List<TopicDm> _topics = [];
 
+  // To store the friends of the current user.
+  late final List<QueryDocumentSnapshot<JSON>> _friends;
+
   @override
   void initState() {
-    print("home page called!");
+    _getFriends();
 
     _focusedDay = DateTimeC.todayTime;
     _selectedDay = DateTimeC.getTodayDateFormatted();
@@ -385,18 +421,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       // appBar: _AppBar(selectedDay: _selectedDay, databaseCubit: _databaseCubit),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: ColorC.elevatedButton,
-        onPressed: () {
-          Navigator.of(context)
-              .pushNamed(
-                RouteC.topicPage,
-                arguments: TopicPageArguments(selectedDay: _selectedDay),
-              )
-              .then((value) => _databaseCubit.fetchData());
-        },
-        child: IconC.add,
-      ),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool isInnerScrolled) {
           return [
@@ -407,10 +431,25 @@ class _HomePageState extends State<HomePage> {
                 // Navigate to dashboard page.
                 IconButton(
                   color: ColorC.primary,
-                    onPressed: () => Navigator.of(context)
-                        .pushNamedAndRemoveUntil(
-                            RouteC.dashboard, (route) => false),
-                    icon: IconC.dashboard)
+                  onPressed: () => Navigator.of(context)
+                      .pushNamedAndRemoveUntil(
+                          RouteC.dashboard, (route) => false),
+                  icon: IconC.dashboard,
+                ),
+
+                // Navigate to the add topic screen.
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamed(
+                          RouteC.topicPage,
+                          arguments:
+                              TopicPageArguments(selectedDay: _selectedDay),
+                        )
+                        .then((value) => _databaseCubit.fetchData());
+                  },
+                  icon: IconC.add,
+                )
               ],
             ),
             SliverToBoxAdapter(
@@ -460,12 +499,15 @@ class _HomePageState extends State<HomePage> {
               topics: filteredTopics,
               databaseCubit: _databaseCubit,
               selectedDay: _selectedDay,
+              friends: _friends,
             );
           },
         ),
       ),
     );
   }
+
+  // ------------------------------ Functions ----------------------------------
 
   void sst() => setState(() {});
 
@@ -519,5 +561,14 @@ class _HomePageState extends State<HomePage> {
             : const SizedBox.shrink(),
       );
     });
+  }
+
+  // To get the friends of the current user.
+  Future<void> _getFriends() async {
+    _friends = await BaseCloud.readSC(
+      collection: CloudC.users,
+      document: BaseAuth.currentUser()?.uid ?? "",
+      subCollection: CloudC.friends,
+    );
   }
 }

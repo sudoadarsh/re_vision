@@ -112,13 +112,12 @@ class BaseCloud {
 
       // Add data into the sub collection document.
       ref?.set(data);
-
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
-  /// To read from a sub-collection.
+  /// To read ids of documents from a sub-collection.
   static Future<List<String>> readSCIDs({
     required String collection,
     required String document,
@@ -127,10 +126,8 @@ class BaseCloud {
     // The list of sub collection document ids.
     List<String> ids = [];
     try {
-      CollectionReference<JSON>? ref = db
-          ?.collection(collection)
-          .doc(document)
-          .collection(subCollection);
+      CollectionReference<JSON>? ref =
+          db?.collection(collection).doc(document).collection(subCollection);
 
       QuerySnapshot<JSON>? qSnap = await ref?.get();
 
@@ -142,10 +139,30 @@ class BaseCloud {
       ids = snaps.map((e) => e.id).toList();
 
       return ids;
-
     } catch (e) {
       debugPrint(e.toString());
     }
     return ids;
+  }
+
+  /// To read all the documents in the sub collection.
+  static Future<List<QueryDocumentSnapshot<JSON>>> readSC({
+    required String collection,
+    required String document,
+    required String subCollection,
+  }) async {
+    try {
+      CollectionReference<JSON>? ref =
+          db?.collection(collection).doc(document).collection(subCollection);
+
+      QuerySnapshot<JSON>? qSnap = await ref?.get();
+
+      if (qSnap == null) return [];
+
+      return qSnap.docs;
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+      return [];
+    }
   }
 }
