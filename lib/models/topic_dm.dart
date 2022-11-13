@@ -16,6 +16,7 @@ class TopicDm extends BaseSqliteModel {
     String? createdAt,
     String? scheduledTo,
     int? iteration,
+    int? isOnline,
   }) {
     _id = id;
     _topic = topic;
@@ -24,6 +25,7 @@ class TopicDm extends BaseSqliteModel {
     _createdAt = createdAt;
     _scheduledTo = scheduledTo;
     _iteration = iteration;
+    _isOnline = isOnline;
   }
 
   TopicDm.fromJson(dynamic json) {
@@ -34,6 +36,7 @@ class TopicDm extends BaseSqliteModel {
     _createdAt = json['created_at'];
     _scheduledTo = json['scheduled_to'];
     _iteration = json['iteration'];
+    _isOnline = json['isOnline'];
   }
 
   String? _id;
@@ -43,6 +46,7 @@ class TopicDm extends BaseSqliteModel {
   String? _createdAt;
   String? _scheduledTo;
   int? _iteration;
+  int? _isOnline;
 
   TopicDm copyWith({
     String? id,
@@ -52,6 +56,7 @@ class TopicDm extends BaseSqliteModel {
     String? createdAt,
     String? scheduledTo,
     int? iteration,
+    int? isOnline
   }) =>
       TopicDm(
         id: id ?? _id,
@@ -61,6 +66,7 @@ class TopicDm extends BaseSqliteModel {
         createdAt: createdAt ?? _createdAt,
         scheduledTo: scheduledTo ?? _scheduledTo,
         iteration: iteration ?? _iteration,
+        isOnline: isOnline ?? _isOnline
       );
 
   String? get id => _id;
@@ -77,6 +83,8 @@ class TopicDm extends BaseSqliteModel {
 
   int? get iteration => _iteration;
 
+  int? get isOnline => _isOnline;
+
   @override
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -87,6 +95,7 @@ class TopicDm extends BaseSqliteModel {
     map['created_at'] = _createdAt;
     map['scheduled_to'] = _scheduledTo;
     map['iteration'] = _iteration;
+    map["is_online"] = _isOnline;
     return map;
   }
 }

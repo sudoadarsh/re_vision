@@ -11,6 +11,7 @@ class StringC {
   static const String scheduledTo = 'scheduled_to';
   static const String iteration = 'iteration';
   static const String localDbKey = 'localdb.db';
+  static const String isOnline = "is_online";
 
   static const String topicTable = 'topic_table';
 

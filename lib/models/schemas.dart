@@ -34,7 +34,10 @@ class Schemas {
 
       /// The iteration column. This will store the count of iteration.
       DbColumn(
-          columnName: StringC.iteration, datatype: DbDataType.integer)
+          columnName: StringC.iteration, datatype: DbDataType.integer),
+
+      /// The is online column. Is 1 when the revision is uploaded to the cloud.
+      DbColumn(columnName: StringC.isOnline, datatype: DbDataType.integer)
     ],
   );
   

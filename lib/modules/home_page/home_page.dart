@@ -268,11 +268,13 @@ class _ShareOptions extends StatelessWidget {
       child: ListView(
         shrinkWrap: true,
         children: [
+          // To share attachments to friends.
           ListTile(
             title: const BaseText(StringC.shareRevision),
             leading: IconC.mainLogoMin,
             onTap: () {},
           ),
+          // To share attachments view other media.
           ListTile(
             title: const BaseText(StringC.shareAttachments),
             leading: IconC.attachments,

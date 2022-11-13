@@ -595,6 +595,7 @@ class _TopicPageState extends State<TopicPage> {
         createdAt: widget.selectedDay.toString().replaceAll('Z', ''),
         scheduledTo: widget.selectedDay.toString().replaceAll('Z', ''),
         iteration: 1,
+        isOnline: 0
       );
 
       try {
