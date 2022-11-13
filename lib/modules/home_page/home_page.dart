@@ -291,9 +291,10 @@ class _ShareOptions extends StatelessWidget {
   void _shareAttachments(BuildContext context) {
     try {
       List<dynamic> data = jsonDecode(topic.attachments ?? '');
-      List<AttachmentDataDm> dataDm =
-      data.map((e) => AttachmentDataDm.fromJson(e)).toList()
-        ..where((element) =>  element.type != 0);
+      List<AttachmentDataDm> dataDm = data
+          .map((e) => AttachmentDataDm.fromJson(e))
+          .toList()
+        ..where((element) => element.type != 0);
 
       if (dataDm.isEmpty) return;
 
@@ -365,6 +366,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    print("home page called!");
+
     _focusedDay = DateTimeC.todayTime;
     _selectedDay = DateTimeC.getTodayDateFormatted();
     _calendarFormat = CalendarFormat.week;
@@ -382,6 +385,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       // appBar: _AppBar(selectedDay: _selectedDay, databaseCubit: _databaseCubit),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: ColorC.elevatedButton,
+        onPressed: () {
+          Navigator.of(context)
+              .pushNamed(
+                RouteC.topicPage,
+                arguments: TopicPageArguments(selectedDay: _selectedDay),
+              )
+              .then((value) => _databaseCubit.fetchData());
+        },
+        child: IconC.add,
+      ),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool isInnerScrolled) {
           return [
@@ -389,18 +404,13 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               title: const BaseText(StringC.revision),
               actions: [
+                // Navigate to dashboard page.
                 IconButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushNamed(
-                          RouteC.topicPage,
-                          arguments:
-                              TopicPageArguments(selectedDay: _selectedDay),
-                        )
-                        .then((value) => _databaseCubit.fetchData());
-                  },
-                  icon: const Icon(Icons.add_circle, color: ColorC.primary),
-                ),
+                  color: ColorC.primary,
+                    onPressed: () => Navigator.of(context)
+                        .pushNamedAndRemoveUntil(
+                            RouteC.dashboard, (route) => false),
+                    icon: IconC.dashboard)
               ],
             ),
             SliverToBoxAdapter(

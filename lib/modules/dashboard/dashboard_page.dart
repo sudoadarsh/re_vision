@@ -57,7 +57,9 @@ class _DashBoardPageState extends State<_DashBoardPage> {
       slivers: [
         SliverAppBar.large(
           automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: Theme
+              .of(context)
+              .scaffoldBackgroundColor,
           title: const BaseText(StringC.dashboard),
           actions: [
             IconButton(
@@ -135,7 +137,9 @@ class _StatCard extends StatelessWidget {
                 stat.toString(),
                 fontSize: 60,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).scaffoldBackgroundColor,
+                color: Theme
+                    .of(context)
+                    .scaffoldBackgroundColor,
               ),
               TextButton(
                 onPressed: onLinkTap,
@@ -212,7 +216,9 @@ class _DashBoardState extends State<DashBoard> {
                 backgroundColor: ColorC.elevatedButton,
                 child: IconC.mainLogo,
                 onPressed: () {
-                  Navigator.of(context).pushNamed(RouteC.homePage);
+                  // Navigate to home screen.
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      RouteC.homePage, (route) => false);
                 },
               ),
             ),
@@ -247,15 +253,15 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                       newNotifications
                           ? Positioned(
-                              bottom: -0,
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: ColorC.secondary),
-                                height: 5,
-                                width: 5,
-                              ),
-                            )
+                        bottom: -0,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ColorC.secondary),
+                          height: 5,
+                          width: 5,
+                        ),
+                      )
                           : SizeC.none,
                     ],
                   ),
@@ -293,7 +299,9 @@ class _DashBoardState extends State<DashBoard> {
   void _getFRRequests() async {
     DocumentSnapshot? snap = await BaseCloud.readD(
       collection: CloudC.users,
-      document: BaseAuth.currentUser()?.uid ?? '',
+      document: BaseAuth
+          .currentUser()
+          ?.uid ?? '',
     );
 
     if (snap != null) {
@@ -349,7 +357,8 @@ class CustomNavigationPainter extends CustomPainter {
       ..color = ColorC.primary
       ..style = PaintingStyle.fill;
 
-    Path path = Path()..moveTo(0, 20);
+    Path path = Path()
+      ..moveTo(0, 20);
 
     path.quadraticBezierTo(x * 0.20, 0, x * 0.35, 0);
     path.quadraticBezierTo(x * 0.40, 0, x * 0.40, 20);
