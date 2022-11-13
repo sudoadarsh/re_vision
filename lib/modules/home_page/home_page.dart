@@ -33,6 +33,7 @@ import '../../models/schemas.dart';
 import '../../utils/cloud/base_cloud.dart';
 import '../../utils/cloud/cloud_constants.dart';
 import '../../utils/social_auth/base_auth.dart';
+import '../friends/friends_page.dart';
 
 // class _AppBar extends StatelessWidget with PreferredSizeWidget {
 //   const _AppBar(
@@ -372,7 +373,13 @@ class _TopicCardsState extends State<_TopicCards> {
           topic: widget.topics[index],
           databaseCubit: widget.databaseCubit,
           selectedDay: widget.selectedDay,
-          onRevisionShared: () {},
+          onRevisionShared: () => Navigator.of(context).pushNamed(
+            RouteC.friendsPage,
+            arguments: FriendsPageArguments(
+              title: StringC.sendToFr,
+              frs: data
+            ),
+          ),
         );
       },
     );

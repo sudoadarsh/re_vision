@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:re_vision/modules/dashboard/dashboard_page.dart';
+import 'package:re_vision/modules/friends/friends_page.dart';
 import 'package:re_vision/modules/profile/profile_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 
@@ -30,6 +31,14 @@ class RouteGenerator {
         break;
       case RouteC.profilePage:
         page = const ProfilePage();
+        break;
+      case RouteC.friendsPage:
+        final args = settings.arguments as FriendsPageArguments;
+        page = FriendsPage(
+          title: args.title,
+          frs: args.frs,
+          fromProfile: args.fromProfile,
+        );
         break;
       default:
         page = const Scaffold(

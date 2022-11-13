@@ -61,6 +61,7 @@ class StringC {
   static const String shareRevision = "Share Revision";
   static const String oops = "Oops!";
   static const String errorShareAttach = 'Unable to share attachments.';
+  static const String sendToFr = "Send revision to a friend";
 
 
   // String constants in the topics page.
@@ -116,4 +117,8 @@ class StringC {
   static const String frRequests = "Friend Request(s)";
   static const String notifications = "Notifications";
   static const String accept = "Accept";
+
+  // String constants used in the friends page.
+  static const String send = "Send";
+  static const String undo = "Undo";
 }
