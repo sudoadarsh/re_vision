@@ -121,4 +121,8 @@ class StringC {
   // String constants used in the friends page.
   static const String send = "Send";
   static const String undo = "Undo";
+  static const String alert = "Alert!";
+  static const String sureWantToSent = "Are you sure you want to send revision ";
+  static const String toThesePeople = "to:";
+  static const String confirm = 'Confirm';
 }

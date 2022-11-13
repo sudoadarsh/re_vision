@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:re_vision/base_widgets/base_elevated_button.dart';
 import 'package:re_vision/constants/color_constants.dart';
@@ -21,12 +22,12 @@ class FriendsPageArguments {
 
 // todo: add ui for when no friends.
 class FriendsPage extends StatefulWidget {
-  const FriendsPage(
-      {Key? key,
-      required this.title,
-      required this.frs,
-      required this.fromProfile})
-      : super(key: key);
+  const FriendsPage({
+    Key? key,
+    required this.title,
+    required this.frs,
+    required this.fromProfile,
+  }) : super(key: key);
 
   final String title;
   final List<FriendDm> frs;
@@ -37,19 +38,75 @@ class FriendsPage extends StatefulWidget {
 }
 
 class _FriendsPageState extends State<FriendsPage> {
+  List<FriendDm> sendReqs = [];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:
-          AppBar(backgroundColor: ColorC.button, title: BaseText(widget.title)),
-      body: ListView.builder(
-        itemCount: widget.frs.length,
-        itemBuilder: (ctx, i) {
-          return _FriendsList(
-              frs: widget.frs, fromProfile: widget.fromProfile, i: i);
-        },
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+            backgroundColor: ColorC.button, title: BaseText(widget.title)),
+        body: ListView.builder(
+          itemCount: widget.frs.length,
+          itemBuilder: (ctx, i) {
+            return _FriendsList(
+              frs: widget.frs,
+              fromProfile: widget.fromProfile,
+              i: i,
+              send: (fr) {
+                sendReqs.add(fr);
+                setState(() {});
+              },
+              undo: (fr) {
+                sendReqs = sendReqs
+                    .where((element) => element.email != fr.email)
+                    .toList();
+                setState(() {});
+              },
+            );
+          },
+        ),
       ),
     );
+  }
+
+  // ------------------------------- Functions ---------------------------------
+  Future<bool> _onWillPop() async {
+    return sendReqs.isEmpty
+        ? true
+        : (await showDialog(
+                context: context,
+                builder: (_) {
+                  return CupertinoAlertDialog(
+                    title: const BaseText(StringC.alert),
+                    content: RichText(
+                      textAlign: TextAlign.center,
+                      maxLines: 10,
+                      text: TextSpan(
+                        style: const TextStyle(color: Colors.black),
+                        children: [
+                          const TextSpan(text: StringC.sureWantToSent),
+                          TextSpan(
+                            text:
+                                "${StringC.toThesePeople} ${sendReqs.map((e) => "${e.name}")}",
+                          )
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      CupertinoDialogAction(
+                        child: const BaseText(StringC.confirm),
+                        onPressed: () => Navigator.of(context).pop(true),
+                      ),
+                      CupertinoDialogAction(
+                        child: const BaseText(StringC.cancel),
+                        onPressed: () => Navigator.of(context).pop(false),
+                      ),
+                    ],
+                  );
+                })) ??
+            false;
   }
 }
 
@@ -59,18 +116,22 @@ class _FriendsList extends StatefulWidget {
     required this.frs,
     required this.fromProfile,
     required this.i,
+    required this.send,
+    required this.undo,
   }) : super(key: key);
 
   final List<FriendDm> frs;
   final bool fromProfile;
   final int i;
+  final Function(FriendDm) send;
+  final Function(FriendDm) undo;
 
   @override
   State<_FriendsList> createState() => _FriendsListState();
 }
 
 class _FriendsListState extends State<_FriendsList> {
-  bool _isSend = false;
+  bool _isUndo = false;
 
   @override
   Widget build(BuildContext context) {
@@ -85,12 +146,15 @@ class _FriendsListState extends State<_FriendsList> {
   Widget _trailing() {
     return BaseElevatedButton(
       size: const Size(80, 40),
-      backgroundColor: !_isSend ? ColorC.elevatedButton : null,
+      backgroundColor: !_isUndo ? ColorC.elevatedButton : null,
       onPressed: () {
-        _isSend = !_isSend;
+        !_isUndo
+            ? widget.send(widget.frs[widget.i])
+            : widget.undo(widget.frs[widget.i]);
+        _isUndo = !_isUndo;
         setState(() {});
       },
-      child: !_isSend
+      child: !_isUndo
           ? const BaseText(StringC.send)
           : const BaseText(StringC.undo),
     );
