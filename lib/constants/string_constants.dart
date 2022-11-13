@@ -25,6 +25,8 @@ class StringC {
   static const String starPath = 'images/star.png';
   static const String friendPath = 'images/friend.png';
   static const String defaultPPPath = 'images/default_profile.png';
+  static const String userGrpPath = 'images/user_group.png';
+
 
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';

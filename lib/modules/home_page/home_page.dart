@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +30,9 @@ import '../../base_widgets/base_rounded_elevated_button.dart';
 import '../../base_widgets/base_table_calendar.dart';
 import '../../constants/date_time_constants.dart';
 import '../../constants/decoration_constants.dart';
+import '../../constants/size_constants.dart';
 import '../../models/schemas.dart';
+import '../../models/topic_user_dm.dart';
 import '../../utils/cloud/base_cloud.dart';
 import '../../utils/cloud/cloud_constants.dart';
 import '../../utils/social_auth/base_auth.dart';
@@ -123,6 +126,11 @@ class _Cards extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                // The user group.
+                topic.isOnline == 1 ? BaseElevatedRoundedButton(
+                  onPressed: () {},
+                  child: IconC.userGrp,
+                ) : SizeC.none,
                 // complete a task.
                 BaseElevatedRoundedButton(
                   onPressed: () async {
@@ -357,10 +365,12 @@ class _TopicCards extends StatefulWidget {
 
 class _TopicCardsState extends State<_TopicCards> {
   late final List<FriendDm> data;
+  late final User? cUser;
 
   @override
   void initState() {
     super.initState();
+    cUser = BaseAuth.currentUser();
     data = widget.friends.map((e) => FriendDm.fromJson(e.data())).toList();
   }
 
@@ -373,16 +383,66 @@ class _TopicCardsState extends State<_TopicCards> {
           topic: widget.topics[index],
           databaseCubit: widget.databaseCubit,
           selectedDay: widget.selectedDay,
-          onRevisionShared: () => Navigator.of(context).pushNamed(
-            RouteC.friendsPage,
-            arguments: FriendsPageArguments(
-              title: StringC.sendToFr,
-              frs: data
-            ),
-          ),
+          onRevisionShared: () async {
+            var reqsSent = await Navigator.of(context).pushNamed(
+              RouteC.friendsPage,
+              arguments:
+                  FriendsPageArguments(title: StringC.sendToFr, frs: data),
+            );
+            if (reqsSent == null) return;
+
+            _addSentReqs(index, reqsSent as List<FriendDm>);
+            _updateCRevision(index);
+          },
         );
       },
     );
+  }
+
+  /// Add revision sent requests to respective users.
+  void _addSentReqs(int index, List<FriendDm> reqs) async {
+    // Add the revision under posts sub-collection of the current user.
+    await BaseCloud.createSC(
+      collection: CloudC.topic,
+      document: widget.topics[index].id ?? "",
+      subCollection: CloudC.users,
+      subDocument: cUser?.uid ?? "",
+      data: TopicUserDm(
+        name: cUser?.displayName,
+        email: cUser?.email,
+        uuid: cUser?.uid,
+        status: 0,
+      ).toJson(),
+    );
+
+    for (FriendDm fr in reqs) {
+      await BaseCloud.createSC(
+        collection: CloudC.topic,
+        document: widget.topics[index].id ?? "",
+        subCollection: CloudC.users,
+        subDocument: fr.uuid ?? "",
+        data: TopicUserDm(
+          name: fr.name,
+          email: fr.email,
+          uuid: fr.uuid,
+          status: 0,
+        ).toJson(),
+      );
+    }
+  }
+
+  /// Update the isOnline field of the current revision.
+  void _updateCRevision(int index) async {
+    TopicDm topic = widget.topics[index].copyWith(isOnline: 1);
+
+    await BaseSqlite.update(
+      tableName: StringC.topicTable,
+      data: topic,
+      where: StringC.id,
+      whereArgs: topic.id,
+    );
+
+    widget.databaseCubit.fetchData();
   }
 }
 

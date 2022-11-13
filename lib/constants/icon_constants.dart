@@ -46,6 +46,7 @@ class IconC {
   static const Icon delete = Icon(Icons.delete, color: ColorC.secondary);
   static const Icon share = Icon(Icons.share, color: Colors.cyan);
   static const Icon attachments = Icon(Icons.attachment);
+  static Widget userGrp = Image.asset(StringC.userGrpPath, scale: 15.0);
 
   // Icons used in the topic page.
   static const Icon article = Icon(Icons.article_outlined);

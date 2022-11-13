@@ -73,40 +73,52 @@ class _FriendsPageState extends State<FriendsPage> {
 
   // ------------------------------- Functions ---------------------------------
   Future<bool> _onWillPop() async {
-    return sendReqs.isEmpty
-        ? true
-        : (await showDialog(
-                context: context,
-                builder: (_) {
-                  return CupertinoAlertDialog(
-                    title: const BaseText(StringC.alert),
-                    content: RichText(
-                      textAlign: TextAlign.center,
-                      maxLines: 10,
-                      text: TextSpan(
-                        style: const TextStyle(color: Colors.black),
-                        children: [
-                          const TextSpan(text: StringC.sureWantToSent),
-                          TextSpan(
-                            text:
-                                "${StringC.toThesePeople} ${sendReqs.map((e) => "${e.name}")}",
-                          )
-                        ],
-                      ),
-                    ),
-                    actions: [
-                      CupertinoDialogAction(
-                        child: const BaseText(StringC.confirm),
-                        onPressed: () => Navigator.of(context).pop(true),
-                      ),
-                      CupertinoDialogAction(
-                        child: const BaseText(StringC.cancel),
-                        onPressed: () => Navigator.of(context).pop(false),
-                      ),
-                    ],
-                  );
-                })) ??
-            false;
+
+    if (sendReqs.isEmpty || widget.fromProfile) {
+      return true;
+    }
+
+    NavigatorState nav = Navigator.of(context);
+
+    bool confirmed = (await showDialog(
+        context: context,
+        builder: (_) {
+          return CupertinoAlertDialog(
+            title: const BaseText(StringC.alert),
+            content: RichText(
+              textAlign: TextAlign.center,
+              maxLines: 10,
+              text: TextSpan(
+                style: const TextStyle(color: Colors.black),
+                children: [
+                  const TextSpan(text: StringC.sureWantToSent),
+                  TextSpan(
+                    text:
+                    "${StringC.toThesePeople} ${sendReqs.map((e) => "${e.name}")}",
+                  )
+                ],
+              ),
+            ),
+            actions: [
+              CupertinoDialogAction(
+                child: const BaseText(StringC.confirm),
+                onPressed: () => Navigator.of(context).pop(true),
+              ),
+              CupertinoDialogAction(
+                child: const BaseText(StringC.cancel),
+                onPressed: () => Navigator.of(context).pop(false),
+              ),
+            ],
+          );
+        })) ??
+        false;
+
+    if (!confirmed) {
+      return false;
+    } else {
+     nav.pop<List<FriendDm>>(sendReqs);
+     return true;
+    }
   }
 }
 

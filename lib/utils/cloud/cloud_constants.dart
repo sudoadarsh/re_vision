@@ -3,4 +3,6 @@ class CloudC {
   static const String requests = 'requests';
   static const String friends = 'friends';
   static const String uuid = 'uuid';
+  static const String topic = 'topic';
+  static const String topicUsers = 'topic_users';
 }

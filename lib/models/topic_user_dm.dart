@@ -1,49 +1,60 @@
+/// uuid : ""
 /// name : ""
 /// email : ""
+/// status : 0
 
-class FriendDm {
-  FriendDm({
+class TopicUserDm {
+  TopicUserDm({
     String? uuid,
     String? name,
     String? email,
+    int? status,
   }) {
+    _uuid = uuid;
     _name = name;
     _email = email;
-    _uuid = uuid;
+    _status = status;
   }
 
-  FriendDm.fromJson(dynamic json) {
+  TopicUserDm.fromJson(dynamic json) {
     _uuid = json['uuid'];
     _name = json['name'];
     _email = json['email'];
+    _status = json['status'];
   }
 
+  String? _uuid;
   String? _name;
   String? _email;
-  String? _uuid;
+  int? _status;
 
-  FriendDm copyWith({
+  TopicUserDm copyWith({
+    String? uuid,
     String? name,
     String? email,
-    String? uuid,
+    int? status,
   }) =>
-      FriendDm(
+      TopicUserDm(
+        uuid: uuid ?? _uuid,
         name: name ?? _name,
         email: email ?? _email,
-        uuid: uuid ?? _uuid
+        status: status ?? _status,
       );
+
+  String? get uuid => _uuid;
 
   String? get name => _name;
 
   String? get email => _email;
 
-  String? get uuid => _uuid;
+  int? get status => _status;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
+    map['uuid'] = _uuid;
     map['name'] = _name;
     map['email'] = _email;
-    map['uuid'] = _uuid;
+    map['status'] = _status;
     return map;
   }
 }

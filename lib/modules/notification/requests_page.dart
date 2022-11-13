@@ -75,19 +75,18 @@ class _RequestsPageState extends State<RequestsPage> {
 
       // Update the friends sub list of current user (Add the user).
       BaseCloud.createSC(
-        collection: CloudC.users,
-        document: BaseAuth.currentUser()?.uid ?? '',
-        subCollection: CloudC.friends,
-        subDocument: req.uuid ?? "",
-        data: FriendDm(name: req.name, email: req.email).toJson()
-      );
+          collection: CloudC.users,
+          document: BaseAuth.currentUser()?.uid ?? '',
+          subCollection: CloudC.friends,
+          subDocument: req.uuid ?? "",
+          data: FriendDm(name: req.name, email: req.email, uuid: req.uuid)
+              .toJson());
     } catch (e) {
       debugPrint("Error while updating data of CU: $e");
     }
   }
 
   void _updateOU(Requests req) async {
-
     User? cUser = BaseAuth.currentUser();
 
     try {
@@ -97,7 +96,9 @@ class _RequestsPageState extends State<RequestsPage> {
         document: req.uuid ?? '',
         subCollection: CloudC.friends,
         subDocument: cUser?.uid ?? "",
-        data: FriendDm(name: cUser?.displayName, email: cUser?.email).toJson(),
+        data: FriendDm(
+                name: cUser?.displayName, email: cUser?.email, uuid: cUser?.uid)
+            .toJson(),
       );
     } catch (e) {
       debugPrint("Error while updating data of OU: $e");

@@ -36,7 +36,7 @@ class TopicDm extends BaseSqliteModel {
     _createdAt = json['created_at'];
     _scheduledTo = json['scheduled_to'];
     _iteration = json['iteration'];
-    _isOnline = json['isOnline'];
+    _isOnline = json['is_online'];
   }
 
   String? _id;
