@@ -127,10 +127,12 @@ class _Cards extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 // The user group.
-                topic.isOnline == 1 ? BaseElevatedRoundedButton(
-                  onPressed: () {},
-                  child: IconC.userGrp,
-                ) : SizeC.none,
+                topic.isOnline == 1
+                    ? BaseElevatedRoundedButton(
+                        onPressed: () {},
+                        child: IconC.userGrp,
+                      )
+                    : SizeC.none,
                 // complete a task.
                 BaseElevatedRoundedButton(
                   onPressed: () async {
@@ -384,11 +386,13 @@ class _TopicCardsState extends State<_TopicCards> {
           databaseCubit: widget.databaseCubit,
           selectedDay: widget.selectedDay,
           onRevisionShared: () async {
+
             var reqsSent = await Navigator.of(context).pushNamed(
               RouteC.friendsPage,
               arguments:
                   FriendsPageArguments(title: StringC.sendToFr, frs: data),
             );
+
             if (reqsSent == null) return;
 
             _addSentReqs(index, reqsSent as List<FriendDm>);
@@ -401,34 +405,61 @@ class _TopicCardsState extends State<_TopicCards> {
 
   /// Add revision sent requests to respective users.
   void _addSentReqs(int index, List<FriendDm> reqs) async {
-    // Add the revision under posts sub-collection of the current user.
-    await BaseCloud.createSC(
-      collection: CloudC.topic,
-      document: widget.topics[index].id ?? "",
-      subCollection: CloudC.users,
-      subDocument: cUser?.uid ?? "",
-      data: TopicUserDm(
-        name: cUser?.displayName,
-        email: cUser?.email,
-        uuid: cUser?.uid,
-        status: 0,
-      ).toJson(),
-    );
 
-    for (FriendDm fr in reqs) {
+    try {
+      List data =
+      jsonDecode(widget.topics[index].attachments ?? "");
+
+      List<AttachmentDataDm> dataDmArr =
+      data.map((e) => AttachmentDataDm.fromJson(e)).toList();
+
+      List<AttachmentDataDm> filteredData =
+      dataDmArr.where((element) => element.type == 0).toList();
+
+      TopicDm topic = widget.topics[index].copyWith(
+          attachments: jsonEncode(filteredData)
+      );
+
+      // Add the revision data.
+      await BaseCloud.create(
+        collection: CloudC.topic,
+        document: widget.topics[index].id ?? "",
+        data: {StringC.revision: topic.toJson()},
+      );
+
+      // Add the revision under posts sub-collection of the current user.
       await BaseCloud.createSC(
         collection: CloudC.topic,
         document: widget.topics[index].id ?? "",
         subCollection: CloudC.users,
-        subDocument: fr.uuid ?? "",
+        subDocument: cUser?.uid ?? "",
         data: TopicUserDm(
-          name: fr.name,
-          email: fr.email,
-          uuid: fr.uuid,
+          name: cUser?.displayName,
+          email: cUser?.email,
+          uuid: cUser?.uid,
           status: 0,
         ).toJson(),
       );
+
+      for (FriendDm fr in reqs) {
+        await BaseCloud.createSC(
+          collection: CloudC.topic,
+          document: widget.topics[index].id ?? "",
+          subCollection: CloudC.users,
+          subDocument: fr.uuid ?? "",
+          data: TopicUserDm(
+            name: fr.name,
+            email: fr.email,
+            uuid: fr.uuid,
+            status: 0,
+          ).toJson(),
+        );
+      }
+    } on Exception catch (e) {
+      // TODO: cannot share revision.
+      debugPrint(e.toString());
     }
+
   }
 
   /// Update the isOnline field of the current revision.
