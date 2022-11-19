@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:re_vision/base_widgets/base_bottom_modal_sheet.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_elevated_button.dart';
 import 'package:re_vision/base_widgets/base_outline_button.dart';
@@ -13,6 +14,7 @@ import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/user_dm.dart';
 import 'package:re_vision/state_management/search/search_repo.dart';
+import 'package:re_vision/utils/app_config.dart';
 import 'package:re_vision/utils/cloud/base_cloud.dart';
 import 'package:re_vision/utils/cloud/cloud_constants.dart';
 import 'package:re_vision/utils/social_auth/base_auth.dart';
@@ -51,53 +53,53 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            BaseTextFormFieldWithDepth(
-              controller: _sc,
-              labelText: StringC.search,
-              prefixIcon: IconC.search,
-              onFieldSubmitted: (val) async {
-                _searchCubit.fetchData<QueryDocumentSnapshot>(data: val);
-              },
-            ),
-            BlocBuilder(
-              bloc: _searchCubit,
-              builder: (context, state) {
-                if (state is CommonCubitStateLoading) {
-                  return Expanded(
-                    child: const CupertinoActivityIndicator().center(),
-                  );
-                } else if (state is CommonCubitStateLoaded) {
-                  List<QueryDocumentSnapshot> data =
-                      state.data as List<QueryDocumentSnapshot>;
-                  List<QueryDocumentSnapshot> filterD = data
-                      .where((element) =>
-                          element.id != BaseAuth.currentUser()?.uid)
-                      .toList();
-                  return Expanded(
-                    child: ListView.builder(
-                      itemCount: filterD.length,
-                      itemBuilder: (context, ind) {
-                        UserFBDm filterM =
-                            UserFBDm.fromJson(filterD[ind].data());
-                        return _UserResult(
-                          frs: _friends,
-                          data: filterM,
-                          userId: filterD[ind].id,
-                        );
-                      },
-                    ),
-                  );
-                }
-                return SizeC.none;
-              },
-            )
-          ],
-        ).paddingDefault(),
-      ),
+    return SizedBox(
+      height: AppConfig.height(context) * 0.8,
+      child: Column(
+        children: [
+          const BaseNotch(),
+          BaseTextFormFieldWithDepth(
+            controller: _sc,
+            labelText: StringC.search,
+            prefixIcon: IconC.search,
+            onFieldSubmitted: (val) async {
+              _searchCubit.fetchData<QueryDocumentSnapshot>(data: val);
+            },
+          ),
+          BlocBuilder(
+            bloc: _searchCubit,
+            builder: (context, state) {
+              if (state is CommonCubitStateLoading) {
+                return Expanded(
+                  child: const CupertinoActivityIndicator().center(),
+                );
+              } else if (state is CommonCubitStateLoaded) {
+                List<QueryDocumentSnapshot> data =
+                state.data as List<QueryDocumentSnapshot>;
+                List<QueryDocumentSnapshot> filterD = data
+                    .where((element) =>
+                element.id != BaseAuth.currentUser()?.uid)
+                    .toList();
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: filterD.length,
+                    itemBuilder: (context, ind) {
+                      UserFBDm filterM =
+                      UserFBDm.fromJson(filterD[ind].data());
+                      return _UserResult(
+                        frs: _friends,
+                        data: filterM,
+                        userId: filterD[ind].id,
+                      );
+                    },
+                  ),
+                );
+              }
+              return SizeC.none;
+            },
+          )
+        ],
+      ).paddingDefault(),
     );
   }
 
@@ -136,9 +138,6 @@ class _UserResultState extends State<_UserResult> {
   /// Boolean to live update the button.
   late Widget _currentButton;
 
-  /// The list of current friends of the user.
-  List<String> get _frs => widget.frs;
-
   @override
   void initState() {
     super.initState();
@@ -156,76 +155,21 @@ class _UserResultState extends State<_UserResult> {
 
   /// Friend Request.
   void _friendRequest() {
-    /// Update the request field of other user.
-    List r = widget.data.requests?.map((e) => e.toJson()).toList() ?? [];
-
-    Requests rr = Requests(
-        uuid: BaseAuth.currentUser()?.uid,
-        status: 0,
-        seen: 0,
-        name: BaseAuth.currentUser()?.displayName,
-        email: BaseAuth.currentUser()?.email,
-        pic: BaseAuth.currentUser()?.photoURL);
-
-    r.add(rr.toJson());
-
-    BaseCloud.update(
-      collection: CloudC.users,
-      document: widget.userId,
-      data: {CloudC.requests: r},
-    );
+    // todo: add friend request in the request sub-collection.
 
     _currentButton = _requestedButton();
     setState(() {});
   }
 
   void _removeRequest() {
-    /// Delete the request.
-    List r = widget.data.requests?.map((e) => e.toJson()).toList() ?? [];
-
-    List m;
-
-    try {
-      m = r
-          .where((element) => element["uuid"] != BaseAuth.currentUser()?.uid)
-          .toList();
-    } catch (e) {
-      m = [];
-    }
-
-    BaseCloud.update(
-      collection: CloudC.users,
-      document: widget.userId,
-      data: {CloudC.requests: m},
-    );
-
+    // todo: delete friend request from the sub collection.
     _currentButton = _requestButton();
     setState(() {});
   }
 
   /// To check whether the searched user is already requested a request.
   Widget _checkReq() {
-    List<Requests> req = widget.data.requests ?? [];
-
-    Requests res = req.firstWhere(
-      (element) => element.uuid == BaseAuth.currentUser()?.uid,
-      orElse: () => Requests(),
-    );
-
-    String fr = _frs.firstWhere(
-      (element) => element == widget.userId,
-      orElse: () => "",
-    );
-
-    if (fr.isNotEmpty) {
-      return SizeC.none;
-    }
-
-    if (res.status == 0) {
-      return _requestedButton();
-    } else {
-      return _requestButton();
-    }
+    return _requestButton();
   }
 
   BaseElevatedButton _requestButton() {

@@ -39,6 +39,7 @@ class IconC {
     color: ColorC.white,
   );
   static final Widget star = Image.asset(StringC.starPath);
+  static const Icon progress = Icon(Icons.auto_graph_rounded);
 
   // Icons used in the home page.
   static const Icon add = Icon(Icons.add, color: ColorC.primary);
@@ -54,11 +55,7 @@ class IconC {
   static const Icon image = Icon(Icons.image_outlined);
   static const Icon pdf = Icon(Icons.picture_as_pdf_outlined);
   static const Icon link = Icon(Icons.link);
-  static const Widget close = CircleAvatar(
-    radius: 18,
-    backgroundColor: ColorC.secondary,
-    child: Icon(Icons.close, color: ColorC.white, size: 18),
-  );
+  static const Icon close = Icon(Icons.close);
   static final Widget noFavIcon = Image.asset(
     StringC.noFavIconPath,
     scale: 15,

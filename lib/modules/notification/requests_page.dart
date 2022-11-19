@@ -11,20 +11,20 @@ import '../../utils/cloud/base_cloud.dart';
 import '../../utils/cloud/cloud_constants.dart';
 import '../../utils/social_auth/base_auth.dart';
 
-class RequestsPage extends StatefulWidget {
-  const RequestsPage({
+class FrRequestsPage extends StatefulWidget {
+  const FrRequestsPage({
     Key? key,
     required this.req,
   }) : super(key: key);
 
-  final List<Requests> req;
+  final List<FrReqDm> req;
 
   @override
-  State<RequestsPage> createState() => _RequestsPageState();
+  State<FrRequestsPage> createState() => _FrRequestsPageState();
 }
 
-class _RequestsPageState extends State<RequestsPage> {
-  List<Requests> get _req => widget.req;
+class _FrRequestsPageState extends State<FrRequestsPage> {
+  List<FrReqDm> get _req => widget.req;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +56,7 @@ class _RequestsPageState extends State<RequestsPage> {
   }
 
   // -------------------------------Functions-----------------------------------
-  void _acceptReq(Requests req) {
+  void _acceptReq(FrReqDm req) {
     // Remove the particular request from the current user and add friend.
     _removeRequest(req);
 
@@ -64,29 +64,11 @@ class _RequestsPageState extends State<RequestsPage> {
     _updateOU(req);
   }
 
-  void _removeRequest(Requests req) async {
-    List<Requests> reqU = _req.where((e) => e.uuid != req.uuid).toList();
-    try {
-      BaseCloud.update(
-        collection: CloudC.users,
-        document: BaseAuth.currentUser()?.uid ?? '',
-        data: {CloudC.requests: reqU},
-      );
-
-      // Update the friends sub list of current user (Add the user).
-      BaseCloud.createSC(
-          collection: CloudC.users,
-          document: BaseAuth.currentUser()?.uid ?? '',
-          subCollection: CloudC.friends,
-          subDocument: req.uuid ?? "",
-          data: FriendDm(name: req.name, email: req.email, uuid: req.uuid)
-              .toJson());
-    } catch (e) {
-      debugPrint("Error while updating data of CU: $e");
-    }
+  void _removeRequest(FrReqDm req) async {
+    // todo: remove a friend request
   }
 
-  void _updateOU(Requests req) async {
+  void _updateOU(FrReqDm req) async {
     User? cUser = BaseAuth.currentUser();
 
     try {

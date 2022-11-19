@@ -231,7 +231,6 @@ class _FormState extends State<_Form> {
     UserFBDm dataToSave = UserFBDm(
       name: _usernameController.text.trim(),
       email: user.email,
-      requests: [],
     );
 
     // Creating the main collection.
@@ -240,13 +239,6 @@ class _FormState extends State<_Form> {
       document: user.uid,
       data: dataToSave.toJson(),
     );
-
-    /*// Creating the sub collection for friends.
-    BaseCloud.createSC(
-      collection: CloudC.users,
-      document: user.uid,
-      subCollection: CloudC.friends
-    );*/
 
     // Update the user name of the user.
     user.updateDisplayName(_usernameController.text.trim());

@@ -13,7 +13,7 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
     this.focusNode,
     this.obscureText,
     this.validator,
-    this.onChanged, this.onFieldSubmitted,
+    this.onChanged, this.onFieldSubmitted, this.onTap, this.readOnly,
   }) : super(key: key);
 
   final String? hintText;
@@ -28,12 +28,16 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
   final String? Function(String? value)? validator;
   final Function(String?)? onChanged;
   final Function(String?)? onFieldSubmitted;
+  final VoidCallback? onTap;
+  final bool? readOnly;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      onTap: onTap,
       focusNode: focusNode,
       onChanged: onChanged,
+      readOnly: readOnly ?? false,
       onFieldSubmitted: onFieldSubmitted,
       expands: expands ?? false,
       obscureText: obscureText ?? false,

@@ -22,16 +22,25 @@ class BaseModalSheetWithNotch extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 50,
-              height: 8,
-              decoration: DecorC.boxDecorAll(radius: 10.0)
-                  .copyWith(color: ColorC.shadowColor),
-            ).paddingDefault(),
+            const BaseNotch(),
             child
           ],
         ),
       ),
     );
+  }
+}
+
+class BaseNotch extends StatelessWidget {
+  const BaseNotch({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 50,
+      height: 8,
+      decoration: DecorC.boxDecorAll(radius: 10.0)
+          .copyWith(color: ColorC.shadowColor),
+    ).paddingDefault();
   }
 }

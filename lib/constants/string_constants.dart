@@ -26,6 +26,8 @@ class StringC {
   static const String friendPath = 'images/friend.png';
   static const String defaultPPPath = 'images/default_profile.png';
   static const String userGrpPath = 'images/user_group.png';
+  static const String revisionReqsPath = 'images/revision_request.png';
+
 
 
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
@@ -51,6 +53,7 @@ class StringC {
   static const String completed = "Completed";
   static const String view = "View";
   static const String missed = "Missed";
+  static const String closeDialog = "Done";
 
   // String constants in the home page.
   static const String homeTitle = empty;
@@ -106,7 +109,7 @@ class StringC {
   static const String friends = 'Friends';
   static const String editProfile = "Edit Profile";
   static const String findFriends = "Find Friends";
-  static const String search = 'Search Friends by their email';
+  static const String search = 'Search Friends';
   static const String logout = 'Logout';
   static const String logoutDesc = "Are you sure want to logout of Re-vision?";
 
@@ -117,6 +120,7 @@ class StringC {
 
   // String constants used in notifications page.
   static const String frRequests = "Friend Request(s)";
+  static const String revisionInvites = "Revision Invite(s)";
   static const String notifications = "Notifications";
   static const String accept = "Accept";
 

@@ -1,5 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_rounded_elevated_button.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
@@ -9,18 +9,15 @@ import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/models/topic_inv_dm.dart';
 import 'package:re_vision/models/user_dm.dart';
 import 'package:re_vision/modules/notification/notifications_page.dart';
 import 'package:re_vision/modules/profile/profile_page.dart';
 import 'package:re_vision/modules/search_page/search_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/utils/app_config.dart';
-import 'package:re_vision/utils/cloud/base_cloud.dart';
-import 'package:re_vision/utils/cloud/cloud_constants.dart';
-import 'package:re_vision/utils/social_auth/base_auth.dart';
 
-
-enum CurrentS { dashboard, search, notifications, profile }
+enum CurrentS { dashboard, progress, notifications, profile }
 
 /// The section headers.
 ///
@@ -50,16 +47,13 @@ class _DashBoardPage extends StatefulWidget {
 }
 
 class _DashBoardPageState extends State<_DashBoardPage> {
-
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
         SliverAppBar.large(
           automaticallyImplyLeading: false,
-          backgroundColor: Theme
-              .of(context)
-              .scaffoldBackgroundColor,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: const BaseText(StringC.dashboard),
           actions: [
             IconButton(
@@ -68,6 +62,21 @@ class _DashBoardPageState extends State<_DashBoardPage> {
             ),
           ],
         ),
+
+        // Search Friends Header.
+        const _SectionHeaders(header: StringC.findFriends),
+        _sliverPadding(
+          SliverToBoxAdapter(
+            child: BaseTextFormFieldWithDepth(
+              readOnly: true,
+              prefixIcon: IconC.search,
+              // Open up the dialog.
+              onTap: _navToSearch,
+            ),
+          ),
+        ),
+
+        // Revision Header.
         const _SectionHeaders(header: StringC.revision),
         SliverPadding(
           padding: const EdgeInsets.only(left: 16),
@@ -102,6 +111,28 @@ class _DashBoardPageState extends State<_DashBoardPage> {
       ],
     );
   }
+
+  // --------------------------------- Functions -------------------------------
+
+  /// Default sliver padding.
+  SliverPadding _sliverPadding(SliverToBoxAdapter child) {
+    return SliverPadding(
+      padding: const EdgeInsets.only(left: 16, right: 16),
+      sliver: child,
+    );
+  }
+
+  /// To open the search friends dialog.
+  void _navToSearch() {
+    showModalBottomSheet(
+      context: context,
+      shape: DecorC.roundedRectangleBorderTop,
+      isScrollControlled: true,
+      builder: (context) => const SingleChildScrollView(
+        child: SearchPage(),
+      ),
+    );
+  }
 }
 
 /// The stat card.
@@ -112,7 +143,8 @@ class _StatCard extends StatelessWidget {
     required this.stat,
     required this.subtitle,
     required this.link,
-    required this.onLinkTap, required this.color,
+    required this.onLinkTap,
+    required this.color,
   }) : super(key: key);
 
   final int stat;
@@ -137,9 +169,7 @@ class _StatCard extends StatelessWidget {
                 stat.toString(),
                 fontSize: 60,
                 fontWeight: FontWeight.bold,
-                color: Theme
-                    .of(context)
-                    .scaffoldBackgroundColor,
+                color: Theme.of(context).scaffoldBackgroundColor,
               ),
               TextButton(
                 onPressed: onLinkTap,
@@ -164,13 +194,13 @@ class DashBoard extends StatefulWidget {
 
   @override
   State<DashBoard> createState() => _DashBoardState();
-
 }
 
 class _DashBoardState extends State<DashBoard> {
   CurrentS _currentS = CurrentS.dashboard;
 
-  List<Requests> _req = [];
+  final List<FrReqDm> _req = [];
+  final List<TopicInvDm> _inv = [];
 
   /// Boolean to control the notifications.
   bool newNotifications = false;
@@ -236,9 +266,9 @@ class _DashBoardState extends State<DashBoard> {
                   ),
                   // Search.
                   _bottomNavButton(
-                    CurrentS.search,
+                    CurrentS.progress,
                     _currentS,
-                    icon: IconC.search,
+                    icon: IconC.progress,
                   ),
                   (AppConfig.width(context) * 0.20).separation(false),
                   // Notifications.
@@ -253,15 +283,15 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                       newNotifications
                           ? Positioned(
-                        bottom: -0,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: ColorC.secondary),
-                          height: 5,
-                          width: 5,
-                        ),
-                      )
+                              bottom: -0,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: ColorC.secondary),
+                                height: 5,
+                                width: 5,
+                              ),
+                            )
                           : SizeC.none,
                     ],
                   ),
@@ -295,52 +325,17 @@ class _DashBoardState extends State<DashBoard> {
 
   // -----------------------Functions-------------------------------------------
 
-  /// To get the friend requests.
-  void _getFRRequests() async {
-    DocumentSnapshot? snap = await BaseCloud.readD(
-      collection: CloudC.users,
-      document: BaseAuth
-          .currentUser()
-          ?.uid ?? '',
-    );
-
-    if (snap != null) {
-      final Map<String, dynamic>? snapD = snap.data() as Map<String, dynamic>?;
-      if (snapD != null) {
-        UserFBDm snapM = UserFBDm.fromJson(snapD);
-
-        _req = snapM.requests ?? [];
-        // _frs = snapM.friends ?? [];
-
-        if (_req.isNotEmpty) {
-          for (Requests e in _req) {
-            if (e.seen == 0) {
-              // Show notification badge.
-              newNotifications = true;
-              setState(() {});
-              break;
-            }
-          }
-        } else {
-          // Remove notifications badge.
-          newNotifications = false;
-        }
-      }
-    }
-  }
-
   /// To get the current screen.
   Widget _getS() {
     switch (_currentS) {
       case CurrentS.dashboard:
-        _getFRRequests();
         return const _DashBoardPage();
-      case CurrentS.search:
-        return const SearchPage();
+      case CurrentS.progress:
+        return Container();
       case CurrentS.profile:
         return const ProfilePage();
       case CurrentS.notifications:
-        return NotificationsPage(req: _req);
+        return NotificationsPage(req: _req, inv: _inv);
       default:
         return const _DashBoardPage();
     }
@@ -357,8 +352,7 @@ class CustomNavigationPainter extends CustomPainter {
       ..color = ColorC.primary
       ..style = PaintingStyle.fill;
 
-    Path path = Path()
-      ..moveTo(0, 20);
+    Path path = Path()..moveTo(0, 20);
 
     path.quadraticBezierTo(x * 0.20, 0, x * 0.35, 0);
     path.quadraticBezierTo(x * 0.40, 0, x * 0.40, 20);
