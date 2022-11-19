@@ -7,9 +7,6 @@ import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/modules/notification/invites_page.dart';
 import 'package:re_vision/modules/notification/requests_page.dart';
 
-import '../../models/topic_inv_dm.dart';
-import '../../models/user_dm.dart';
-
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({
     Key? key,
@@ -17,8 +14,8 @@ class NotificationsPage extends StatefulWidget {
     required this.inv,
   }) : super(key: key);
 
-  final List<FrReqDm> req;
-  final List<TopicInvDm> inv;
+  final List req;
+  final List inv;
 
   @override
   State<NotificationsPage> createState() => _NotificationsPageState();

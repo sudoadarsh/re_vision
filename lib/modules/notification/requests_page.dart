@@ -5,8 +5,6 @@ import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/models/friend_dm.dart';
-
-import '../../models/user_dm.dart';
 import '../../utils/cloud/base_cloud.dart';
 import '../../utils/cloud/cloud_constants.dart';
 import '../../utils/social_auth/base_auth.dart';
@@ -17,14 +15,14 @@ class FrRequestsPage extends StatefulWidget {
     required this.req,
   }) : super(key: key);
 
-  final List<FrReqDm> req;
+  final List req;
 
   @override
   State<FrRequestsPage> createState() => _FrRequestsPageState();
 }
 
 class _FrRequestsPageState extends State<FrRequestsPage> {
-  List<FrReqDm> get _req => widget.req;
+  List get _req => widget.req;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +54,7 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
   }
 
   // -------------------------------Functions-----------------------------------
-  void _acceptReq(FrReqDm req) {
+  void _acceptReq(var req) {
     // Remove the particular request from the current user and add friend.
     _removeRequest(req);
 
@@ -64,11 +62,11 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
     _updateOU(req);
   }
 
-  void _removeRequest(FrReqDm req) async {
+  void _removeRequest(var req) async {
     // todo: remove a friend request
   }
 
-  void _updateOU(FrReqDm req) async {
+  void _updateOU(var req) async {
     User? cUser = BaseAuth.currentUser();
 
     try {

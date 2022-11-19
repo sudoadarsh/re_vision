@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
@@ -10,7 +11,7 @@ import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
-import 'package:re_vision/models/topic_inv_dm.dart';
+import 'package:re_vision/models/reqs_dm.dart';
 import 'package:re_vision/models/user_dm.dart';
 import 'package:re_vision/modules/notification/notifications_page.dart';
 import 'package:re_vision/modules/profile/profile_page.dart';
@@ -57,7 +58,9 @@ class _DashBoardPageState extends State<_DashBoardPage> {
       slivers: [
         SliverAppBar.large(
           automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          backgroundColor: Theme
+              .of(context)
+              .scaffoldBackgroundColor,
           title: const BaseText(StringC.dashboard),
           actions: [
             IconButton(
@@ -127,7 +130,7 @@ class _DashBoardPageState extends State<_DashBoardPage> {
   /// To open the search friends dialog.
   void _navToSearch() async {
     List<Map<String, UserFBDm>>? reqsMade =
-        await Navigator.of(context).push<List<Map<String, UserFBDm>>>(
+    await Navigator.of(context).push<List<Map<String, UserFBDm>>>(
       MaterialPageRoute(
         builder: (_) => const SearchPage(),
       ),
@@ -141,11 +144,12 @@ class _DashBoardPageState extends State<_DashBoardPage> {
       await BaseCloud.createSC(
         collection: CloudC.users,
         document: user.keys.first,
-        subCollection: CloudC.frRequests,
+        subCollection: CloudC.requests,
         subDocument: currentU?.uid ?? '',
-        data: UserFBDm(
-          email: currentU?.email ?? "",
-          name: currentU?.displayName ?? ""
+        data: ReqsDm(
+            email: currentU?.email ?? "",
+            name: currentU?.displayName ?? "",
+            status: 0
         ).toJson(),
       );
     }
@@ -186,7 +190,9 @@ class _StatCard extends StatelessWidget {
                 stat.toString(),
                 fontSize: 60,
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).scaffoldBackgroundColor,
+                color: Theme
+                    .of(context)
+                    .scaffoldBackgroundColor,
               ),
               TextButton(
                 onPressed: onLinkTap,
@@ -216,30 +222,46 @@ class DashBoard extends StatefulWidget {
 class _DashBoardState extends State<DashBoard> {
   CurrentS _currentS = CurrentS.dashboard;
 
-  final List<FrReqDm> _req = [];
-  final List<TopicInvDm> _inv = [];
-
   /// Boolean to control the notifications.
   bool newNotifications = false;
+
+  /// The snapshot of requests.
+  late final Stream<QuerySnapshot> _reqsStream;
 
   @override
   void initState() {
     super.initState();
-    // _getFRRequests();
+    _reqsStream = FirebaseFirestore.instance.collection(CloudC.users).doc(BaseAuth
+        .currentUser()
+        ?.uid ?? "").collection(CloudC.requests).snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            _getS(),
-            _bottomNavigation(context),
-          ],
-        ),
-      ),
+    return StreamBuilder<QuerySnapshot>(
+        stream: _reqsStream,
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+
+          if (snapshot.hasError) {
+            // print ("error in stream builder: ${snapshot.error}");
+          }
+
+          else if (snapshot.hasData) {
+            // print (snapshot.data?.docs.map((e) => e.data()));
+          }
+
+          return Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  _getS(),
+                  _bottomNavigation(context),
+                ],
+              ),
+            ),
+          );
+        }
     );
   }
 
@@ -300,15 +322,15 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                       newNotifications
                           ? Positioned(
-                              bottom: -0,
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: ColorC.secondary),
-                                height: 5,
-                                width: 5,
-                              ),
-                            )
+                        bottom: -0,
+                        child: Container(
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ColorC.secondary),
+                          height: 5,
+                          width: 5,
+                        ),
+                      )
                           : SizeC.none,
                     ],
                   ),
@@ -352,7 +374,7 @@ class _DashBoardState extends State<DashBoard> {
       case CurrentS.profile:
         return const ProfilePage();
       case CurrentS.notifications:
-        return NotificationsPage(req: _req, inv: _inv);
+        return const NotificationsPage(req: [], inv: []);
       default:
         return const _DashBoardPage();
     }
@@ -369,7 +391,8 @@ class CustomNavigationPainter extends CustomPainter {
       ..color = ColorC.primary
       ..style = PaintingStyle.fill;
 
-    Path path = Path()..moveTo(0, 20);
+    Path path = Path()
+      ..moveTo(0, 20);
 
     path.quadraticBezierTo(x * 0.20, 0, x * 0.35, 0);
     path.quadraticBezierTo(x * 0.40, 0, x * 0.40, 20);

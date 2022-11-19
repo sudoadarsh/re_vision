@@ -3,7 +3,6 @@ import 'package:re_vision/constants/string_constants.dart';
 
 import '../../base_widgets/base_elevated_button.dart';
 import '../../base_widgets/base_text.dart';
-import '../../models/topic_inv_dm.dart';
 
 class InvitesPage extends StatelessWidget {
   const InvitesPage({
@@ -11,7 +10,7 @@ class InvitesPage extends StatelessWidget {
     required this.topicInvites,
   }) : super(key: key);
 
-  final List<TopicInvDm> topicInvites;
+  final List topicInvites;
 
   @override
   Widget build(BuildContext context) {
