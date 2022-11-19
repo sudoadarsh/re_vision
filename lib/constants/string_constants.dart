@@ -114,8 +114,8 @@ class StringC {
   static const String logoutDesc = "Are you sure want to logout of Re-vision?";
 
   // String constants used in search page.
-  static const String request = 'Request';
-  static const String requested = 'Requested';
+  static const String add = 'Add';
+  static const String remove = 'Remove';
   static const String unfriend = "Unfriend";
 
   // String constants used in notifications page.

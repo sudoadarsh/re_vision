@@ -496,7 +496,7 @@ class _HomePageState extends State<HomePage> {
   List<TopicDm> _topics = [];
 
   // To store the friends of the current user.
-  late final List<QueryDocumentSnapshot<JSON>> _friends;
+  List<QueryDocumentSnapshot<JSON>> _friends = [];
 
   @override
   void initState() {

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_rounded_elevated_button.dart';
@@ -16,6 +17,9 @@ import 'package:re_vision/modules/profile/profile_page.dart';
 import 'package:re_vision/modules/search_page/search_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/utils/app_config.dart';
+import 'package:re_vision/utils/cloud/base_cloud.dart';
+import 'package:re_vision/utils/cloud/cloud_constants.dart';
+import 'package:re_vision/utils/social_auth/base_auth.dart';
 
 enum CurrentS { dashboard, progress, notifications, profile }
 
@@ -62,17 +66,15 @@ class _DashBoardPageState extends State<_DashBoardPage> {
             ),
           ],
         ),
-
-        // Search Friends Header.
-        const _SectionHeaders(header: StringC.findFriends),
         _sliverPadding(
           SliverToBoxAdapter(
             child: BaseTextFormFieldWithDepth(
+              hintText: StringC.findFriends,
               readOnly: true,
               prefixIcon: IconC.search,
               // Open up the dialog.
               onTap: _navToSearch,
-            ),
+            ).paddingOnly(bottom: 8),
           ),
         ),
 
@@ -123,15 +125,30 @@ class _DashBoardPageState extends State<_DashBoardPage> {
   }
 
   /// To open the search friends dialog.
-  void _navToSearch() {
-    showModalBottomSheet(
-      context: context,
-      shape: DecorC.roundedRectangleBorderTop,
-      isScrollControlled: true,
-      builder: (context) => const SingleChildScrollView(
-        child: SearchPage(),
+  void _navToSearch() async {
+    List<Map<String, UserFBDm>>? reqsMade =
+        await Navigator.of(context).push<List<Map<String, UserFBDm>>>(
+      MaterialPageRoute(
+        builder: (_) => const SearchPage(),
       ),
     );
+
+    if (reqsMade == null || reqsMade.isEmpty) return;
+
+    final User? currentU = BaseAuth.currentUser();
+
+    for (Map<String, UserFBDm> user in reqsMade) {
+      await BaseCloud.createSC(
+        collection: CloudC.users,
+        document: user.keys.first,
+        subCollection: CloudC.frRequests,
+        subDocument: currentU?.uid ?? '',
+        data: UserFBDm(
+          email: currentU?.email ?? "",
+          name: currentU?.displayName ?? ""
+        ).toJson(),
+      );
+    }
   }
 }
 
