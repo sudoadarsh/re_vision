@@ -25,6 +25,8 @@ class FrRequestsPage extends StatefulWidget {
 class _FrRequestsPageState extends State<FrRequestsPage> {
   List get _req => widget.req;
 
+  User? cUser = BaseAuth.currentUser();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,12 +65,17 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
     _updateFCollection(req);
   }
 
-  void _removeRequest(var req) async {
-    // todo: remove a friend request
+  void _removeRequest(ReqsDm req) async {
+    // Remove the request from the current user.
+    BaseCloud.deleteSC(
+        collection: CloudC.users,
+        document: cUser?.uid ?? "",
+        subCollection: CloudC.requests,
+        subDocument: req.uuid ?? "",
+    );
   }
 
   void _updateFCollection(ReqsDm req) async {
-    User? cUser = BaseAuth.currentUser();
 
     try {
       // Update the friends sub list of other user (Add the current user).

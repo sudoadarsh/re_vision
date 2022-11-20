@@ -165,4 +165,23 @@ class BaseCloud {
       return [];
     }
   }
+
+  /// To delete a document from the sub-collection.
+  static Future<void> deleteSC({
+    required String collection,
+    required String document,
+    required String subCollection,
+    required String subDocument,
+  }) async {
+    try {
+      await db
+          ?.collection(collection)
+          .doc(document)
+          .collection(subCollection)
+          .doc(subDocument)
+          .delete();
+    } on Exception catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 }
