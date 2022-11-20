@@ -21,7 +21,6 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-
   late List<ReqsDm> _frReqs;
   late List<ReqsDm> _topicReqs;
 
@@ -62,8 +61,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
               list: _topicReqs,
               image: StringC.revisionReqsPath,
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => InvitesPage(topicInvites: _topicReqs)));
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (_) => InvitesPage(topicInvites: _topicReqs)),
+                );
               },
             ),
           ),

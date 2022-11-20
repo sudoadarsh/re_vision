@@ -69,4 +69,7 @@ class IconC {
   // Icon constants in the profile page.
   static const Icon pfCardTrailing = Icon(Icons.arrow_forward_ios);
   static const Icon logout = Icon(Icons.logout, color: ColorC.secondary);
+
+  // Icon constants in the invites page.
+  static const Icon calendar = Icon(Icons.calendar_month);
 }

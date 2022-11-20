@@ -16,6 +16,7 @@ import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/attachment_data_dm.dart';
 import 'package:re_vision/models/friend_dm.dart';
+import 'package:re_vision/models/reqs_dm.dart';
 import 'package:re_vision/models/topic_dm.dart';
 import 'package:re_vision/modules/topic_page/topic_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
@@ -420,14 +421,14 @@ class _TopicCardsState extends State<_TopicCards> {
           attachments: jsonEncode(filteredData)
       );
 
-      // Add the revision data.
+      // Add the revision data in the topics collection.
       await BaseCloud.create(
         collection: CloudC.topic,
         document: widget.topics[index].id ?? "",
         data: {StringC.revision: topic.toJson()},
       );
 
-      // Add the revision under posts sub-collection of the current user.
+      // Add the current user in the users sub-collection of users.
       await BaseCloud.createSC(
         collection: CloudC.topic,
         document: widget.topics[index].id ?? "",
@@ -441,6 +442,8 @@ class _TopicCardsState extends State<_TopicCards> {
         ).toJson(),
       );
 
+      // Add the rest of the users in the sub-collection as well.
+      // Send invite requests to other users as well.
       for (FriendDm fr in reqs) {
         await BaseCloud.createSC(
           collection: CloudC.topic,
@@ -453,6 +456,21 @@ class _TopicCardsState extends State<_TopicCards> {
             uuid: fr.uuid,
             status: 0,
           ).toJson(),
+        );
+
+        await BaseCloud.createSC(
+            collection: CloudC.users,
+            document: fr.uuid ?? "",
+            subCollection: CloudC.requests,
+            subDocument: cUser?.uid ?? "",
+            data: ReqsDm(
+              topic: widget.topics[index].topic,
+              primaryId: widget.topics[index].id,
+              name: cUser?.displayName,
+              email: cUser?.email,
+              status: 0,
+              uuid: cUser?.uid
+            ).toJson(),
         );
       }
     } on Exception catch (e) {

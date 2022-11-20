@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class DateTimeC {
   static DateTime todayTime = DateTime.now();
   static DateTime firstDay = DateTime.utc(2022, 08, 06);
@@ -35,4 +37,7 @@ class DateTimeC {
 
   /// Constant duration of 500 ms.
   static const Duration cd200 = Duration(milliseconds: 200);
+
+  /// Today date in yMMMMd (String).
+  static String yMMMdToday = DateFormat.yMMMMd('en_US').format(DateTime.now());
 }

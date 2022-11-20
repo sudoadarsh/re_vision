@@ -10,12 +10,14 @@ class ReqsDm {
     String? email,
     int? status,
     String? uuid,
+    String? topic
   }) {
     _primaryId = primaryId;
     _name = name;
     _email = email;
     _status = status;
     _uuid = uuid;
+    _topic = topic;
   }
 
   ReqsDm.fromJson(dynamic json) {
@@ -24,6 +26,7 @@ class ReqsDm {
     _email = json['email'];
     _status = json['status'];
     _uuid = json['uuid'];
+    _topic = json['topic'];
   }
 
   String? _primaryId;
@@ -31,6 +34,7 @@ class ReqsDm {
   String? _email;
   int? _status;
   String? _uuid;
+  String? _topic;
 
   ReqsDm copyWith({
     String? primaryId,
@@ -38,6 +42,7 @@ class ReqsDm {
     String? email,
     int? status,
     String? uuid,
+    String? topic,
   }) =>
       ReqsDm(
         primaryId: primaryId ?? _primaryId,
@@ -45,6 +50,7 @@ class ReqsDm {
         email: email ?? _email,
         status: status ?? _status,
         uuid: uuid ?? _uuid,
+        topic: topic ?? _topic,
       );
 
   String? get primaryId => _primaryId;
@@ -57,6 +63,8 @@ class ReqsDm {
 
   String? get uuid => _uuid;
 
+  String? get topic => _topic;
+
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['primary_id'] = _primaryId;
@@ -64,6 +72,7 @@ class ReqsDm {
     map['email'] = _email;
     map['status'] = _status;
     map['uuid'] = _uuid;
+    map['topic'] = _topic;
     return map;
   }
 }

@@ -54,6 +54,7 @@ dependencies:
   flutter_quill: ^6.0.10
   share_plus: ^6.2.0
   uuid: ^3.0.6
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
