@@ -4,6 +4,7 @@ import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
+import 'package:re_vision/models/reqs_dm.dart';
 import 'package:re_vision/modules/notification/invites_page.dart';
 import 'package:re_vision/modules/notification/requests_page.dart';
 
@@ -11,17 +12,27 @@ class NotificationsPage extends StatefulWidget {
   const NotificationsPage({
     Key? key,
     required this.req,
-    required this.inv,
   }) : super(key: key);
 
-  final List req;
-  final List inv;
+  final List<ReqsDm> req;
 
   @override
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
+
+  late List<ReqsDm> _frReqs;
+  late List<ReqsDm> _topicReqs;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _frReqs = widget.req.where((e) => e.primaryId == null).toList();
+    _topicReqs = widget.req.where((e) => e.primaryId != null).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,12 +46,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
           SliverToBoxAdapter(
             child: _RequestsTile(
               title: StringC.frRequests,
-              list: widget.req,
+              list: _frReqs,
               image: StringC.friendPath,
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                      builder: (_) => FrRequestsPage(req: widget.req)),
+                      builder: (_) => FrRequestsPage(req: _frReqs)),
                 );
               },
             ),
@@ -48,11 +59,11 @@ class _NotificationsPageState extends State<NotificationsPage> {
           SliverToBoxAdapter(
             child: _RequestsTile(
               title: StringC.revisionInvites,
-              list: widget.inv,
+              list: _topicReqs,
               image: StringC.revisionReqsPath,
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => InvitesPage(topicInvites: widget.inv)));
+                    builder: (_) => InvitesPage(topicInvites: _topicReqs)));
               },
             ),
           ),

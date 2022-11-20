@@ -5,6 +5,7 @@ import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/models/friend_dm.dart';
+import 'package:re_vision/models/reqs_dm.dart';
 import '../../utils/cloud/base_cloud.dart';
 import '../../utils/cloud/cloud_constants.dart';
 import '../../utils/social_auth/base_auth.dart';
@@ -15,7 +16,7 @@ class FrRequestsPage extends StatefulWidget {
     required this.req,
   }) : super(key: key);
 
-  final List req;
+  final List<ReqsDm> req;
 
   @override
   State<FrRequestsPage> createState() => _FrRequestsPageState();
@@ -59,14 +60,14 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
     _removeRequest(req);
 
     // Update friends in the other user.
-    _updateOU(req);
+    _updateFCollection(req);
   }
 
   void _removeRequest(var req) async {
     // todo: remove a friend request
   }
 
-  void _updateOU(var req) async {
+  void _updateFCollection(ReqsDm req) async {
     User? cUser = BaseAuth.currentUser();
 
     try {
@@ -79,6 +80,17 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
         data: FriendDm(
                 name: cUser?.displayName, email: cUser?.email, uuid: cUser?.uid)
             .toJson(),
+      );
+
+      // Update the friends sub list of the current user.
+      BaseCloud.createSC(
+          collection: CloudC.users,
+          document: cUser?.uid ?? '',
+          subCollection: CloudC.friends,
+          subDocument: req.uuid ?? '',
+          data: FriendDm(
+            name: req.name, email: req.email, uuid: req.uuid
+          ).toJson(),
       );
     } catch (e) {
       debugPrint("Error while updating data of OU: $e");

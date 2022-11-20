@@ -58,9 +58,7 @@ class _DashBoardPageState extends State<_DashBoardPage> {
       slivers: [
         SliverAppBar.large(
           automaticallyImplyLeading: false,
-          backgroundColor: Theme
-              .of(context)
-              .scaffoldBackgroundColor,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           title: const BaseText(StringC.dashboard),
           actions: [
             IconButton(
@@ -130,7 +128,7 @@ class _DashBoardPageState extends State<_DashBoardPage> {
   /// To open the search friends dialog.
   void _navToSearch() async {
     List<Map<String, UserFBDm>>? reqsMade =
-    await Navigator.of(context).push<List<Map<String, UserFBDm>>>(
+        await Navigator.of(context).push<List<Map<String, UserFBDm>>>(
       MaterialPageRoute(
         builder: (_) => const SearchPage(),
       ),
@@ -147,9 +145,10 @@ class _DashBoardPageState extends State<_DashBoardPage> {
         subCollection: CloudC.requests,
         subDocument: currentU?.uid ?? '',
         data: ReqsDm(
-            email: currentU?.email ?? "",
-            name: currentU?.displayName ?? "",
-            status: 0
+          uuid: currentU?.uid,
+          email: currentU?.email,
+          name: currentU?.displayName,
+          status: 0,
         ).toJson(),
       );
     }
@@ -190,9 +189,7 @@ class _StatCard extends StatelessWidget {
                 stat.toString(),
                 fontSize: 60,
                 fontWeight: FontWeight.bold,
-                color: Theme
-                    .of(context)
-                    .scaffoldBackgroundColor,
+                color: Theme.of(context).scaffoldBackgroundColor,
               ),
               TextButton(
                 onPressed: onLinkTap,
@@ -220,48 +217,33 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
+  /// The current visible screen in the dashboard.
   CurrentS _currentS = CurrentS.dashboard;
 
   /// Boolean to control the notifications.
-  bool newNotifications = false;
+  bool _newNotifications = false;
 
-  /// The snapshot of requests.
-  late final Stream<QuerySnapshot> _reqsStream;
+  /// Array that contains all the requests for the user.
+  List<ReqsDm> _requests = [];
 
   @override
   void initState() {
     super.initState();
-    _reqsStream = FirebaseFirestore.instance.collection(CloudC.users).doc(BaseAuth
-        .currentUser()
-        ?.uid ?? "").collection(CloudC.requests).snapshots();
+    _fetchReqs();
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-        stream: _reqsStream,
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-
-          if (snapshot.hasError) {
-            // print ("error in stream builder: ${snapshot.error}");
-          }
-
-          else if (snapshot.hasData) {
-            // print (snapshot.data?.docs.map((e) => e.data()));
-          }
-
-          return Scaffold(
-            resizeToAvoidBottomInset: false,
-            body: SafeArea(
-              child: Stack(
-                children: [
-                  _getS(),
-                  _bottomNavigation(context),
-                ],
-              ),
-            ),
-          );
-        }
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            _getS(),
+            _bottomNavigation(context),
+          ],
+        ),
+      ),
     );
   }
 
@@ -298,16 +280,14 @@ class _DashBoardState extends State<DashBoard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Dashboard.
-                  _bottomNavButton(
-                    CurrentS.dashboard,
-                    _currentS,
-                    icon: IconC.dashboard,
-                  ),
+                  _bottomNavButton(CurrentS.dashboard, _currentS,
+                      icon: IconC.dashboard, additionalCB: () {}),
                   // Search.
                   _bottomNavButton(
                     CurrentS.progress,
                     _currentS,
                     icon: IconC.progress,
+                    additionalCB: () {},
                   ),
                   (AppConfig.width(context) * 0.20).separation(false),
                   // Notifications.
@@ -315,31 +295,27 @@ class _DashBoardState extends State<DashBoard> {
                     alignment: Alignment.center,
                     clipBehavior: Clip.none,
                     children: [
-                      _bottomNavButton(
-                        CurrentS.notifications,
-                        _currentS,
-                        icon: IconC.notification,
-                      ),
-                      newNotifications
+                      _bottomNavButton(CurrentS.notifications, _currentS,
+                          icon: IconC.notification, additionalCB: () {
+                        _newNotifications = false;
+                      }),
+                      _newNotifications
                           ? Positioned(
-                        bottom: -0,
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: ColorC.secondary),
-                          height: 5,
-                          width: 5,
-                        ),
-                      )
+                              bottom: -0,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: ColorC.secondary),
+                                height: 5,
+                                width: 5,
+                              ),
+                            )
                           : SizeC.none,
                     ],
                   ),
                   // Profile.
-                  _bottomNavButton(
-                    CurrentS.profile,
-                    _currentS,
-                    icon: IconC.profile,
-                  ),
+                  _bottomNavButton(CurrentS.profile, _currentS,
+                      icon: IconC.profile, additionalCB: () {}),
                 ],
               ),
             )
@@ -350,11 +326,16 @@ class _DashBoardState extends State<DashBoard> {
   }
 
   // Bottom navigation buttons.
-  IconButton _bottomNavButton(CurrentS val, CurrentS grpVal,
-      {required Icon icon}) {
+  IconButton _bottomNavButton(
+    CurrentS val,
+    CurrentS grpVal, {
+    required Icon icon,
+    required VoidCallback additionalCB,
+  }) {
     return IconButton(
       onPressed: () {
         _currentS = val;
+        additionalCB();
         setState(() {});
       },
       icon: icon,
@@ -374,9 +355,28 @@ class _DashBoardState extends State<DashBoard> {
       case CurrentS.profile:
         return const ProfilePage();
       case CurrentS.notifications:
-        return const NotificationsPage(req: [], inv: []);
+        return NotificationsPage(req: _requests);
       default:
         return const _DashBoardPage();
+    }
+  }
+
+  /// Function to fetch the number of requests.
+  void _fetchReqs() async {
+    List<QueryDocumentSnapshot<JSON>> res = await BaseCloud.readSC(
+      collection: CloudC.users,
+      document: BaseAuth.currentUser()?.uid ?? "",
+      subCollection: CloudC.requests,
+    );
+
+    // Mapping the response to [ReqDm] model.
+    _requests = res.map((e) => ReqsDm.fromJson(e.data())).toList();
+
+    if (_requests.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        _newNotifications = true;
+        setState(() {});
+      });
     }
   }
 }
@@ -391,8 +391,7 @@ class CustomNavigationPainter extends CustomPainter {
       ..color = ColorC.primary
       ..style = PaintingStyle.fill;
 
-    Path path = Path()
-      ..moveTo(0, 20);
+    Path path = Path()..moveTo(0, 20);
 
     path.quadraticBezierTo(x * 0.20, 0, x * 0.35, 0);
     path.quadraticBezierTo(x * 0.40, 0, x * 0.40, 20);
