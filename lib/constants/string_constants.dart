@@ -32,6 +32,8 @@ class StringC {
 
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
+  static const String lottieNoTopics = 'lottiefiles/no_topics.json';
+
 
 
   // String constants in the login/ sign-in page.
@@ -69,6 +71,7 @@ class StringC {
   static const String sendToFr = "Send revision to a friend";
   static const String todaySTopic = "Today's Topics";
   static const String topics = "Topics";
+  static const String noTopics = 'Create a topic for revision';
 
 
   // String constants in the topics page.

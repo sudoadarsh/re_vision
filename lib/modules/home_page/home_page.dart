@@ -458,6 +458,40 @@ class _TopicCardsState extends State<_TopicCards> {
   }
 }
 
+/// Widget o show when the number of revision is empty.
+///
+class _EmptyTopics extends StatelessWidget {
+  const _EmptyTopics({
+    Key? key,
+    required this.isPast,
+    required this.onPressed,
+  }) : super(key: key);
+
+  final bool isPast;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Lottie.asset(StringC.lottieNoTopics),
+        isPast
+            ? SizeC.none
+            : InkWell(
+                onTap: onPressed,
+                child: Card(
+                  shape: DecorC.roundedRectangleBorder,
+                  child: const BaseText(
+                    StringC.noTopics,
+                    fontWeight: FontWeight.w300,
+                  ).paddingDefault(),
+                ),
+              ),
+      ],
+    );
+  }
+}
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -532,15 +566,7 @@ class _HomePageState extends State<HomePage> {
                 Card(
                   shape: DecorC.roundedRectangleBorder,
                   child: IconButton(
-                    onPressed: () {
-                      Navigator.of(context)
-                          .pushNamed(
-                            RouteC.topicPage,
-                            arguments:
-                                TopicPageArguments(selectedDay: _selectedDay),
-                          )
-                          .then((value) => _databaseCubit.fetchData());
-                    },
+                    onPressed: _navigateToTopicPage,
                     icon: IconC.add,
                   ),
                 )
@@ -559,8 +585,9 @@ class _HomePageState extends State<HomePage> {
                     shape: DecorC.roundedRectangleBorder,
                     elevation: _calendarVisible ? 2.0 : 1.0,
                     child: IconButton(
-                      color:
-                          _calendarVisible ? ColorC.primary : ColorC.shadowColor,
+                      color: _calendarVisible
+                          ? ColorC.primary
+                          : ColorC.shadowColor,
                       onPressed: () {
                         _calendarVisible = !_calendarVisible;
                         sst();
@@ -636,12 +663,20 @@ class _HomePageState extends State<HomePage> {
 
             // Getting the filtered topics for the day.
             List<TopicDm> filteredTopics = filterTopics(_selectedDay);
-            return _TopicCards(
-              topics: filteredTopics,
-              databaseCubit: _databaseCubit,
-              selectedDay: _selectedDay,
-              friends: _friends,
-            );
+
+            return filteredTopics.isEmpty
+                ? _EmptyTopics(
+                    isPast: _selectedDay.isBefore(
+                      DateTimeC.todayTime.subtract(const Duration(days: 1)),
+                    ),
+                    onPressed: _navigateToTopicPage,
+                  )
+                : _TopicCards(
+                    topics: filteredTopics,
+                    databaseCubit: _databaseCubit,
+                    selectedDay: _selectedDay,
+                    friends: _friends,
+                  );
           },
         ),
       ),
@@ -651,6 +686,16 @@ class _HomePageState extends State<HomePage> {
   // ------------------------------ Functions ----------------------------------
 
   void sst() => setState(() {});
+
+  void _navigateToTopicPage() {
+    Navigator.of(context)
+        .pushNamed(
+      RouteC.topicPage,
+      arguments:
+      TopicPageArguments(selectedDay: _selectedDay),
+    )
+        .then((value) => _databaseCubit.fetchData());
+  }
 
   final CalendarStyle _calendarStyle = CalendarStyle(
     selectedDecoration: DecorC.circleShape.copyWith(color: ColorC.secondary),
