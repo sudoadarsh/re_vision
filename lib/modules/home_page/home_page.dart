@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:re_vision/base_widgets/base_cupertino_dialog.dart';
 import 'package:re_vision/base_widgets/base_cupertino_dialog_button.dart';
+import 'package:re_vision/base_widgets/base_expanded_section.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/common_cubit/common__cubit.dart';
 import 'package:re_vision/constants/color_constants.dart';
@@ -481,8 +482,12 @@ class _HomePageState extends State<HomePage> {
   // Page controller to swipe between dates.
   late PageController _dateController;
 
+  // Boolean to control the calendar expansion.
+  late bool _calendarVisible;
+
   @override
   void initState() {
+    _calendarVisible = false;
 
     _getFriends();
 
@@ -501,8 +506,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isToday = DateTimeC.reformatSelectedDate(_selectedDay) ==
+        DateTimeC.getTodayDateFormatted().toString();
     return Scaffold(
-      // appBar: _AppBar(selectedDay: _selectedDay, databaseCubit: _databaseCubit),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool isInnerScrolled) {
           return [
@@ -511,26 +517,32 @@ class _HomePageState extends State<HomePage> {
               title: const BaseText(StringC.revision),
               actions: [
                 // Navigate to dashboard page.
-                IconButton(
-                  color: ColorC.primary,
-                  onPressed: () => Navigator.of(context)
-                      .pushNamedAndRemoveUntil(
-                          RouteC.dashboard, (route) => false),
-                  icon: IconC.dashboard,
+                Card(
+                  shape: DecorC.roundedRectangleBorder,
+                  child: IconButton(
+                    color: ColorC.primary,
+                    onPressed: () => Navigator.of(context)
+                        .pushNamedAndRemoveUntil(
+                            RouteC.dashboard, (route) => false),
+                    icon: IconC.dashboard,
+                  ),
                 ),
 
                 // Navigate to the add topic screen.
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushNamed(
-                          RouteC.topicPage,
-                          arguments:
-                              TopicPageArguments(selectedDay: _selectedDay),
-                        )
-                        .then((value) => _databaseCubit.fetchData());
-                  },
-                  icon: IconC.add,
+                Card(
+                  shape: DecorC.roundedRectangleBorder,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushNamed(
+                            RouteC.topicPage,
+                            arguments:
+                                TopicPageArguments(selectedDay: _selectedDay),
+                          )
+                          .then((value) => _databaseCubit.fetchData());
+                    },
+                    icon: IconC.add,
+                  ),
                 )
               ],
             ),
@@ -538,58 +550,73 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const BaseText(
-                    StringC.todaySTopic,
+                  BaseText(
+                    isToday ? StringC.todaySTopic : StringC.topics,
                     fontSize: 20.0,
                     fontWeight: FontWeight.w300,
                   ),
-                  InkWell(
-                    onTap: () {},
-                    child: IconC.calendar,
-                  )
-                ],
-              ).paddingOnly(left: 16, right: 16),
-            ),
-            SliverToBoxAdapter(
-              child: CustomCalendarHeader(
-                focusedDay: _focusedDay,
-                onLeftArrowTap: () {
-                  _dateController.previousPage(
-                      duration: DateTimeC.cd300, curve: Curves.easeIn);
-                },
-                onRightArrowTap: () {
-                  _dateController.nextPage(
-                      duration: DateTimeC.cd300, curve: Curves.easeIn);
-                },
-              ).paddingOnly(left: 16),
-            ),
-            SliverToBoxAdapter(
-              child: BaseTableCalendar(
-                onCalendarCreated: (controller) => _dateController = controller,
-                      headerVisible: false,
-                      selectedDay: _selectedDay,
-                      focusedDay: _focusedDay,
-                      calendarFormat: _calendarFormat,
-                      onDaySelected: (selectedDay, focusedDay) {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
+                  Card(
+                    shape: DecorC.roundedRectangleBorder,
+                    elevation: _calendarVisible ? 2.0 : 1.0,
+                    child: IconButton(
+                      color:
+                          _calendarVisible ? ColorC.primary : ColorC.shadowColor,
+                      onPressed: () {
+                        _calendarVisible = !_calendarVisible;
                         sst();
                       },
-                      onFormatChanged: (format) {
-                        if (_calendarFormat != format) {
-                          _calendarFormat = format;
-                          sst();
-                        }
+                      icon: IconC.calendar,
+                    ),
+                  )
+                ],
+              ).paddingOnly(left: 16, right: 4),
+            ),
+            SliverToBoxAdapter(
+              child: BaseExpandedSection(
+                expand: _calendarVisible,
+                child: Column(
+                  children: [
+                    CustomCalendarHeader(
+                      focusedDay: _focusedDay,
+                      onLeftArrowTap: () {
+                        _dateController.previousPage(
+                            duration: DateTimeC.cd300, curve: Curves.easeIn);
                       },
-                      onPageChanged: (focusedDay) {
-                        _focusedDay = focusedDay;
+                      onRightArrowTap: () {
+                        _dateController.nextPage(
+                            duration: DateTimeC.cd300, curve: Curves.easeIn);
                       },
-                      calendarStyle: _calendarStyle,
-                      eventLoader: (day) {
-                        return filterTopics(day);
-                      },
-                      calendarBuilders: _calendarBuilders())
-                  .paddingOnly(left: 3, right: 3),
+                    ).paddingOnly(left: 16),
+                    BaseTableCalendar(
+                            onCalendarCreated: (controller) =>
+                                _dateController = controller,
+                            headerVisible: false,
+                            selectedDay: _selectedDay,
+                            focusedDay: _focusedDay,
+                            calendarFormat: _calendarFormat,
+                            onDaySelected: (selectedDay, focusedDay) {
+                              _selectedDay = selectedDay;
+                              _focusedDay = focusedDay;
+                              sst();
+                            },
+                            onFormatChanged: (format) {
+                              if (_calendarFormat != format) {
+                                _calendarFormat = format;
+                                sst();
+                              }
+                            },
+                            onPageChanged: (focusedDay) {
+                              _focusedDay = focusedDay;
+                            },
+                            calendarStyle: _calendarStyle,
+                            eventLoader: (day) {
+                              return filterTopics(day);
+                            },
+                            calendarBuilders: _calendarBuilders())
+                        .paddingOnly(left: 3, right: 3),
+                  ],
+                ),
+              ),
             ),
           ];
         },

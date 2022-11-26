@@ -176,7 +176,7 @@ class _InvitesTileState extends State<_InvitesTile> {
                 });
           }
         } else if (state is CommonButtonFailure) {
-          print(state.error);
+          // todo: handle error.
         }
       },
       builder: (context, state) {
@@ -334,7 +334,6 @@ class _InvitesTileState extends State<_InvitesTile> {
     // Guard the [confirm].
     if (confirm == null || !confirm) return;
 
-    print("accepted, $confirm");
     _acceptCubit.fetchData<DocumentSnapshot>(data: widget.topicInv);
   }
 
