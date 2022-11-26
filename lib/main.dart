@@ -32,16 +32,12 @@ class Root extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // int authState = BaseSharedPrefsSingleton.getInt("auth") ?? 0;
 
     return BlocProvider(
       create: (context) => AttachmentCubit(),
       child: MaterialApp(
         theme: CustomThemeData.themeData,
         onGenerateRoute: RouteGenerator.generate,
-        // initialRoute: authState == 1
-        //     ? RouteC.dashboard
-        //     : RouteC.loginPage,
         initialRoute: RouteC.loginPage,
       ),
     );

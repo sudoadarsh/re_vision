@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:re_vision/base_sqlite/sqlite_helper.dart';
 import 'package:re_vision/base_widgets/base_bottom_modal_sheet.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
+import 'package:re_vision/common_cubit/common__cubit.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/date_time_constants.dart';
 import 'package:re_vision/constants/decoration_constants.dart';
@@ -10,7 +14,11 @@ import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/reqs_dm.dart';
+import 'package:re_vision/models/topic_dm.dart';
 import 'package:re_vision/state_management/topic_cloud/topic_cloud_repo.dart';
+import 'package:re_vision/utils/cloud/base_cloud.dart';
+import 'package:re_vision/utils/cloud/cloud_constants.dart';
+import 'package:re_vision/utils/social_auth/base_auth.dart';
 
 import '../../base_widgets/base_elevated_button.dart';
 import '../../base_widgets/base_text.dart';
@@ -69,7 +77,7 @@ class _InvitesTile extends StatefulWidget {
 
 class _InvitesTileState extends State<_InvitesTile> {
   /// The cubit to fetch the data from the topic collection.
-  late final CommonButtonCubit _cubit;
+  late final CommonButtonCubit _acceptCubit;
 
   /// Text form field controllers.
   late final TextEditingController _senderC;
@@ -89,7 +97,18 @@ class _InvitesTileState extends State<_InvitesTile> {
     _topicC.text = widget.topicInv.topic ?? "";
     _scheduledC.text = DateTimeC.yMMMdToday;
 
-    _cubit = CommonButtonCubit(TopicCloudRepo());
+    _acceptCubit = CommonButtonCubit(TopicCloudRepo());
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _senderC.dispose();
+    _topicC.dispose();
+    _scheduledC.dispose();
+
+    _acceptCubit.close();
   }
 
   @override
@@ -104,13 +123,66 @@ class _InvitesTileState extends State<_InvitesTile> {
 
   /// Accepted button.
   Widget _acceptButton() {
-    return BaseElevatedButton(
-      backgroundColor: ColorC.elevatedButton,
-      onPressed: _confirmAccept,
-      size: const Size(80, 40),
-      child: const BaseText(StringC.accept),
+    return BlocConsumer(
+      bloc: _acceptCubit,
+      listener: (context, state) async {
+        if (state is CommonButtonSuccess) {
+          // Map the received data as the Document snapshot.
+          DocumentSnapshot? snap = state.data as DocumentSnapshot;
+
+          if (snap.exists) {
+            JSON? data = snap.data() as JSON;
+
+            if (data.isEmpty) return;
+
+            // Mapping to revision data model.
+            TopicDm topicDm = TopicDm.fromJson(data[StringC.revision]);
+            topicDm.copyWith(
+              topic: _topicC.text,
+              scheduledTo: "${_scheduledC.text} 00:00:00.000",
+              iteration: 1
+            );
+
+            // Save the revision locally.
+            _invitationAccepted(topicDm);
+
+            // Remove the revision request from cloud.
+            await BaseCloud.deleteSC(
+                collection: CloudC.users,
+                document: BaseAuth.currentUser()?.uid ?? "",
+                subCollection: CloudC.requests,
+                subDocument: widget.topicInv.primaryId ?? ""
+            );
+
+            // Update the status of the revision in cloud.
+            await BaseCloud.updateSC(
+                collection: CloudC.topic,
+                document: topicDm.id ?? "",
+                subCollection: CloudC.users,
+                subDocument: BaseAuth.currentUser()?.uid ?? "",
+                data: {
+                  CloudC.status: 1
+                });
+          }
+        } else if (state is CommonButtonFailure) {
+          print(state.error);
+        }
+      },
+      builder: (context, state) {
+        if (state is CommonCubitStateLoading) {
+          return const CupertinoActivityIndicator();
+        }
+        return BaseElevatedButton(
+          backgroundColor: ColorC.elevatedButton,
+          onPressed: _confirmAccept,
+          size: const Size(80, 40),
+          child: const BaseText(StringC.accept),
+        );
+      },
     );
   }
+
+  // ----------------------------- Function ------------------------------------
 
   /// Function to perform when the invitation list is tapped.
   void _onListTap() async {
@@ -147,7 +219,7 @@ class _InvitesTileState extends State<_InvitesTile> {
               BaseElevatedButton(
                 backgroundColor: ColorC.elevatedButton,
                 size: SizeC.elevatedButton,
-                onPressed: () {},
+                onPressed: _accept,
                 child: const BaseText(StringC.accept),
               ),
             ],
@@ -159,8 +231,6 @@ class _InvitesTileState extends State<_InvitesTile> {
     // Update the topic name.
     widget.saveChanges(_topicC.text);
   }
-
-  // ----------------------------- Function ------------------------------------
 
   /// Function to render the date picker.
   void _datePicker() async {
@@ -191,13 +261,13 @@ class _InvitesTileState extends State<_InvitesTile> {
     // Guard the date picked.
     if (datePicked == null) return;
 
-    _scheduledC.text = DateFormat.yMMMMd('en_US').format(datePicked);
+    _scheduledC.text = DateFormat("yyyy-MM-dd").format(datePicked);
     setState(() {});
   }
 
   /// Confirmation dialog for the when the user accepts the revision invitation.
   void _confirmAccept() async {
-    bool confirm = await showDialog(
+    bool? confirm = await showDialog(
       context: context,
       builder: (_) => CupertinoAlertDialog(
         title: const BaseText(StringC.appName),
@@ -251,6 +321,28 @@ class _InvitesTileState extends State<_InvitesTile> {
     );
 
     // Guard the [confirm].
-    if (!confirm) return;
+    if (confirm == null || !confirm) return;
+
+    print("accepted, $confirm");
+    _acceptCubit.fetchData<DocumentSnapshot>(data: widget.topicInv);
+  }
+
+  /// Function to perform when the user accepts the revision request.
+  void _accept() {
+    _acceptCubit.fetchData<DocumentSnapshot>(data: widget.topicInv);
+    Navigator.of(context).pop();
+  }
+
+  /// Function to save the accepted revision locally and remove the particular
+  /// request.
+  Future<void> _invitationAccepted(TopicDm topicDm) async {
+    // Saving the revision data locally.
+    // Throwable.
+    try {
+      await BaseSqlite.insert(tableName: StringC.topicTable, data: topicDm);
+    } on Exception catch (e) {
+      debugPrint("Unable to save the revision locally: $e");
+      // todo: add snack bar for error.
+    }
   }
 }

@@ -5,9 +5,10 @@ import 'package:re_vision/utils/cloud/cloud_constants.dart';
 
 class TopicCloudProvider {
   Future<DocumentSnapshot?> fetchData(ReqsDm req) async {
-    return BaseCloud.readD(
+    DocumentSnapshot? snap = await BaseCloud.readD(
         collection: CloudC.topic,
         document: req.primaryId ?? ""
     );
+    return snap;
   }
 }

@@ -1,3 +1,3 @@
 abstract class CommonButtonCubitRepo {
-  fetchData({data});
+  dynamic fetchData({data});
 }

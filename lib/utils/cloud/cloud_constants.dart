@@ -5,4 +5,5 @@ class CloudC {
   static const String uuid = 'uuid';
   static const String topic = 'topic';
   static const String topicUsers = 'topic_users';
+  static const String status = 'status';
 }

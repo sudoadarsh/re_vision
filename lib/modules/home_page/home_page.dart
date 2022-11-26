@@ -462,7 +462,7 @@ class _TopicCardsState extends State<_TopicCards> {
             collection: CloudC.users,
             document: fr.uuid ?? "",
             subCollection: CloudC.requests,
-            subDocument: cUser?.uid ?? "",
+            subDocument: widget.topics[index].id ?? "",
             data: ReqsDm(
               topic: widget.topics[index].topic,
               primaryId: widget.topics[index].id,

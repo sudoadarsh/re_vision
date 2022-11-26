@@ -60,7 +60,7 @@ class BaseCloud {
           ?.collection(collection)
           .doc(document)
           .collection(subCollection)
-          .doc(subCollection);
+          .doc(subDocument);
 
       // Update the data in the sub collection.
       ref?.update(data);

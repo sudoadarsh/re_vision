@@ -5,5 +5,5 @@ class RouteC {
   static const String loginPage = '/login_page';
   static const String profilePage = '/profile_page';
   static const String friendsPage = '/friends_page';
-  static const String dashboard = '/';
+  static const String dashboard = '/dashboard';
 }

@@ -39,5 +39,5 @@ class DateTimeC {
   static const Duration cd200 = Duration(milliseconds: 200);
 
   /// Today date in yMMMMd (String).
-  static String yMMMdToday = DateFormat.yMMMMd('en_US').format(DateTime.now());
+  static String yMMMdToday = DateFormat("yyyy-MM-dd").format(DateTime.now());
 }
