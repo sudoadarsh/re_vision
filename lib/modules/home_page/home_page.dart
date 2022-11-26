@@ -39,39 +39,6 @@ import '../../utils/cloud/cloud_constants.dart';
 import '../../utils/social_auth/base_auth.dart';
 import '../friends/friends_page.dart';
 
-// class _AppBar extends StatelessWidget with PreferredSizeWidget {
-//   const _AppBar(
-//       {Key? key, required this.selectedDay, required this.databaseCubit})
-//       : super(key: key);
-//
-//   final DateTime selectedDay;
-//   final CommonCubit databaseCubit;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return AppBar(
-//       title: const BaseText(StringConstants.empty),
-//       backgroundColor: ColorConstants.primary,
-//       actions: [
-//         IconButton(
-//           onPressed: () {
-//             Navigator.of(context)
-//                 .pushNamed(
-//                   RouteConstants.topicPage,
-//                   arguments: TopicPageArguments(selectedDay: selectedDay),
-//                 )
-//                 .then((value) => databaseCubit.fetchData());
-//           },
-//           icon: const Icon(Icons.add_circle, color: ColorConstants.white),
-//         ),
-//       ],
-//     );
-//   }
-//
-//   @override
-//   Size get preferredSize => const Size.fromHeight(56.0);
-// }
-
 class _Cards extends StatelessWidget {
   const _Cards({
     Key? key,
@@ -387,7 +354,6 @@ class _TopicCardsState extends State<_TopicCards> {
           databaseCubit: widget.databaseCubit,
           selectedDay: widget.selectedDay,
           onRevisionShared: () async {
-
             var reqsSent = await Navigator.of(context).pushNamed(
               RouteC.friendsPage,
               arguments:
@@ -406,20 +372,17 @@ class _TopicCardsState extends State<_TopicCards> {
 
   /// Add revision sent requests to respective users.
   void _addSentReqs(int index, List<FriendDm> reqs) async {
-
     try {
-      List data =
-      jsonDecode(widget.topics[index].attachments ?? "");
+      List data = jsonDecode(widget.topics[index].attachments ?? "");
 
       List<AttachmentDataDm> dataDmArr =
-      data.map((e) => AttachmentDataDm.fromJson(e)).toList();
+          data.map((e) => AttachmentDataDm.fromJson(e)).toList();
 
       List<AttachmentDataDm> filteredData =
-      dataDmArr.where((element) => element.type == 0).toList();
+          dataDmArr.where((element) => element.type == 0).toList();
 
-      TopicDm topic = widget.topics[index].copyWith(
-          attachments: jsonEncode(filteredData)
-      );
+      TopicDm topic =
+          widget.topics[index].copyWith(attachments: jsonEncode(filteredData));
 
       // Add the revision data in the topics collection.
       await BaseCloud.create(
@@ -459,25 +422,24 @@ class _TopicCardsState extends State<_TopicCards> {
         );
 
         await BaseCloud.createSC(
-            collection: CloudC.users,
-            document: fr.uuid ?? "",
-            subCollection: CloudC.requests,
-            subDocument: widget.topics[index].id ?? "",
-            data: ReqsDm(
-              topic: widget.topics[index].topic,
-              primaryId: widget.topics[index].id,
-              name: cUser?.displayName,
-              email: cUser?.email,
-              status: 0,
-              uuid: cUser?.uid
-            ).toJson(),
+          collection: CloudC.users,
+          document: fr.uuid ?? "",
+          subCollection: CloudC.requests,
+          subDocument: widget.topics[index].id ?? "",
+          data: ReqsDm(
+                  topic: widget.topics[index].topic,
+                  primaryId: widget.topics[index].id,
+                  name: cUser?.displayName,
+                  email: cUser?.email,
+                  status: 0,
+                  uuid: cUser?.uid)
+              .toJson(),
         );
       }
     } on Exception catch (e) {
       // TODO: cannot share revision.
       debugPrint(e.toString());
     }
-
   }
 
   /// Update the isOnline field of the current revision.
@@ -516,8 +478,12 @@ class _HomePageState extends State<HomePage> {
   // To store the friends of the current user.
   List<QueryDocumentSnapshot<JSON>> _friends = [];
 
+  // Page controller to swipe between dates.
+  late PageController _dateController;
+
   @override
   void initState() {
+
     _getFriends();
 
     _focusedDay = DateTimeC.todayTime;
@@ -569,29 +535,61 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             SliverToBoxAdapter(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const BaseText(
+                    StringC.todaySTopic,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.w300,
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: IconC.calendar,
+                  )
+                ],
+              ).paddingOnly(left: 16, right: 16),
+            ),
+            SliverToBoxAdapter(
+              child: CustomCalendarHeader(
+                focusedDay: _focusedDay,
+                onLeftArrowTap: () {
+                  _dateController.previousPage(
+                      duration: DateTimeC.cd300, curve: Curves.easeIn);
+                },
+                onRightArrowTap: () {
+                  _dateController.nextPage(
+                      duration: DateTimeC.cd300, curve: Curves.easeIn);
+                },
+              ).paddingOnly(left: 16),
+            ),
+            SliverToBoxAdapter(
               child: BaseTableCalendar(
-                  selectedDay: _selectedDay,
-                  focusedDay: _focusedDay,
-                  calendarFormat: _calendarFormat,
-                  onDaySelected: (selectedDay, focusedDay) {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
-                    sst();
-                  },
-                  onFormatChanged: (format) {
-                    if (_calendarFormat != format) {
-                      _calendarFormat = format;
-                      sst();
-                    }
-                  },
-                  onPageChanged: (focusedDay) {
-                    _focusedDay = focusedDay;
-                  },
-                  calendarStyle: _calendarStyle,
-                  eventLoader: (day) {
-                    return filterTopics(day);
-                  },
-                  calendarBuilders: _calendarBuilders()),
+                onCalendarCreated: (controller) => _dateController = controller,
+                      headerVisible: false,
+                      selectedDay: _selectedDay,
+                      focusedDay: _focusedDay,
+                      calendarFormat: _calendarFormat,
+                      onDaySelected: (selectedDay, focusedDay) {
+                        _selectedDay = selectedDay;
+                        _focusedDay = focusedDay;
+                        sst();
+                      },
+                      onFormatChanged: (format) {
+                        if (_calendarFormat != format) {
+                          _calendarFormat = format;
+                          sst();
+                        }
+                      },
+                      onPageChanged: (focusedDay) {
+                        _focusedDay = focusedDay;
+                      },
+                      calendarStyle: _calendarStyle,
+                      eventLoader: (day) {
+                        return filterTopics(day);
+                      },
+                      calendarBuilders: _calendarBuilders())
+                  .paddingOnly(left: 3, right: 3),
             ),
           ];
         },

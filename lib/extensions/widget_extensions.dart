@@ -5,7 +5,8 @@ extension WidgetEx on Widget {
   Widget paddingDefault() =>
       Padding(padding: const EdgeInsets.all(8.0), child: this);
 
-  Widget paddingAll16() => Padding(padding: const EdgeInsets.all(16.0), child: this);
+  Widget paddingAll16() =>
+      Padding(padding: const EdgeInsets.all(16.0), child: this);
 
   Widget paddingAll4() =>
       Padding(padding: const EdgeInsets.all(4.0), child: this);
@@ -14,7 +15,10 @@ extension WidgetEx on Widget {
       Padding(padding: const EdgeInsets.symmetric(vertical: 8.0), child: this);
 
   Widget paddingHorizontal8() =>
-      Padding(padding: const EdgeInsets.all(8.0), child: this);
+      Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: this);
+
+  Widget paddingHorizontal16() =>
+      Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: this);
 
   Widget paddingLeft8() =>
       Padding(padding: const EdgeInsets.only(left: 8.0), child: this);

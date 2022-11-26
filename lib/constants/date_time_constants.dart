@@ -38,6 +38,9 @@ class DateTimeC {
   /// Constant duration of 500 ms.
   static const Duration cd200 = Duration(milliseconds: 200);
 
+  /// Constant duration of 300 ms.
+  static const Duration cd300 = Duration(milliseconds: 300);
+
   /// Today date in yMMMMd (String).
   static String yMMMdToday = DateFormat("yyyy-MM-dd").format(DateTime.now());
 }

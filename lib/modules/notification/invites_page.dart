@@ -37,6 +37,17 @@ class InvitesPage extends StatefulWidget {
 }
 
 class _InvitesPageState extends State<InvitesPage> {
+
+  /// To store the received invites.
+  late List<ReqsDm> reqs;
+
+  @override
+  void initState() {
+    super.initState();
+
+    reqs = widget.topicInvites;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,13 +56,13 @@ class _InvitesPageState extends State<InvitesPage> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: ListView.builder(
-        itemCount: widget.topicInvites.length,
+        itemCount: reqs.length,
         itemBuilder: (ctx, i) {
           return _InvitesTile(
-            topicInv: widget.topicInvites[i],
+            topicInv: reqs[i],
             saveChanges: (val) {
-              widget.topicInvites.replaceRange(
-                  i, i + 1, [widget.topicInvites[i].copyWith(topic: val)]);
+              reqs.replaceRange(
+                  i, i + 1, [reqs[i].copyWith(topic: val)]);
               setState(() {});
             },
           );

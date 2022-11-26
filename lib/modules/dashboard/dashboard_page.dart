@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_rounded_elevated_button.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
+import 'package:re_vision/base_widgets/sliver_section_header.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/decoration_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
@@ -23,24 +24,6 @@ import 'package:re_vision/utils/cloud/cloud_constants.dart';
 import 'package:re_vision/utils/social_auth/base_auth.dart';
 
 enum CurrentS { dashboard, progress, notifications, profile }
-
-/// The section headers.
-///
-class _SectionHeaders extends StatelessWidget {
-  const _SectionHeaders({Key? key, required this.header}) : super(key: key);
-
-  final String header;
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.only(left: 16.0, bottom: 8),
-      sliver: SliverToBoxAdapter(
-        child: BaseText(header, fontSize: 20.0, fontWeight: FontWeight.w300),
-      ),
-    );
-  }
-}
 
 /// The Dashboard page.
 ///
@@ -80,7 +63,7 @@ class _DashBoardPageState extends State<_DashBoardPage> {
         ),
 
         // Revision Header.
-        const _SectionHeaders(header: StringC.revision),
+        const SliverSectionHeader(header: StringC.revision),
         SliverPadding(
           padding: const EdgeInsets.only(left: 16),
           sliver: SliverToBoxAdapter(

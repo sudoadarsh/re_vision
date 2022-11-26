@@ -67,6 +67,7 @@ class StringC {
   static const String oops = "Oops!";
   static const String errorShareAttach = 'Unable to share attachments.';
   static const String sendToFr = "Send revision to a friend";
+  static const String todaySTopic = "Today's Topics";
 
 
   // String constants in the topics page.
