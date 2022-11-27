@@ -553,9 +553,14 @@ class _HomePageState extends State<HomePage> {
                   shape: DecorC.roundedRectangleBorder,
                   child: IconButton(
                     color: ColorC.primary,
-                    onPressed: () => Navigator.of(context)
-                        .pushNamedAndRemoveUntil(
-                            RouteC.dashboard, (route) => false),
+                    onPressed: () {
+                      if (BaseAuth.currentUser() != null) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            RouteC.dashboard, (route) => false);
+                        return;
+                      }
+                      _loginRequest();
+                    },
                     icon: IconC.dashboard,
                   ),
                 ),
@@ -752,6 +757,39 @@ class _HomePageState extends State<HomePage> {
       collection: CloudC.users,
       document: BaseAuth.currentUser()?.uid ?? "",
       subCollection: CloudC.friends,
+    );
+  }
+
+  // Dialog asking the user to log into revision app.
+  Future<void> _loginRequest() async {
+    await showDialog(
+      context: context,
+      builder: (_) => CupertinoAlertDialog(
+        title: const BaseText(StringC.appName),
+        content: Column(
+          children: [
+            Lottie.asset(StringC.lottieGoSocial, height: 200),
+            const BaseText(
+              StringC.goSocial,
+              maxLines: 3,
+            )
+          ],
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: const BaseText(StringC.login),
+            onPressed: () {
+              Navigator.of(context).pushNamed(RouteC.loginPage);
+            },
+          ),
+          CupertinoDialogAction(
+            child: const BaseText(StringC.cancel),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          )
+        ],
+      ),
     );
   }
 }

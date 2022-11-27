@@ -1,5 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
+import 'package:re_vision/base_widgets/base_bottom_modal_sheet.dart';
+import 'package:re_vision/utils/app_config.dart';
 import 'package:uuid/uuid.dart';
 import 'package:favicon/favicon.dart';
 import 'package:file_picker/file_picker.dart';
@@ -212,58 +215,103 @@ class _NoteEditorState extends State<_NoteEditor> {
   void initState() {
     super.initState();
     _fNode = FocusNode();
-
-    // print(_qc.document.toPlainText());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: DecorC.roundedRectangleBorder,
-      child: QuillEditor(
-        onTapUp: _onTapUp,
-        controller: _qc,
-        scrollController: ScrollController(),
-        scrollable: true,
-        autoFocus: false,
-        readOnly: true,
-        placeholder: 'Add Note',
-        enableSelectionToolbar: isMobile(),
-        expands: false,
-        padding: const EdgeInsets.all(8.0), focusNode: FocusNode(),
-      ),
-    );
+    return _qc.document.toPlainText().trim().isEmpty
+        ? Expanded(
+            child: SingleChildScrollView(
+              child: InkWell(
+                onTap: _showEditorSheet,
+                child: Stack(
+                  alignment: AlignmentDirectional.center,
+                  children: [
+                    Image.asset(StringC.notesPath, scale: 2),
+                    Transform.rotate(
+                      angle: -pi / 24,
+                      child: const BaseText(StringC.tapToAddANote),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        : Flexible(
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topRight,
+              children: [
+                Card(
+                  shape: DecorC.roundedRectangleBorder,
+                  child: QuillEditor(
+                    onTapUp: _onTapUp,
+                    controller: _qc,
+                    scrollController: ScrollController(),
+                    scrollable: true,
+                    autoFocus: false,
+                    readOnly: true,
+                    showCursor: false,
+                    placeholder: 'Add Note',
+                    enableSelectionToolbar: isMobile(),
+                    expands: false,
+                    padding: const EdgeInsets.all(8.0),
+                    focusNode: FocusNode(),
+                  ).paddingDefault(),
+                ),
+                Positioned(
+                  top: -5,
+                  child: Image.asset(
+                    StringC.notesPath,
+                    scale: 16,
+                  ),
+                )
+              ],
+            ),
+          );
   }
 
   bool _onTapUp(TapUpDetails details, TextPosition Function(Offset) offset) {
-    // Open the action sheet to add or edit notes.
-    showModalBottomSheet(
+    _showEditorSheet();
+    return true;
+  }
+
+  // Open the action sheet to add or edit notes.
+  Future<void> _showEditorSheet() async {
+    await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         shape: DecorC.roundedRectangleBorderTop,
-        builder: (_) => SafeArea(
-          child: Column(
-            children: [
-              QuillToolbar.basic(controller: _qc),
-              SizedBox(
-                height: 500,
-                child: QuillEditor(
-                  controller: _qc,
-                  scrollController: ScrollController(),
-                  scrollable: true,
-                  autoFocus: false,
-                  readOnly: false,
-                  placeholder: 'Add Note',
-                  enableSelectionToolbar: isMobile(),
-                  expands: true,
-                  padding: const EdgeInsets.all(8.0), focusNode: _fNode,
-                ),
+        builder: (_) => SizedBox(
+              height: AppConfig.height(context) * 0.75,
+              child: Column(
+                children: [
+                  const BaseNotch(),
+                  QuillToolbar.basic(controller: _qc),
+                  SizedBox(
+                    height: AppConfig.height(context) * 0.5,
+                    child: QuillEditor(
+                      controller: _qc,
+                      scrollController: ScrollController(),
+                      scrollable: true,
+                      autoFocus: false,
+                      readOnly: false,
+                      placeholder: 'Add Note',
+                      enableSelectionToolbar: isMobile(),
+                      expands: false,
+                      padding: const EdgeInsets.all(8.0),
+                      focusNode: _fNode,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        )
-    );
-    return true;
+            ));
+
+    if (_qc.document.toPlainText().trim().isEmpty) _qc.clear();
+
+    setState(() {});
+
+    return;
   }
 }
 
@@ -563,7 +611,7 @@ class _TopicPageState extends State<TopicPage> {
         : (await showDialog(
               context: context,
               builder: (context) => CupertinoAlertDialog(
-                title: const BaseText (StringC.areYouSureExit),
+                title: const BaseText(StringC.areYouSureExit),
                 content: const BaseText(StringC.consequences),
                 actions: [
                   CupertinoDialogAction(
@@ -602,15 +650,14 @@ class _TopicPageState extends State<TopicPage> {
       // todo: add condition for empty topic field.
       // Creating the topic data.
       final TopicDm data = TopicDm(
-        id: const Uuid().v1(),
-        topic: _topicController.text,
-        attachments: jsonEncode(jsonData),
-        notes: jsonEncode(jsonQuill),
-        createdAt: widget.selectedDay.toString().replaceAll('Z', ''),
-        scheduledTo: widget.selectedDay.toString().replaceAll('Z', ''),
-        iteration: 1,
-        isOnline: 0
-      );
+          id: const Uuid().v1(),
+          topic: _topicController.text,
+          attachments: jsonEncode(jsonData),
+          notes: jsonEncode(jsonQuill),
+          createdAt: widget.selectedDay.toString().replaceAll('Z', ''),
+          scheduledTo: widget.selectedDay.toString().replaceAll('Z', ''),
+          iteration: 1,
+          isOnline: 0);
 
       try {
         await BaseSqlite.insert(

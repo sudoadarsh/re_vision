@@ -27,13 +27,11 @@ class StringC {
   static const String defaultPPPath = 'images/default_profile.png';
   static const String userGrpPath = 'images/user_group.png';
   static const String revisionReqsPath = 'images/revision_request.png';
-
-
-
+  static const String notesPath = 'images/note.png';
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
   static const String lottieNoTopics = 'lottiefiles/no_topics.json';
-
+  static const String lottieGoSocial = 'lottiefiles/go_social.json';
 
 
   // String constants in the login/ sign-in page.
@@ -72,6 +70,7 @@ class StringC {
   static const String todaySTopic = "Today's Topics";
   static const String topics = "Topics";
   static const String noTopics = 'Create a topic for revision';
+  static const String goSocial = "Go social, connect with your friends and make revision fun.";
 
 
   // String constants in the topics page.
@@ -90,7 +89,8 @@ class StringC {
   static const String cancel = 'Cancel';
   static const String save = 'Save';
   static const String link = 'link';
-  static const String addNote = 'Add note';
+  static const String addNote = 'Add a note';
+  static const String tapToAddANote = "Tap to add a note";
 
   static const String deleteAttachment = 'Delete this attachment?';
   static const String ok = 'Okay';

@@ -9,7 +9,7 @@ class BaseText extends StatelessWidget {
     this.fontSize,
     this.overflow,
     this.textAlign,
-    this.fontFamily, this.decoration,
+    this.fontFamily, this.decoration, this.maxLines,
   }) : super(key: key);
 
   final String text;
@@ -20,11 +20,13 @@ class BaseText extends StatelessWidget {
   final TextAlign? textAlign;
   final String? fontFamily;
   final TextDecoration? decoration;
+  final int? maxLines;
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
+      maxLines: maxLines,
       style: TextStyle(
         color: color,
         fontWeight: fontWeight,
