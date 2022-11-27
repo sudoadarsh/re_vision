@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:re_vision/modules/dashboard/dashboard_page.dart';
 import 'package:re_vision/modules/friends/friends_page.dart';
-import 'package:re_vision/modules/profile/profile_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 
 import '../modules/home_page/home_page.dart';
@@ -28,9 +27,6 @@ class RouteGenerator {
         break;
       case RouteC.loginPage:
         page = const LoginPage();
-        break;
-      case RouteC.profilePage:
-        page = const ProfilePage();
         break;
       case RouteC.friendsPage:
         final args = settings.arguments as FriendsPageArguments;

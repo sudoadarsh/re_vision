@@ -14,4 +14,5 @@ class ColorC {
   static const Color buttonComp = Color.fromRGBO(246, 229, 176, 1.0);
   static const Color elevatedButton = Color.fromRGBO(246, 229, 176, 1.0);
   static const Color link = Color.fromRGBO(18, 75, 217, 1.0);
+  static final Color disabledColor = Colors.grey.shade500;
 }

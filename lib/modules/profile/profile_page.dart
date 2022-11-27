@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:re_vision/base_shared_prefs/base_shared_prefs.dart';
@@ -8,10 +9,12 @@ import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/modules/friends/friends_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/utils/social_auth/base_auth.dart';
 
 import '../../base_widgets/base_text.dart';
+import '../../models/friend_dm.dart';
 
 /// The profile pic.
 class _ProfilePic extends StatelessWidget {
@@ -59,7 +62,9 @@ class _EditProfile extends StatelessWidget {
 
 /// The user stats.
 class _UserStats extends StatelessWidget {
-  const _UserStats({Key? key}) : super(key: key);
+  const _UserStats({Key? key, required this.frs}) : super(key: key);
+
+  final List<FriendDm> frs;
 
   @override
   Widget build(BuildContext context) {
@@ -71,11 +76,9 @@ class _UserStats extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _statContent("20", StringC.revisionProf),
+            _statContent(context, "0", StringC.starsProf),
             const VerticalDivider(),
-            _statContent("20", StringC.starsProf),
-            const VerticalDivider(),
-            _statContent("20", StringC.friends),
+            _statContent(context, frs.length.toString(), StringC.friends),
           ],
         ),
       ),
@@ -83,16 +86,27 @@ class _UserStats extends StatelessWidget {
   }
 
   /// The Stat content.
-  Column _statContent(String title, String subtitle) {
-    return Column(
-      children: [
-        BaseText(title, fontSize: 20),
-        BaseText(
-          subtitle,
-          fontWeight: FontWeight.w300,
-          color: ColorC.subtitle,
-        ),
-      ],
+  Widget _statContent(BuildContext context, String title, String subtitle) {
+    return GestureDetector(
+      onTap: () {
+        if (subtitle == StringC.friends) {
+          Navigator.of(context).pushNamed(
+            RouteC.friendsPage,
+            arguments:
+                FriendsPageArguments(title: subtitle, frs: frs, fromProfile: true),
+          );
+        }
+      },
+      child: Column(
+        children: [
+          BaseText(title, fontSize: 20),
+          BaseText(
+            subtitle,
+            fontWeight: FontWeight.w300,
+            color: ColorC.subtitle,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -120,8 +134,28 @@ class _SectionHeader extends StatelessWidget {
 
 /// The profile page.
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({
+    Key? key,
+    required this.friends,
+  }) : super(key: key);
+
+  final List<FriendDm> friends;
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  /// To store the current user.
+  late final User? cUser;
+
+  @override
+  void initState() {
+    super.initState();
+
+    cUser = BaseAuth.currentUser();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,17 +171,17 @@ class ProfilePage extends StatelessWidget {
                 children: [
                   const _ProfilePic(profileURL: ""),
                   SizeC.spaceVertical10,
-                  const BaseText(
-                    "Adarsh Sudarsanan",
+                  BaseText(
+                    cUser?.displayName ?? "",
                     color: ColorC.white,
                     fontSize: 20,
                     fontWeight: FontWeight.w300,
                   ),
-                  const BaseText("adarshs@meditab.com", color: ColorC.subtitle),
+                  BaseText(cUser?.email ?? "", color: ColorC.subtitle),
                   SizeC.spaceVertical10,
                   const _EditProfile(),
                   SizeC.spaceVertical10,
-                  const _UserStats(),
+                  _UserStats(frs: widget.friends),
                 ],
               ).paddingDefault(),
             ),
@@ -170,8 +204,6 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
-
-  // ------------------------------ Functions ----------------------------------
 
   /// Function to display the dialog alerting the user about the logout.
   void _logoutAlert(BuildContext context) {

@@ -589,31 +589,28 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Row(
                     children: [
-                      isToday
-                          ? SizeC.none
-                          : Card(
-                              shape: DecorC.roundedRectangleBorder,
-                              elevation: _calendarVisible ? 2.0 : 1.0,
-                              child: IconButton(
-                                color: ColorC.primary,
-                                onPressed: () {
-                                  _dateController.animateToPage(initialPage,
-                                      duration: DateTimeC.cd300,
-                                      curve: Curves.easeIn);
-                                  _selectedDay =
-                                      DateTimeC.getTodayDateFormatted();
-                                  sst();
-                                },
-                                icon: IconC.goToToday,
-                              ),
-                            ),
+                      Card(
+                        shape: DecorC.roundedRectangleBorder,
+                        elevation: _calendarVisible ? 2.0 : 1.0,
+                        child: IconButton(
+                          color: ColorC.primary,
+                          onPressed: isToday? null : () {
+                            _dateController.animateToPage(initialPage,
+                                duration: DateTimeC.cd300,
+                                curve: Curves.easeIn);
+                            _selectedDay = DateTimeC.getTodayDateFormatted();
+                            sst();
+                          },
+                          icon: IconC.goToToday,
+                        ),
+                      ),
                       Card(
                         shape: DecorC.roundedRectangleBorder,
                         elevation: _calendarVisible ? 2.0 : 1.0,
                         child: IconButton(
                           color: _calendarVisible
                               ? ColorC.primary
-                              : ColorC.shadowColor,
+                              : ColorC.disabledColor,
                           onPressed: () {
                             _calendarVisible = !_calendarVisible;
                             sst();
@@ -784,7 +781,7 @@ class _HomePageState extends State<HomePage> {
 
   // To get the friends of the current user.
   Future<void> _getFriends() async {
-    _friends = await BaseCloud.readSC(
+    _friends = BaseAuth.currentUser() == null ? [] : await BaseCloud.readSC(
       collection: CloudC.users,
       document: BaseAuth.currentUser()?.uid ?? "",
       subCollection: CloudC.friends,

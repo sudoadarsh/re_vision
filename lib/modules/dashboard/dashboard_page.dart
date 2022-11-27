@@ -14,6 +14,7 @@ import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/models/friend_dm.dart';
 import 'package:re_vision/models/reqs_dm.dart';
 import 'package:re_vision/models/topic_dm.dart';
 import 'package:re_vision/models/user_dm.dart';
@@ -27,6 +28,7 @@ import 'package:re_vision/utils/cloud/cloud_constants.dart';
 import 'package:re_vision/utils/social_auth/base_auth.dart';
 
 import '../../common_cubit/common__cubit.dart';
+import '../../constants/date_time_constants.dart';
 import '../../state_management/topic/topic_repo.dart';
 
 enum CurrentS { dashboard, progress, notifications, profile }
@@ -91,37 +93,51 @@ class _DashBoardPageState extends State<_DashBoardPage> {
               child: BlocBuilder(
                 bloc: _dbCubit,
                 builder: (context, state) {
-
                   List<TopicDm> topics = [];
 
                   if (state is CommonCubitStateLoading) {
                     return const CupertinoActivityIndicator().center();
                   } else if (state is CommonCubitStateLoaded) {
-                    topics = state.data.map((e) => TopicDm.fromJson(e)).toList();
+                    topics =
+                        state.data.map((e) => TopicDm.fromJson(e)).toList();
+                    topics.removeWhere(
+                        (element) => element.scheduledTo == StringC.done);
+
+                    return ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        // Completed revisions stat.
+                        _StatCard(
+                          subtitle: StringC.completed,
+                          stat: state.data.length - topics.length,
+                          link: StringC.view,
+                          onLinkTap: () {},
+                          color: ColorC.primaryComp,
+                        ),
+                        SizeC.spaceHorizontal5,
+                        // Failed revision stat.
+                        _StatCard(
+                          subtitle: StringC.missed,
+                          stat: topics
+                              .where((e) =>
+                                  DateTime.tryParse(e.scheduledTo ?? "")
+                                      ?.isBefore(
+                                    DateTimeC.todayTime.subtract(
+                                      const Duration(days: 1),
+                                    ),
+                                  ) ??
+                                  false)
+                              .toList()
+                              .length,
+                          link: StringC.view,
+                          onLinkTap: () {},
+                          color: ColorC.buttonComp,
+                        ),
+                      ],
+                    );
                   }
 
-                  return ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      // Completed revisions stat.
-                      _StatCard(
-                        subtitle: StringC.completed,
-                        stat: 23,
-                        link: StringC.view,
-                        onLinkTap: () {},
-                        color: ColorC.primaryComp,
-                      ),
-                      SizeC.spaceHorizontal5,
-                      // Failed revision stat.
-                      _StatCard(
-                        subtitle: StringC.missed,
-                        stat: 23,
-                        link: StringC.view,
-                        onLinkTap: () {},
-                        color: ColorC.buttonComp,
-                      ),
-                    ],
-                  );
+                  return SizeC.none;
                 },
               ),
             ),
@@ -242,9 +258,13 @@ class _DashBoardState extends State<DashBoard> {
   /// Array that contains all the requests for the user.
   List<ReqsDm> _requests = [];
 
+  /// Array that stores the friends of the user.
+  List<QueryDocumentSnapshot<JSON>> _friends = [];
+
   @override
   void initState() {
     super.initState();
+    _getFriends();
     _fetchReqs();
   }
 
@@ -369,7 +389,9 @@ class _DashBoardState extends State<DashBoard> {
       case CurrentS.progress:
         return Container();
       case CurrentS.profile:
-        return const ProfilePage();
+        return ProfilePage(
+          friends: _friends.map((e) => FriendDm.fromJson(e)).toList(),
+        );
       case CurrentS.notifications:
         return NotificationsPage(req: _requests);
       default:
@@ -394,6 +416,15 @@ class _DashBoardState extends State<DashBoard> {
         setState(() {});
       });
     }
+  }
+
+  /// To get the friends of the current user.
+  Future<void> _getFriends() async {
+    _friends = await BaseCloud.readSC(
+      collection: CloudC.users,
+      document: BaseAuth.currentUser()?.uid ?? "",
+      subCollection: CloudC.friends,
+    );
   }
 }
 

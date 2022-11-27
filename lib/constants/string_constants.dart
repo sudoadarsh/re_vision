@@ -109,10 +109,10 @@ class StringC {
   static const String errorInSaving = 'Error while saving the topic!';
 
   // String constants used in profile page.
-  static const String starsProf = "Stars";
+  static const String starsProf = "Star(s)";
   static const String revisionProf = 'Revisions';
   static const String account = "Account";
-  static const String friends = 'Friends';
+  static const String friends = 'Friend(s)';
   static const String editProfile = "Edit Profile";
   static const String findFriends = "Find Friends";
   static const String search = 'Search Friends';
