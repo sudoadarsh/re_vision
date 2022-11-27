@@ -219,27 +219,27 @@ class _Cards extends StatelessWidget {
   }
 
   // The Dialog to display for confirmation of delete/completion.
-  BaseCupertinoDialog _confirmDialog(
+  CupertinoAlertDialog _confirmDialog(
     BuildContext context, {
     required String assetName,
     required String title,
   }) {
-    return BaseCupertinoDialog(
-      title: title,
-      customContent: Lottie.asset(assetName, height: 80, width: 80),
+    return CupertinoAlertDialog(
+      title: BaseText(title),
+      content: Lottie.asset(assetName, height: 80, width: 80),
       actions: [
-        BaseCupertinoDialogButton(
-            color: ColorC.primary,
-            onTap: () {
-              Navigator.of(context).pop(true);
-            },
-            title: StringC.ok),
-        BaseCupertinoDialogButton(
-            color: ColorC.secondary,
-            onTap: () {
-              Navigator.of(context).pop(false);
-            },
-            title: StringC.cancel),
+        CupertinoDialogAction(
+          onPressed: () {
+            Navigator.of(context).pop(true);
+          },
+          child: const BaseText(StringC.ok),
+        ),
+        CupertinoDialogAction(
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+          child: const BaseText(StringC.cancel),
+        ),
       ],
     );
   }
@@ -690,10 +690,9 @@ class _HomePageState extends State<HomePage> {
   void _navigateToTopicPage() {
     Navigator.of(context)
         .pushNamed(
-      RouteC.topicPage,
-      arguments:
-      TopicPageArguments(selectedDay: _selectedDay),
-    )
+          RouteC.topicPage,
+          arguments: TopicPageArguments(selectedDay: _selectedDay),
+        )
         .then((value) => _databaseCubit.fetchData());
   }
 

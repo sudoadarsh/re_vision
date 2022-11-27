@@ -29,7 +29,6 @@ import 'package:re_vision/state_management/save/save_cubit.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../base_sqlite/sqlite_helper.dart';
-import '../../base_widgets/base_cupertino_dialog_button.dart';
 import '../../base_widgets/base_elevated_button.dart';
 import '../../base_widgets/base_underline_field.dart';
 import '../../models/attachment_dm.dart';
@@ -214,11 +213,13 @@ class _NoteEditorState extends State<_NoteEditor> {
   void initState() {
     super.initState();
     _fNode = FocusNode();
+
+    print(_qc.document.toPlainText());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    /*return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -246,6 +247,17 @@ class _NoteEditorState extends State<_NoteEditor> {
             ),
           ),
         ],
+      ),
+    );*/
+    return Card(
+      color: ColorC.buttonComp,
+      child: ListTile(
+        trailing: IconButton(
+            color: Colors.blue,
+            onPressed: (){},
+            icon: IconC.edit
+        ),
+        title: BaseText(_qc.document.toPlainText()).paddingDefault(),
       ),
     );
   }
@@ -546,14 +558,13 @@ class _TopicPageState extends State<TopicPage> {
         ? true
         : (await showDialog(
               context: context,
-              builder: (context) => BaseCupertinoDialog(
-                title: StringC.areYouSureExit,
-                description: StringC.consequences,
+              builder: (context) => CupertinoAlertDialog(
+                title: const BaseText (StringC.areYouSureExit),
+                content: const BaseText(StringC.consequences),
                 actions: [
-                  BaseCupertinoDialogButton(
-                    title: StringC.save,
-                    color: ColorC.primary,
-                    onTap: () {
+                  CupertinoDialogAction(
+                    child: const BaseText(StringC.save),
+                    onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
                         _saveToLocalDatabase();
                       } else {
@@ -561,10 +572,9 @@ class _TopicPageState extends State<TopicPage> {
                       }
                     },
                   ),
-                  BaseCupertinoDialogButton(
-                    title: StringC.discard,
-                    color: ColorC.secondary,
-                    onTap: () {
+                  CupertinoDialogAction(
+                    child: const BaseText(StringC.discard),
+                    onPressed: () {
                       Navigator.of(context).pop(true);
                     },
                   ),

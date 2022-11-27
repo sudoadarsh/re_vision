@@ -67,6 +67,7 @@ class IconC {
   static const Icon collapse = Icon(Icons.keyboard_arrow_up_rounded);
   static const Icon success = Icon(Icons.check_circle, color: ColorC.primary);
   static const Icon failed = Icon(Icons.info, color: ColorC.secondary);
+  static const Icon edit = Icon(Icons.edit);
 
   // Icon constants in the profile page.
   static const Icon pfCardTrailing = Icon(Icons.arrow_forward_ios);
