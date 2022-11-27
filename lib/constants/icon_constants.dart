@@ -50,6 +50,7 @@ class IconC {
   static Widget userGrp = Image.asset(StringC.userGrpPath, scale: 15.0);
   static const Icon arrowB = Icon(Icons.chevron_left);
   static const Icon arrowF = Icon(Icons.chevron_right);
+  static const Icon goToToday = Icon (Icons.my_location);
 
   // Icons used in the topic page.
   static const Icon article = Icon(Icons.article_outlined);

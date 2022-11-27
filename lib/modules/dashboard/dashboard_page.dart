@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
 import 'package:re_vision/base_widgets/base_rounded_elevated_button.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
@@ -13,6 +15,7 @@ import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/reqs_dm.dart';
+import 'package:re_vision/models/topic_dm.dart';
 import 'package:re_vision/models/user_dm.dart';
 import 'package:re_vision/modules/notification/notifications_page.dart';
 import 'package:re_vision/modules/profile/profile_page.dart';
@@ -22,6 +25,9 @@ import 'package:re_vision/utils/app_config.dart';
 import 'package:re_vision/utils/cloud/base_cloud.dart';
 import 'package:re_vision/utils/cloud/cloud_constants.dart';
 import 'package:re_vision/utils/social_auth/base_auth.dart';
+
+import '../../common_cubit/common__cubit.dart';
+import '../../state_management/topic/topic_repo.dart';
 
 enum CurrentS { dashboard, progress, notifications, profile }
 
@@ -35,6 +41,19 @@ class _DashBoardPage extends StatefulWidget {
 }
 
 class _DashBoardPageState extends State<_DashBoardPage> {
+  /// Custom cubit to fetch the data from the database.
+  late final CommonCubit _dbCubit;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _dbCubit = CommonCubit(TopicRepo());
+
+    // Fetch the database data.
+    _dbCubit.fetchData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -69,27 +88,41 @@ class _DashBoardPageState extends State<_DashBoardPage> {
           sliver: SliverToBoxAdapter(
             child: SizedBox(
               height: 160,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  // Completed revisions stat.
-                  _StatCard(
-                    subtitle: StringC.completed,
-                    stat: 23,
-                    link: StringC.view,
-                    onLinkTap: () {},
-                    color: ColorC.primaryComp,
-                  ),
-                  SizeC.spaceHorizontal5,
-                  // Failed revision stat.
-                  _StatCard(
-                    subtitle: StringC.missed,
-                    stat: 23,
-                    link: StringC.view,
-                    onLinkTap: () {},
-                    color: ColorC.buttonComp,
-                  ),
-                ],
+              child: BlocBuilder(
+                bloc: _dbCubit,
+                builder: (context, state) {
+
+                  List<TopicDm> topics = [];
+
+                  if (state is CommonCubitStateLoading) {
+                    return const CupertinoActivityIndicator().center();
+                  } else if (state is CommonCubitStateLoaded) {
+                    topics = state.data.map((e) => TopicDm.fromJson(e)).toList();
+                  }
+
+                  return ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      // Completed revisions stat.
+                      _StatCard(
+                        subtitle: StringC.completed,
+                        stat: 23,
+                        link: StringC.view,
+                        onLinkTap: () {},
+                        color: ColorC.primaryComp,
+                      ),
+                      SizeC.spaceHorizontal5,
+                      // Failed revision stat.
+                      _StatCard(
+                        subtitle: StringC.missed,
+                        stat: 23,
+                        link: StringC.view,
+                        onLinkTap: () {},
+                        color: ColorC.buttonComp,
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),

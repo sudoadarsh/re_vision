@@ -517,6 +517,9 @@ class _HomePageState extends State<HomePage> {
   // Boolean to control the calendar expansion.
   late bool _calendarVisible;
 
+  // To store the initial index for the page view controller.
+  int initialPage = -1;
+
   @override
   void initState() {
     _calendarVisible = false;
@@ -584,19 +587,41 @@ class _HomePageState extends State<HomePage> {
                     fontSize: 20.0,
                     fontWeight: FontWeight.w300,
                   ),
-                  Card(
-                    shape: DecorC.roundedRectangleBorder,
-                    elevation: _calendarVisible ? 2.0 : 1.0,
-                    child: IconButton(
-                      color: _calendarVisible
-                          ? ColorC.primary
-                          : ColorC.shadowColor,
-                      onPressed: () {
-                        _calendarVisible = !_calendarVisible;
-                        sst();
-                      },
-                      icon: IconC.calendar,
-                    ),
+                  Row(
+                    children: [
+                      isToday
+                          ? SizeC.none
+                          : Card(
+                              shape: DecorC.roundedRectangleBorder,
+                              elevation: _calendarVisible ? 2.0 : 1.0,
+                              child: IconButton(
+                                color: ColorC.primary,
+                                onPressed: () {
+                                  _dateController.animateToPage(initialPage,
+                                      duration: DateTimeC.cd300,
+                                      curve: Curves.easeIn);
+                                  _selectedDay =
+                                      DateTimeC.getTodayDateFormatted();
+                                  sst();
+                                },
+                                icon: IconC.goToToday,
+                              ),
+                            ),
+                      Card(
+                        shape: DecorC.roundedRectangleBorder,
+                        elevation: _calendarVisible ? 2.0 : 1.0,
+                        child: IconButton(
+                          color: _calendarVisible
+                              ? ColorC.primary
+                              : ColorC.shadowColor,
+                          onPressed: () {
+                            _calendarVisible = !_calendarVisible;
+                            sst();
+                          },
+                          icon: IconC.calendar,
+                        ),
+                      ),
+                    ],
                   )
                 ],
               ).paddingOnly(left: 16, right: 4),
@@ -618,8 +643,9 @@ class _HomePageState extends State<HomePage> {
                       },
                     ).paddingOnly(left: 16),
                     BaseTableCalendar(
-                            onCalendarCreated: (controller) =>
-                                _dateController = controller,
+                            onCalendarCreated: (controller) {
+                              return _dateController = controller;
+                            },
                             headerVisible: false,
                             selectedDay: _selectedDay,
                             focusedDay: _focusedDay,
@@ -656,6 +682,9 @@ class _HomePageState extends State<HomePage> {
             if (state is CommonCubitStateLoaded) {
               List data = state.data;
               _topics = data.map((e) => TopicDm.fromJson(e)).toList();
+              initialPage.isNegative
+                  ? initialPage = _dateController.page?.toInt() ?? 0
+                  : null;
               sst();
             }
           },
@@ -668,11 +697,13 @@ class _HomePageState extends State<HomePage> {
             List<TopicDm> filteredTopics = filterTopics(_selectedDay);
 
             return filteredTopics.isEmpty
-                ? _EmptyTopics(
-                    isPast: _selectedDay.isBefore(
-                      DateTimeC.todayTime.subtract(const Duration(days: 1)),
+                ? SingleChildScrollView(
+                    child: _EmptyTopics(
+                      isPast: _selectedDay.isBefore(
+                        DateTimeC.todayTime.subtract(const Duration(days: 1)),
+                      ),
+                      onPressed: _navigateToTopicPage,
                     ),
-                    onPressed: _navigateToTopicPage,
                   )
                 : _TopicCards(
                     topics: filteredTopics,
