@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/extensions.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:re_vision/base_widgets/base_cupertino_dialog.dart';
 import 'package:re_vision/base_widgets/base_separator.dart';
 import 'package:re_vision/base_widgets/base_skeleton_dialog.dart';
 import 'package:re_vision/base_widgets/base_depth_form_field.dart';
@@ -214,52 +213,57 @@ class _NoteEditorState extends State<_NoteEditor> {
     super.initState();
     _fNode = FocusNode();
 
-    print(_qc.document.toPlainText());
+    // print(_qc.document.toPlainText());
   }
 
   @override
   Widget build(BuildContext context) {
-    /*return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          QuillToolbar.basic(controller: _qc),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: DecorC.roundedBorderRadius(10.0),
-                boxShadow: DecorC.depthEffect(-4.0, 3.0,
-                    shadowColor: ColorC.shadowColor,
-                    backgroundColor: Theme.of(context).scaffoldBackgroundColor),
-              ),
-              child: QuillEditor(
-                controller: _qc,
-                scrollController: ScrollController(),
-                scrollable: true,
-                focusNode: _fNode,
-                autoFocus: false,
-                readOnly: false,
-                placeholder: 'Add Note',
-                enableSelectionToolbar: isMobile(),
-                expands: true,
-                padding: const EdgeInsets.all(8.0),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );*/
     return Card(
-      color: ColorC.buttonComp,
-      child: ListTile(
-        trailing: IconButton(
-            color: Colors.blue,
-            onPressed: (){},
-            icon: IconC.edit
-        ),
-        title: BaseText(_qc.document.toPlainText()).paddingDefault(),
+      shape: DecorC.roundedRectangleBorder,
+      child: QuillEditor(
+        onTapUp: _onTapUp,
+        controller: _qc,
+        scrollController: ScrollController(),
+        scrollable: true,
+        autoFocus: false,
+        readOnly: true,
+        placeholder: 'Add Note',
+        enableSelectionToolbar: isMobile(),
+        expands: false,
+        padding: const EdgeInsets.all(8.0), focusNode: FocusNode(),
       ),
     );
+  }
+
+  bool _onTapUp(TapUpDetails details, TextPosition Function(Offset) offset) {
+    // Open the action sheet to add or edit notes.
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: DecorC.roundedRectangleBorderTop,
+        builder: (_) => SafeArea(
+          child: Column(
+            children: [
+              QuillToolbar.basic(controller: _qc),
+              SizedBox(
+                height: 500,
+                child: QuillEditor(
+                  controller: _qc,
+                  scrollController: ScrollController(),
+                  scrollable: true,
+                  autoFocus: false,
+                  readOnly: false,
+                  placeholder: 'Add Note',
+                  enableSelectionToolbar: isMobile(),
+                  expands: true,
+                  padding: const EdgeInsets.all(8.0), focusNode: _fNode,
+                ),
+              ),
+            ],
+          ),
+        )
+    );
+    return true;
   }
 }
 

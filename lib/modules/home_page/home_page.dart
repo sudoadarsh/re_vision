@@ -6,8 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
-import 'package:re_vision/base_widgets/base_cupertino_dialog.dart';
-import 'package:re_vision/base_widgets/base_cupertino_dialog_button.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/common_cubit/common__cubit.dart';

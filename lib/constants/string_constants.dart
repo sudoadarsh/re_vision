@@ -90,6 +90,7 @@ class StringC {
   static const String cancel = 'Cancel';
   static const String save = 'Save';
   static const String link = 'link';
+  static const String addNote = 'Add note';
 
   static const String deleteAttachment = 'Delete this attachment?';
   static const String ok = 'Okay';
