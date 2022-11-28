@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'package:re_vision/base_widgets/base_divider.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/common_cubit/common__cubit.dart';
@@ -52,9 +53,6 @@ class _Cards extends StatelessWidget {
   final DateTime selectedDay;
   final VoidCallback onRevisionShared;
 
-  static const Widget _divider =
-      Expanded(child: Divider(thickness: 1, indent: 10.0, endIndent: 10.0));
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -75,13 +73,13 @@ class _Cards extends StatelessWidget {
           children: [
             Row(
               children: [
-                _divider,
+                const BaseDivider(),
                 BaseText(
                   'Level ${topic.iteration}',
                   fontWeight: FontWeight.w300,
                   fontSize: 16.0,
                 ),
-                _divider
+                const BaseDivider(),
               ],
             ),
             BaseText(topic.topic ?? ''),

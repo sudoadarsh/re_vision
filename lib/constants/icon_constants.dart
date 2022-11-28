@@ -76,4 +76,7 @@ class IconC {
 
   // Icon constants in the invites page.
   static const Icon calendar = Icon(Icons.calendar_month);
+
+  // Icon constants in the overview page.
+  static const Icon reschedule = Icon(Icons.restart_alt_rounded);
 }
