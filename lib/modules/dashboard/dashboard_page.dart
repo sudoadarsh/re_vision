@@ -19,6 +19,7 @@ import 'package:re_vision/models/reqs_dm.dart';
 import 'package:re_vision/models/topic_dm.dart';
 import 'package:re_vision/models/user_dm.dart';
 import 'package:re_vision/modules/notification/notifications_page.dart';
+import 'package:re_vision/modules/overview/overview_page.dart';
 import 'package:re_vision/modules/profile/profile_page.dart';
 import 'package:re_vision/modules/search_page/search_page.dart';
 import 'package:re_vision/routes/route_constants.dart';
@@ -93,15 +94,31 @@ class _DashBoardPageState extends State<_DashBoardPage> {
               child: BlocBuilder(
                 bloc: _dbCubit,
                 builder: (context, state) {
-                  List<TopicDm> topics = [];
+                  List<TopicDm> completed = [];
+                  List<TopicDm> missed = [];
 
                   if (state is CommonCubitStateLoading) {
                     return const CupertinoActivityIndicator().center();
                   } else if (state is CommonCubitStateLoaded) {
-                    topics =
-                        state.data.map((e) => TopicDm.fromJson(e)).toList();
-                    topics.removeWhere(
-                        (element) => element.scheduledTo == StringC.done);
+                    // Completed revisions.
+                    completed = state.data
+                        .map((e) => TopicDm.fromJson(e))
+                        .toList()
+                        .where((e) => e.scheduledTo == StringC.done)
+                        .toList();
+
+                    // Missed revisions.
+                    missed = state.data
+                        .map((e) => TopicDm.fromJson(e))
+                        .toList()
+                        .where((e) =>
+                            DateTime.tryParse(e.scheduledTo ?? "")?.isBefore(
+                              DateTimeC.todayTime.subtract(
+                                const Duration(days: 1),
+                              ),
+                            ) ??
+                            false)
+                        .toList();
 
                     return ListView(
                       scrollDirection: Axis.horizontal,
@@ -109,28 +126,31 @@ class _DashBoardPageState extends State<_DashBoardPage> {
                         // Completed revisions stat.
                         _StatCard(
                           subtitle: StringC.completed,
-                          stat: state.data.length - topics.length,
+                          stat: completed.length,
                           link: StringC.view,
-                          onLinkTap: () {},
+                          onLinkTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => OverViewPage(
+                                    topics: completed,
+                                    title: StringC.completed),
+                              ),
+                            );
+                          },
                           color: ColorC.primaryComp,
                         ),
                         SizeC.spaceHorizontal5,
                         // Failed revision stat.
                         _StatCard(
                           subtitle: StringC.missed,
-                          stat: topics
-                              .where((e) =>
-                                  DateTime.tryParse(e.scheduledTo ?? "")
-                                      ?.isBefore(
-                                    DateTimeC.todayTime.subtract(
-                                      const Duration(days: 1),
-                                    ),
-                                  ) ??
-                                  false)
-                              .toList()
-                              .length,
+                          stat: missed.length,
                           link: StringC.view,
-                          onLinkTap: () {},
+                          onLinkTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => OverViewPage(
+                                  topics: missed, title: StringC.missed),
+                            ));
+                          },
                           color: ColorC.buttonComp,
                         ),
                       ],
@@ -207,36 +227,39 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: DecorC.boxDecorAll(radius: 10).copyWith(
-        color: color,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BaseText(
-                stat.toString(),
-                fontSize: 60,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).scaffoldBackgroundColor,
-              ),
-              TextButton(
-                onPressed: onLinkTap,
-                child: Row(
-                  children: [
-                    BaseText(link),
-                    const Icon(Icons.keyboard_arrow_right_rounded)
-                  ],
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 150),
+      child: Container(
+        decoration: DecorC.boxDecorAll(radius: 10).copyWith(
+          color: color,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BaseText(
+                  stat.toString(),
+                  fontSize: 60,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).scaffoldBackgroundColor,
                 ),
-              ),
-            ],
-          ),
-          BaseText(subtitle, color: ColorC.subtitle),
-        ],
-      ).paddingDefault(),
+                TextButton(
+                  onPressed: onLinkTap,
+                  child: Row(
+                    children: [
+                      BaseText(link),
+                      const Icon(Icons.keyboard_arrow_right_rounded)
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            BaseText(subtitle, color: ColorC.subtitle),
+          ],
+        ).paddingDefault(),
+      ),
     );
   }
 }
@@ -350,8 +373,12 @@ class _DashBoardState extends State<DashBoard> {
                     ],
                   ),
                   // Profile.
-                  _bottomNavButton(CurrentS.profile, _currentS,
-                      icon: IconC.profile, additionalCB: () {}),
+                  _bottomNavButton(
+                    CurrentS.profile,
+                    _currentS,
+                    icon: IconC.profile,
+                    additionalCB: () {},
+                  ),
                 ],
               ),
             )

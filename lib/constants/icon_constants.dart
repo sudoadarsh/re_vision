@@ -30,7 +30,7 @@ class IconC {
       Icon(Icons.visibility_off, color: ColorC.primary);
 
   // Icons used in the dashboard.
-  static const Icon dashboard = Icon(Icons.home);
+  static const Icon dashboard = Icon(Icons.dashboard_customize_rounded);
   static const Icon settings = Icon(Icons.settings);
   static const Icon notification = Icon(Icons.favorite);
   static const Icon search = Icon(Icons.search);
