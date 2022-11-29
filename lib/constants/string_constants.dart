@@ -32,6 +32,7 @@ class StringC {
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
   static const String lottieNoTopics = 'lottiefiles/no_topics.json';
   static const String lottieGoSocial = 'lottiefiles/go_social.json';
+  static const String lottieReschedule = 'lottiefiles/reschedule.json';
 
 
   // String constants in the login/ sign-in page.
@@ -137,4 +138,10 @@ class StringC {
   static const String sureWantToSent = "Are you sure you want to send revision ";
   static const String toThesePeople = "to:";
   static const String confirm = 'Confirm';
+
+  // String constants used in the overview page.
+  static const String reschedule = 'Reschedule';
+  static const String rescheduleAlert = "This topic will be rescheduled and the level will be set to 1.";
+  static const String reSuccess = "Reschedule Success";
+  static const String reFailed = "Reschedule Failed";
 }
