@@ -153,7 +153,14 @@ class _TopicPageV1State extends State<TopicPageV1> {
               itemCount: body.length + 1,
               itemBuilder: (context, i) {
                 if (i >= body.length) {
-                  return _attachmentTitle ? _attachments() : SizeC.none;
+                  return BlocBuilder<AttachmentCubit, AttachmentState>(
+                    builder: (context, state) {
+                      return Visibility(
+                        visible: state.data.isNotEmpty,
+                        child: _attachments(),
+                      );
+                    },
+                  );
                 }
                 return body[i].paddingHorizontal8();
               },
@@ -228,38 +235,55 @@ class _TopicPageV1State extends State<TopicPageV1> {
     ).paddingDefault();
   }
 
+  /// The attachment section.
   Widget _attachments() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children:  [
-            const BaseText(StringC.addAttachment, fontWeight: FontWeight.w300, fontSize: 20,),
+    return BlocConsumer<AttachmentCubit, AttachmentState>(
+      listener: (context, state) {
+        if (!_attachmentTitle && state.data.isNotEmpty) {
+          setState(() {
+            _attachmentTitle = true;
+          });
+        } else if (_attachmentTitle && state.data.isEmpty) {
+          setState(() {
+            _attachmentTitle = false;
+          });
+        }
+      },
+      builder: (context, state) {
+        List<AttachmentDataDm> receivedData = state.data;
+        return Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const BaseText(
+                  StringC.addAttachment,
+                  fontWeight: FontWeight.w300,
+                  fontSize: 20,
+                ).paddingHorizontal8(),
+                Card(
+                  shape: DecorC.roundedRectangleBorder,
+                  child: BaseText(receivedData.length.toString())
+                      .paddingOnly(left: 16, right: 16, top: 8, bottom: 8),
+                ),
+              ],
+            ),
             Card(
-              shape: DecorC.roundedRectangleBorder,
-              child: const BaseText("0").paddingOnly(left: 16, right: 16, top: 8, bottom: 8)
-            )
+              child: SizedBox(
+                width: double.infinity,
+                height: AppConfig.height(context) * 0.3,
+                child: ListView.builder(
+                  itemCount: receivedData.length,
+                  itemBuilder: (context, i) {
+                    return _getTile(receivedData[i]);
+                  },
+                ),
+              ),
+            ),
           ],
-        ),
-        Container(
-          color: Colors.red,
-          height: AppConfig.height(context) * 0.3,
-          child: BlocBuilder<AttachmentCubit, AttachmentState>(
-            builder: (context, state) {
-              List<AttachmentDataDm> receivedData = state.data;
-              if (!_attachmentTitle && state.data.isNotEmpty) {
-                setState(() {
-                  _attachmentTitle = true;
-                });
-              }
-              return Column(
-                children: receivedData.map((e) => _getTile(e)).toList(),
-              );
-            },
-          ),
-        )
-      ],
-    ).paddingOnly(left: 16, right: 8);
+        );
+      },
+    );
   }
 
   /// The notes.
@@ -484,7 +508,6 @@ class _CommonTile extends StatelessWidget {
     }
   }
 }
-
 
 class _PasteLinkDropdown extends StatefulWidget {
   const _PasteLinkDropdown({Key? key}) : super(key: key);
