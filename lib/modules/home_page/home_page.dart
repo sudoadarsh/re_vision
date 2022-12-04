@@ -630,7 +630,7 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     CustomCalendarHeader(
-                      focusedDay: _focusedDay,
+                      focusedDay: _selectedDay,
                       onLeftArrowTap: () {
                         _dateController.previousPage(
                             duration: DateTimeC.cd300, curve: Curves.easeIn);
@@ -653,12 +653,12 @@ class _HomePageState extends State<HomePage> {
                               _focusedDay = focusedDay;
                               sst();
                             },
-                            onFormatChanged: (format) {
+                            /*onFormatChanged: (format) {
                               if (_calendarFormat != format) {
                                 _calendarFormat = format;
                                 sst();
                               }
-                            },
+                            },*/
                             onPageChanged: (focusedDay) {
                               _focusedDay = focusedDay;
                             },
