@@ -53,7 +53,7 @@ class IconC {
   static const Icon goToToday = Icon (Icons.my_location);
 
   // Icons used in the topic page.
-  static const Icon article = Icon(Icons.article_outlined);
+  static const Icon article = Icon(Icons.link);
   static const Icon video = Icon(Icons.video_library_outlined);
   static const Icon image = Icon(Icons.image_outlined);
   static const Icon pdf = Icon(Icons.picture_as_pdf_outlined);
@@ -69,6 +69,7 @@ class IconC {
   static const Icon success = Icon(Icons.check_circle, color: ColorC.primary);
   static const Icon failed = Icon(Icons.info, color: ColorC.secondary);
   static const Icon edit = Icon(Icons.edit);
+  static const Icon send = Icon(Icons.send);
 
   // Icon constants in the profile page.
   static const Icon pfCardTrailing = Icon(Icons.arrow_forward_ios);

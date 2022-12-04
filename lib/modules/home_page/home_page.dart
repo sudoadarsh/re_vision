@@ -595,9 +595,11 @@ class _HomePageState extends State<HomePage> {
                           onPressed: isToday
                               ? null
                               : () {
-                                  _dateController.animateToPage(initialPage,
-                                      duration: DateTimeC.cd300,
-                                      curve: Curves.easeIn);
+                                  _dateController.animateToPage(
+                                    initialPage,
+                                    duration: DateTimeC.cd300,
+                                    curve: Curves.easeIn,
+                                  );
                                   _selectedDay =
                                       DateTimeC.getTodayDateFormatted();
                                   sst();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class BaseTextFormFieldWithDepth extends StatelessWidget {
   const BaseTextFormFieldWithDepth({
@@ -13,7 +14,11 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
     this.focusNode,
     this.obscureText,
     this.validator,
-    this.onChanged, this.onFieldSubmitted, this.onTap, this.readOnly,
+    this.onChanged,
+    this.onFieldSubmitted,
+    this.onTap,
+    this.readOnly,
+    this.inputFormatters,
   }) : super(key: key);
 
   final String? hintText;
@@ -30,11 +35,13 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
   final Function(String?)? onFieldSubmitted;
   final VoidCallback? onTap;
   final bool? readOnly;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       onTap: onTap,
+      inputFormatters: inputFormatters,
       focusNode: focusNode,
       onChanged: onChanged,
       readOnly: readOnly ?? false,

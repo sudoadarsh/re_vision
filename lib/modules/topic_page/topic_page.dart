@@ -562,7 +562,7 @@ class _TopicPageState extends State<TopicPage> {
   // -------------------------------Functions-----------------------------------
 
   // 3.1 Dialog box to add links of articles.
-  Future _pasteLink() async {
+  Future<void> _pasteLink() async {
     return await showDialog(
       context: context,
       builder: (context) => const BaseSkeletonDialog(
@@ -578,7 +578,7 @@ class _TopicPageState extends State<TopicPage> {
 
   // 4.1 File picker to pick image when the user wants to select an image.
   // todo: add info plist permissions.
-  Future _pickFile({
+  Future<void> _pickFile({
     required List<String> allowedExtensions,
     required int fileType,
   }) async {
