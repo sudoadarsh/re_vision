@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:favicon/favicon.dart';
@@ -14,9 +15,12 @@ import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/utils/app_config.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 
+import '../../base_sqlite/sqlite_helper.dart';
 import '../../base_widgets/base_image_builder.dart';
 import '../../base_widgets/base_skeleton_dialog.dart';
+import '../../base_widgets/base_snackbar.dart';
 import '../../base_widgets/base_text.dart';
 import '../../base_widgets/base_underline_field.dart';
 import '../../constants/color_constants.dart';
@@ -26,8 +30,6 @@ import '../../models/attachment_data_dm.dart';
 import '../../models/topic_dm.dart';
 import '../../state_management/attachment/attachment_cubit.dart';
 import '../../state_management/save/save_cubit.dart';
-
-enum Sender { topic, notes }
 
 class TopicPageV1 extends StatefulWidget {
   const TopicPageV1({
@@ -52,9 +54,6 @@ class _TopicPageV1State extends State<TopicPageV1> {
 
   /// The notes controller.
   late final TextEditingController _noteC;
-
-  /// The current sender.
-  late Sender _senderC = Sender.topic;
 
   /// The list of visible widgets in the body of [TopicPageV1].
   List<Widget> body = [];
@@ -110,6 +109,8 @@ class _TopicPageV1State extends State<TopicPageV1> {
     ];
 
     _attachmentTitle = false;
+
+    _setInitialData();
   }
 
   @override
@@ -129,6 +130,7 @@ class _TopicPageV1State extends State<TopicPageV1> {
           TextButton(
             onPressed: () {
               // todo: on save button tap.
+              _saveToLocalDatabase();
             },
             child: BlocBuilder<SaveCubit, SaveState>(
               bloc: _saveCubit,
@@ -186,10 +188,10 @@ class _TopicPageV1State extends State<TopicPageV1> {
                         ),
                       )
                     : SizeC.none,
-                _senderC == Sender.topic
+                _topicC.text.isEmpty
                     ? _topicHeading()
                     : _noteC.text.isEmpty
-                        ? _notes()
+                        ? _notesHeading()
                         : SizeC.none,
               ],
             ),
@@ -201,6 +203,37 @@ class _TopicPageV1State extends State<TopicPageV1> {
 
   // ------------------------- Class methods -----------------------------------
 
+  /// Set the initial data.
+  void _setInitialData() {
+    context.read<AttachmentCubit>().clear();
+    if (widget.topicDm != null) {
+      // todo: add try and catch block.
+      // Setting the topic.
+      _topicC.text = widget.topicDm?.topic ?? '';
+      body.add(_topic());
+      // Setting the notes.
+      body.add(
+        const BaseText(
+          StringC.note,
+          fontSize: 20,
+          fontWeight: FontWeight.w300,
+        ).paddingHorizontal8(),
+      );
+      body.add(_notes());
+      List decodedAttachments = jsonDecode(widget.topicDm?.attachments ?? '');
+      List<AttachmentDataDm> attachmentData =
+          decodedAttachments.map((e) => AttachmentDataDm.fromJson(e)).toList();
+      for (var element in attachmentData) {
+        context.read<AttachmentCubit>().addAttachment(element);
+      }
+
+      _attachmentTitle = true;
+
+      // Setting up the notes.
+      _noteC.text = widget.topicDm?.notes ?? '';
+    }
+  }
+
   /// The topic heading.
   Widget _topicHeading() {
     return BaseTextFormFieldWithDepth(
@@ -209,30 +242,27 @@ class _TopicPageV1State extends State<TopicPageV1> {
       labelText: StringC.topicLabel,
       suffixIcon: IconButton(
         onPressed: () {
-          body.add(
-            Column(
-              children: [
-                TextFormFieldWithoutBorder(
-                  minLines: 1,
-                  maxLines: 3,
-                  style: const TextStyle(fontSize: 24),
-                  controller: _topicC,
-                  inputFormatters: [UpperCaseTextFormatter()],
-                  suffixIcon: IconButton(
-                    color: ColorC.link,
-                    icon: IconC.edit,
-                    onPressed: () {},
-                  ),
-                ).paddingOnly(left: 6),
-              ],
-            ),
-          );
-          _senderC = Sender.notes;
+          body.add(_topic());
           setState(() {});
         },
         icon: IconC.send,
       ),
     ).paddingDefault();
+  }
+
+  Widget _topic() {
+    return TextFormFieldWithoutBorder(
+      minLines: 1,
+      maxLines: 3,
+      style: const TextStyle(fontSize: 20),
+      controller: _topicC,
+      inputFormatters: [UpperCaseTextFormatter()],
+      suffixIcon: IconButton(
+        color: ColorC.link,
+        icon: IconC.edit,
+        onPressed: () {},
+      ),
+    ).paddingOnly(left: 6);
   }
 
   /// The attachment section.
@@ -287,7 +317,7 @@ class _TopicPageV1State extends State<TopicPageV1> {
   }
 
   /// The notes.
-  Widget _notes() {
+  Widget _notesHeading() {
     return BaseTextFormFieldWithDepth(
       controller: _noteC,
       suffixIcon: IconButton(
@@ -297,23 +327,25 @@ class _TopicPageV1State extends State<TopicPageV1> {
               StringC.note,
               fontSize: 20.0,
               fontWeight: FontWeight.w300,
-            ),
+            ).paddingHorizontal8(),
           );
-          body.add(
-            Card(
-              shape: DecorC.roundedRectangleBorder,
-              child: TextFormFieldWithoutBorder(
-                maxLines: 8,
-                controller: _noteC,
-              ).paddingDefault(),
-            ),
-          );
+          body.add(_notes());
           setState(() {});
         },
         icon: IconC.send,
       ),
       labelText: StringC.addNote,
     ).paddingDefault();
+  }
+
+  Widget _notes() {
+    return Card(
+      shape: DecorC.roundedRectangleBorder,
+      child: TextFormFieldWithoutBorder(
+        maxLines: 8,
+        controller: _noteC,
+      ).paddingDefault(),
+    );
   }
 
   Widget _getTile(AttachmentDataDm e) {
@@ -364,6 +396,76 @@ class _TopicPageV1State extends State<TopicPageV1> {
     } else {
       // todo: User canceled the picker
     }
+  }
+
+  /// Function to save the data locally.
+  Future<void> _saveToLocalDatabase() async {
+    // Mapping the attachments.
+    List<AttachmentDataDm> attachments =
+        context.read<AttachmentCubit>().state.data;
+    List<Map<String, dynamic>> jsonData =
+        attachments.map((e) => e.toJson()).toList();
+
+    if (widget.topicDm == null) {
+      // todo: add condition for empty topic field.
+      // Creating the topic data.
+      final TopicDm data = TopicDm(
+        id: const Uuid().v1(),
+        topic: _topicC.text,
+        attachments: jsonEncode(jsonData),
+        notes: _noteC.text,
+        createdAt: widget.selectedDay.toString().replaceAll('Z', ''),
+        scheduledTo: widget.selectedDay.toString().replaceAll('Z', ''),
+        iteration: 1,
+        isOnline: 0,
+      );
+
+      try {
+        await BaseSqlite.insert(
+          tableName: StringC.topicTable,
+          data: data,
+        );
+        if (!mounted) return;
+        baseSnackBar(context,
+            message: StringC.savedSuccessfully, leading: IconC.success);
+        Navigator.of(context).pop(true);
+      } catch (e) {
+        debugPrint(e.toString());
+        baseSnackBar(context,
+            message: StringC.errorInSaving, leading: IconC.failed);
+        Navigator.of(context).pop(true);
+      }
+    } else {
+      // Creating the topic data.
+      final TopicDm? data = widget.topicDm?.copyWith(
+        topic: _topicC.text,
+        attachments: jsonEncode(jsonData),
+        notes: _noteC.text,
+      );
+
+      // Updating the database.
+      try {
+        await BaseSqlite.update(
+          tableName: StringC.topicTable,
+          data: data ?? TopicDm(),
+          where: StringC.id,
+          whereArgs: data?.id,
+        );
+        if (!mounted) return;
+        baseSnackBar(context,
+            message: StringC.savedSuccessfully, leading: IconC.success);
+        Navigator.of(context).pop(true);
+      } catch (e) {
+        debugPrint(e.toString());
+        baseSnackBar(context,
+            message: StringC.errorInSaving, leading: IconC.failed);
+        Navigator.of(context).pop(true);
+      }
+    }
+
+    // Clearing the cubit.
+    if (!mounted) return;
+    context.read<AttachmentCubit>().clear();
   }
 }
 
