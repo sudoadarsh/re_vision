@@ -6,6 +6,6 @@ class CustomThemeData {
     // Use material 3
     useMaterial3: true,
     // primary color.
-    primaryColor: ColorConstants.primary,
+    primaryColor: ColorC.primary,
   );
 }
