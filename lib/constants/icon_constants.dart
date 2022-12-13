@@ -70,6 +70,7 @@ class IconC {
   static const Icon failed = Icon(Icons.info, color: ColorC.secondary);
   static const Icon edit = Icon(Icons.edit);
   static const Icon send = Icon(Icons.send);
+  static const Icon folder = Icon(Icons.folder_open_rounded);
 
   // Icon constants in the profile page.
   static const Icon pfCardTrailing = Icon(Icons.arrow_forward_ios);

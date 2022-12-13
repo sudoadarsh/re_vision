@@ -16,6 +16,7 @@ class StringC {
   static const String topicTable = 'topic_table';
 
   static const String done = 'done';
+  static const String label = "label";
 
   // Path constants.
   static const String logoPath = 'images/revision.png';
@@ -75,7 +76,7 @@ class StringC {
 
 
   // String constants in the topics page.
-  static const String addTopic = 'Add topic';
+  static const String addTopic = 'Add topic here';
   static const String updateTopic = 'Update Topic';
   static const String topicLabel = 'Topic';
   static const String addAttachment = 'Attachments';
@@ -108,6 +109,8 @@ class StringC {
   static const String invalidUrl = 'Invalid Url';
   static const String savedSuccessfully = 'Saved Successfully';
   static const String errorInSaving = 'Error while saving the topic!';
+
+  static const String addLabels = "Add label(s)";
 
   // String constants used in profile page.
   static const String starsProf = "Star(s)";

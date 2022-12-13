@@ -22,7 +22,7 @@ class BaseSkeletonDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: BaseText(title),
+      title: BaseText(title, textAlign: TextAlign.center),
       content: customContent ??
           BaseText(
             description ?? '',
