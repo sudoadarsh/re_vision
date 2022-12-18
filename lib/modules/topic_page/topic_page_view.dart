@@ -1,9 +1,9 @@
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:re_vision/constants/decoration_constants.dart';
+import 'package:re_vision/base_widgets/base_text.dart';
+import 'package:re_vision/base_widgets/exapandable_fab.dart';
+import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
-import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/modules/topic_page/topic_page_v1.dart';
 
 mixin TopicPageView on State<TopicPageV1> {
@@ -11,6 +11,36 @@ mixin TopicPageView on State<TopicPageV1> {
   PreferredSizeWidget title(TextEditingController controller) {
     return _Title(
       titleC: controller,
+    );
+  }
+
+  /// The expandable FAB.
+  Widget expandableFab() {
+    return ExpandableFab(
+      color: ColorC.primary,
+      distance: 112.0,
+      children: [
+        ExpandableFABActionButton(
+          color: ColorC.secondary,
+          onPressed: (){},
+          icon: IconC.image,
+        ),
+        ExpandableFABActionButton(
+          color: ColorC.secondary,
+          onPressed: (){},
+          icon: IconC.link,
+        ),
+        ExpandableFABActionButton(
+          color: ColorC.secondary,
+          onPressed: (){},
+          icon: IconC.video,
+        ),
+        ExpandableFABActionButton(
+          color: ColorC.secondary,
+          onPressed: (){},
+          icon: IconC.pdf,
+        ),
+      ],
     );
   }
 }
@@ -31,15 +61,9 @@ class _Title extends StatefulWidget with PreferredSizeWidget {
 }
 
 class _TitleState extends State<_Title> {
-  /// The items of attachments dropdown.
-  late final List<String> _dropdownItems;
-
   @override
   void initState() {
     super.initState();
-
-    _dropdownItems = ["Image", "Pdf", "Video", "Article"];
-
   }
 
   @override
@@ -54,28 +78,7 @@ class _TitleState extends State<_Title> {
         ),
       ),
       actions: [
-        IconButton(onPressed: () {}, icon: IconC.folder),
-        DropdownButtonHideUnderline(
-          child: DropdownButton2(
-            dropdownWidth: 100,
-            dropdownDecoration: DecorC.boxDecorAll(radius: 10.0),
-            selectedItemBuilder: (_) {
-              return _dropdownItems
-                  .map((e) => const Padding(padding: EdgeInsets.symmetric(horizontal: 8.0)))
-                  .toList();
-            },
-            items: _dropdownItems
-                .map<DropdownMenuItem<String>>((e) => DropdownMenuItem(
-                      value: e,
-                      child: Text(e.toString()),
-                    ))
-                .toList(),
-            onChanged: (val) {},
-            icon: IconC.attachments,
-            iconEnabledColor: Colors.black,
-            iconDisabledColor: Colors.black,
-          ).paddingOnly(right: 8.0),
-        )
+        TextButton(onPressed: () {}, child: const BaseText(StringC.save))
       ],
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/modules/topic_page/topic_page_view.dart';
 
@@ -28,6 +29,9 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
   /// The focus node.
   late final FocusNode _notesFN;
 
+  /// Boolean to hide the quill toolbar.
+  late bool _hideTB = true;
+
   @override
   void initState() {
     super.initState();
@@ -36,10 +40,26 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
     _notesC = QuillController.basic();
 
     _notesFN = FocusNode();
+
+    _notesFN.addListener(() {
+      if (_hideTB && !_notesFN.hasFocus) {
+        _hideTB = false;
+        setState(() {});
+        return;
+      } else if (!_hideTB && _notesFN.hasFocus) {
+        _hideTB = true;
+        setState(() {});
+        return;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+
+    /// Keyboard is visible.
+    bool keyVisible = MediaQuery.of(context).viewInsets.bottom > 0.0;
+
     return Scaffold(
       // The app bar.
       appBar: title(_titleC),
@@ -57,15 +77,29 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
             padding: const EdgeInsets.all(8.0),
             focusNode: _notesFN,
           ),
-          MediaQuery.of(context).viewInsets.bottom > 0.0
+          keyVisible && _hideTB
               ? Positioned(
                   bottom: 0.0,
                   right: 0.0,
                   left: 0.0,
-                  child: QuillToolbar.basic(controller: _notesC),
+                  child: QuillToolbar.basic(
+                    controller: _notesC,
+                    showFontFamily: false,
+                    showFontSize: false,
+                    iconTheme: const QuillIconTheme(
+                      iconSelectedFillColor: ColorC.primary,
+                      iconSelectedColor: ColorC.white,
+                    ),
+                  ),
                 )
               : SizeC.none
         ],
+      ),
+
+      // The floating action button with multiple selection options.
+      floatingActionButton: Visibility(
+        visible: !keyVisible,
+          child: expandableFab(),
       ),
     );
   }
