@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +18,7 @@ import 'package:re_vision/state_management/attachment/attachment_cubit.dart';
 import '../../models/attachment_data_dm.dart';
 import '../../models/topic_dm.dart';
 import '../../routes/route_constants.dart';
+import 'package:tuple/tuple.dart';
 
 class TopicPageV1 extends StatefulWidget {
   const TopicPageV1({
@@ -141,6 +144,14 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
                   expands: true,
                   padding: const EdgeInsets.all(8.0),
                   focusNode: _notesFN,
+                  customStyles: DefaultStyles(
+                    placeHolder: DefaultTextBlockStyle(
+                      const TextStyle(fontSize: 16, color: Colors.black),
+                      const Tuple2<double, double>(8, 8),
+                      const Tuple2(3, 3),
+                      const BoxDecoration(),
+                    ),
+                  ),
                 ).paddingOnly(bottom: keyVisible ? 100.0 : 0.0),
               ),
             ],
