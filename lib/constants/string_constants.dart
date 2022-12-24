@@ -91,7 +91,7 @@ class StringC {
   static const String cancel = 'Cancel';
   static const String save = 'Save';
   static const String link = 'link';
-  static const String addNote = 'Add a note';
+  static const String addNote = 'Add notes here';
   static const String tapToAddANote = "Tap to add a note";
 
   static const String deleteAttachment = 'Delete this attachment?';
@@ -111,6 +111,7 @@ class StringC {
   static const String errorInSaving = 'Error while saving the topic!';
 
   static const String addLabels = "Add label(s)";
+  static const String searchLabels = "Search for labels";
 
   // String constants used in profile page.
   static const String starsProf = "Star(s)";

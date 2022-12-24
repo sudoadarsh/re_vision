@@ -10,18 +10,23 @@ class LabelsCubit extends Cubit<LabelsState> {
 
   /// Search for labels.
   void searchLabels(String label, List availableLabels) {
+    print(label);
+
     // 1. If the search field is empty.
-    if (label.isEmpty || label == "") emit(LabelsEmpty());
-
-    // 2. Return the labels matching the search.
-    List res = availableLabels
-        .where((element) => element.toLowerCase().contains(label.trim().toLowerCase()))
-        .toList();
-
-    if (res.isEmpty) {
-      emit (LabelsNotFound());
+    if (label.isEmpty || label == "") {
+      emit(LabelsEmpty());
     } else {
-      emit(LabelsFound(result: res));
+      // 2. Return the labels matching the search.
+      List res = availableLabels
+          .where((element) =>
+              element.toLowerCase().contains(label.trim().toLowerCase()))
+          .toList();
+
+      if (res.isEmpty) {
+        emit(LabelsNotFound());
+      } else {
+        emit(LabelsFound(result: res));
+      }
     }
   }
 }

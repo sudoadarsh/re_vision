@@ -3,10 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:re_vision/base_widgets/base_underline_field.dart';
+import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
+import 'package:re_vision/constants/string_constants.dart';
+import 'package:re_vision/modules/labels/labels_view.dart';
 import 'package:re_vision/utils/app_config.dart';
 
-import '../../base_widgets/base_text.dart';
 import '../../state_management/labels/labels_cubit.dart';
 
 class LabelsPage extends StatefulWidget {
@@ -16,9 +19,12 @@ class LabelsPage extends StatefulWidget {
   State<LabelsPage> createState() => _LabelsPageState();
 }
 
-class _LabelsPageState extends State<LabelsPage> {
+class _LabelsPageState extends State<LabelsPage> with LabelsView {
   /// The available labels.
   List _labels = [];
+
+  /// The selected labels.
+  List selectedLabels = [];
 
   /// The cubit to control the states of label search.
   late final LabelsCubit _labelsCubit;
@@ -36,6 +42,12 @@ class _LabelsPageState extends State<LabelsPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _labelsCubit.close();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
@@ -45,9 +57,10 @@ class _LabelsPageState extends State<LabelsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextFormField(
+            BaseUnderlineField(
               controller: _labelC,
-              decoration: const InputDecoration(hintText: "Search for labels"),
+              hintText: StringC.searchLabels,
+              prefixIcon: IconC.search,
               onChanged: (val) {
                 _labelsCubit.searchLabels(_labelC.text, _labels);
               },
@@ -57,29 +70,43 @@ class _LabelsPageState extends State<LabelsPage> {
               bloc: _labelsCubit,
               builder: (context, state) {
                 if (state is LabelsEmpty) {
-
-                  print("--------------- is empty");
-
-                } else if (state is LabelsNotFound) {
-
-                  print("create a custom label here");
-
-                } else if (state is LabelsFound) {
-                  return _resultLabel(state.result);
-                }
-                return Flexible(
-                  child: ListView.builder(
-                    itemCount: _labels.length,
+                  return resultBuilder(
+                    items: selectedLabels,
                     itemBuilder: (context, i) {
-                      return Align(
-                        alignment: Alignment.centerLeft,
-                        child: Chip(
-                          label: BaseText(_labels[i]),
-                          backgroundColor: Colors.grey,
-                        ),
+                      return labelChip(
+                        label: selectedLabels[i],
+                        onTap: () => _labelTapped(selectedLabels[i]),
+                        isSelected: true,
                       );
                     },
-                  ),
+                  );
+                } else if (state is LabelsNotFound) {
+                  return labelChip(
+                    label: _labelC.text,
+                    onTap: () => _labelTapped(_labelC.text),
+                    isSelected: selectedLabels.contains(_labelC.text),
+                  );
+                } else if (state is LabelsFound) {
+                  return resultBuilder(
+                    items: state.result,
+                    itemBuilder: (context, i) {
+                      return labelChip(
+                        label: state.result[i],
+                        isSelected: selectedLabels.contains(state.result[i]),
+                        onTap: () => _labelTapped(state.result[i]),
+                      );
+                    },
+                  );
+                }
+                return resultBuilder(
+                  items: _labels,
+                  itemBuilder: (context, i) {
+                    return labelChip(
+                      label: _labels[i],
+                      isSelected: selectedLabels.contains(_labels[i]),
+                      onTap: () => _labelTapped(_labels[i]),
+                    );
+                  },
                 );
               },
             ),
@@ -97,21 +124,13 @@ class _LabelsPageState extends State<LabelsPage> {
     _labels = jsonDecode(labels)["topics"];
   }
 
-  /// The result label builder.
-  Widget _resultLabel(List labels) {
-    return Flexible(
-      child: ListView.builder(
-        itemCount: labels.length,
-        itemBuilder: (context, i) {
-          return Align(
-            alignment: Alignment.centerLeft,
-            child: Chip(
-              label: BaseText(labels[i]),
-              backgroundColor: Colors.grey,
-            ),
-          );
-        },
-      ),
-    );
+  /// Function to add the label to the selected list if doesn't already exist.
+  void _labelTapped(String label) {
+    if (selectedLabels.contains(label)) {
+      selectedLabels.remove(label);
+    } else {
+      selectedLabels.add(label);
+    }
+    setState(() {});
   }
 }

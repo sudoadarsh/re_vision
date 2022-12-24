@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:re_vision/modules/attachment/attachment_page.dart';
 import 'package:re_vision/modules/dashboard/dashboard_page.dart';
 import 'package:re_vision/modules/friends/friends_page.dart';
 import 'package:re_vision/modules/topic_page/topic_page_v1.dart';
@@ -37,6 +38,10 @@ class RouteGenerator {
           frs: args.frs,
           fromProfile: args.fromProfile,
         );
+        break;
+      case RouteC.attachments:
+        final args = settings.arguments as AttachmentPageArguments;
+        page = AttachmentPage(data: args.data);
         break;
       default:
         page = const Scaffold(

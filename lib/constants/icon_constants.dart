@@ -70,7 +70,7 @@ class IconC {
   static const Icon failed = Icon(Icons.info, color: ColorC.secondary);
   static const Icon edit = Icon(Icons.edit);
   static const Icon send = Icon(Icons.send);
-  static const Icon folder = Icon(Icons.folder_open_rounded);
+  static const Icon folder = Icon(Icons.folder_open_rounded, size: 20.0);
   static const Icon options = Icon(Icons.add);
 
   // Icon constants in the profile page.
