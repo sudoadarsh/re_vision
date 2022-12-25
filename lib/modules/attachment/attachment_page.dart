@@ -1,10 +1,14 @@
 import 'dart:io';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:favicon/favicon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:re_vision/constants/color_constants.dart';
+import 'package:re_vision/constants/decoration_constants.dart';
+import 'package:re_vision/extensions/enum_extension.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -14,44 +18,117 @@ import '../../constants/icon_constants.dart';
 import '../../constants/string_constants.dart';
 import '../../models/attachment_data_dm.dart';
 import '../../state_management/attachment/attachment_cubit.dart';
+import 'attachment_view.dart';
 
-/// Attachment page arguments.
-class AttachmentPageArguments {
-  final List<AttachmentDataDm> data;
+enum Attachments {
+  article(0),
+  image(1),
+  pdf(2),
+  video(3);
 
-  AttachmentPageArguments({required this.data});
+  const Attachments(this.value);
+
+  final int value;
 }
 
 class AttachmentPage extends StatefulWidget {
-  const AttachmentPage({Key? key, required this.data}) : super(key: key);
-
-  final List<AttachmentDataDm> data;
+  const AttachmentPage({Key? key}) : super(key: key);
 
   @override
   State<AttachmentPage> createState() => _AttachmentPageState();
 }
 
-class _AttachmentPageState extends State<AttachmentPage> {
-  /// The list of attachments added.
-  late List<AttachmentDataDm> data;
-
-  @override
-  void initState() {
-    super.initState();
-
-    data = widget.data;
-  }
-
+class _AttachmentPageState extends State<AttachmentPage> with AttachmentView {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const BaseText(StringC.addAttachment),
+        actions: [
+          DropdownButtonHideUnderline(
+            child: Theme(
+              data: ThemeData(splashColor: Colors.transparent),
+              child: DropdownButton2(
+                buttonPadding: const EdgeInsets.only(right: 8.0),
+                icon: IconC.add,
+                value: null,
+                dropdownDecoration: DecorC.boxDecorAll(radius: 10.0),
+                items: Attachments.values
+                    .map((e) => DropdownMenuItem<Attachments>(
+                          value: e,
+                          child: BaseText(e.desc()),
+                        ))
+                    .toList(),
+                onChanged: (val) async {
+                  switch (val) {
+                    case Attachments.image:
+                      pickFile(
+                        allowedExtensions: [
+                          "jpg",
+                          "jpeg",
+                          "jfif",
+                          "pjpeg",
+                          "pjp",
+                          "png"
+                        ],
+                        fileType: Attachments.image.value,
+                      );
+                      break;
+                    case Attachments.video:
+                      pickFile(
+                        allowedExtensions: ["mp4", "mov", "wmv", "avi"],
+                        fileType: Attachments.video.value,
+                      );
+                      break;
+                    case Attachments.pdf:
+                      pickFile(
+                        allowedExtensions: ["pdf", "xlsx", "docx", "pptx"],
+                        fileType: Attachments.pdf.value,
+                      );
+                      break;
+                    case Attachments.article:
+                      await pasteLink();
+                      break;
+                    default:
+                      break;
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Flexible(
+          /// Filter chips.
+          SizedBox(
+            height: 50,
             child: ListView.builder(
-                itemCount: data.length, itemBuilder: (context, i) {
-                  return _getTile(data[i]);
-            }),
+                scrollDirection: Axis.horizontal,
+                itemCount: Attachments.values.length,
+                itemBuilder: (context, i) {
+                  return Chip(
+                    backgroundColor: ColorC.secondaryComp,
+                    label: BaseText(Attachments.values[i].name),
+                  ).paddingOnly(left: 4.0, right: 8.0);
+                }),
+          ),
+
+          Flexible(
+            child: BlocBuilder<AttachmentCubit, AttachmentState>(
+              builder: (context, state) {
+                List<AttachmentDataDm> receivedData = state.data;
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: receivedData.length,
+                  itemBuilder: (context, i) {
+                    return _getTile(receivedData[i]);
+                  },
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -210,5 +287,3 @@ class _CommonTile extends StatelessWidget {
     }
   }
 }
-
-

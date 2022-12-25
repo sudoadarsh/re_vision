@@ -10,7 +10,6 @@ class LabelsCubit extends Cubit<LabelsState> {
 
   /// Search for labels.
   void searchLabels(String label, List availableLabels) {
-    print(label);
 
     // 1. If the search field is empty.
     if (label.isEmpty || label == "") {

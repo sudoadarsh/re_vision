@@ -44,7 +44,7 @@ class IconC {
   // Icons used in the home page.
   static const Icon add = Icon(Icons.add, color: ColorC.primary);
   static const Icon complete = Icon(Icons.done, color: ColorC.primary);
-  static const Icon delete = Icon(Icons.delete, color: ColorC.secondary);
+  static const Icon delete = Icon(Icons.delete, color: ColorC.delete);
   static const Icon share = Icon(Icons.share, color: Colors.cyan);
   static const Icon attachments = Icon(Icons.attachment);
   static Widget userGrp = Image.asset(StringC.userGrpPath, scale: 15.0);
@@ -71,7 +71,7 @@ class IconC {
   static const Icon edit = Icon(Icons.edit);
   static const Icon send = Icon(Icons.send);
   static const Icon folder = Icon(Icons.folder_open_rounded, size: 20.0);
-  static const Icon options = Icon(Icons.add);
+  static const Icon options = Icon(Icons.label_important);
 
   // Icon constants in the profile page.
   static const Icon pfCardTrailing = Icon(Icons.arrow_forward_ios);

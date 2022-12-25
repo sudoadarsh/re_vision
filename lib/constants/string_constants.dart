@@ -34,6 +34,7 @@ class StringC {
   static const String lottieNoTopics = 'lottiefiles/no_topics.json';
   static const String lottieGoSocial = 'lottiefiles/go_social.json';
   static const String lottieReschedule = 'lottiefiles/reschedule.json';
+  static const String lottieAttachment = 'lottiefiles/add_attachment.json';
 
 
   // String constants in the login/ sign-in page.
@@ -112,6 +113,13 @@ class StringC {
 
   static const String addLabels = "Add label(s)";
   static const String searchLabels = "Search for labels";
+
+  // String constants used in labels page.
+  static const String noLabelsAdded = "No label(s) added";
+  static const String labels = "Label(s)";
+
+  // String constants used in attachments page.
+  static const String attachmentOverview = "Add attachments to revise on the GO!";
 
   // String constants used in profile page.
   static const String starsProf = "Star(s)";

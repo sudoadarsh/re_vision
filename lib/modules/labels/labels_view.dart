@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/modules/labels/labels_page.dart';
 
 import '../../base_widgets/base_text.dart';
@@ -50,6 +51,11 @@ class _LabelChip extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Chip(
+          avatar: isSelected ? const CircleAvatar(
+            backgroundColor: ColorC.white,
+            foregroundColor: ColorC.primary,
+            child: IconC.complete,
+          ) : null,
           label: BaseText(
             label.trim(),
           ),

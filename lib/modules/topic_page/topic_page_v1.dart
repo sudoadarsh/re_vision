@@ -10,12 +10,9 @@ import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/size_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
-import 'package:re_vision/modules/attachment/attachment_page.dart';
 import 'package:re_vision/modules/labels/labels_page.dart';
 import 'package:re_vision/modules/topic_page/topic_page_view.dart';
 import 'package:re_vision/state_management/attachment/attachment_cubit.dart';
-
-import '../../models/attachment_data_dm.dart';
 import '../../models/topic_dm.dart';
 import '../../routes/route_constants.dart';
 import 'package:tuple/tuple.dart';
@@ -46,9 +43,14 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
   /// Boolean to hide the quill toolbar.
   late bool _hideTB = true;
 
+  /// To store the selected Labels.
+  late List _selectedLabels;
+
   @override
   void initState() {
     super.initState();
+
+    _selectedLabels = [];
 
     _titleC = TextEditingController();
     _notesC = QuillController.basic();
@@ -88,14 +90,14 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
                 children: [
                   InkWell(
                     onTap: _showLabelsDialog,
-                    child: const Chip(
-                      avatar: CircleAvatar(
+                    child: Chip(
+                      avatar: const CircleAvatar(
                         backgroundColor: Colors.white,
                         foregroundColor: ColorC.primary,
                         child: IconC.options,
                       ),
                       label: BaseText(
-                        StringC.addLabels,
+                        _selectedLabels.isEmpty ? StringC.addLabels : StringC.labels,
                         fontSize: 12,
                         fontWeight: FontWeight.w300,
                       ),
@@ -104,16 +106,12 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
                   SizeC.spaceHorizontal5,
                   BlocBuilder<AttachmentCubit, AttachmentState>(
                     builder: (context, state) {
-                      List<AttachmentDataDm> receivedData = state.data;
-
-                      if (receivedData.isEmpty) return SizeC.none;
+                      // List<AttachmentDataDm> receivedData = state.data;
 
                       return InkWell(
                         onTap: () {
                           Navigator.of(context).pushNamed(
                             RouteC.attachments,
-                            arguments:
-                                AttachmentPageArguments(data: receivedData),
                           );
                         },
                         child: const Chip(
@@ -132,7 +130,7 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
                     },
                   ),
                 ],
-              ),
+              ).paddingOnly(left: 4, right: 4),
               Flexible(
                 child: QuillEditor(
                   placeholder: StringC.addNote,
@@ -174,12 +172,6 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
               : SizeC.none
         ],
       ),
-
-      // The floating action button with multiple selection options.
-      floatingActionButton: Visibility(
-        visible: !keyVisible,
-        child: expandableFab(),
-      ),
     );
   }
 
@@ -187,20 +179,15 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
 
   /// Method to show the labels dialog.
   void _showLabelsDialog() async {
+
     await showDialog(
       context: context,
       builder: (_) => CupertinoAlertDialog(
         title: const BaseText(StringC.appName),
-        content: const LabelsPage(),
+        content: LabelsPage(selectedLabels: _selectedLabels),
         actions: [
           CupertinoDialogAction(
-            child: const BaseText(StringC.cancel),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          CupertinoDialogAction(
-            child: const BaseText(StringC.save),
+            child: const BaseText(StringC.ok),
             onPressed: () {
               Navigator.of(context).pop();
             },

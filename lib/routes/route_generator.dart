@@ -40,8 +40,7 @@ class RouteGenerator {
         );
         break;
       case RouteC.attachments:
-        final args = settings.arguments as AttachmentPageArguments;
-        page = AttachmentPage(data: args.data);
+        page = const AttachmentPage();
         break;
       default:
         page = const Scaffold(

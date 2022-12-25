@@ -10,10 +10,13 @@ import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/modules/labels/labels_view.dart';
 import 'package:re_vision/utils/app_config.dart';
 
+import '../../base_widgets/base_text.dart';
 import '../../state_management/labels/labels_cubit.dart';
 
 class LabelsPage extends StatefulWidget {
-  const LabelsPage({Key? key}) : super(key: key);
+  const LabelsPage({Key? key, required this.selectedLabels}) : super(key: key);
+  
+  final List selectedLabels;
 
   @override
   State<LabelsPage> createState() => _LabelsPageState();
@@ -24,7 +27,7 @@ class _LabelsPageState extends State<LabelsPage> with LabelsView {
   List _labels = [];
 
   /// The selected labels.
-  List selectedLabels = [];
+  late List _selectedLabels;
 
   /// The cubit to control the states of label search.
   late final LabelsCubit _labelsCubit;
@@ -35,10 +38,14 @@ class _LabelsPageState extends State<LabelsPage> with LabelsView {
   @override
   void initState() {
     super.initState();
+    
+    _selectedLabels = widget.selectedLabels;
 
     _labelsCubit = LabelsCubit();
     _getJsonLabels();
     _labelC = TextEditingController();
+
+    _labelsCubit.searchLabels(_labelC.text, _labels);
   }
 
   @override
@@ -70,12 +77,15 @@ class _LabelsPageState extends State<LabelsPage> with LabelsView {
               bloc: _labelsCubit,
               builder: (context, state) {
                 if (state is LabelsEmpty) {
+                  if (_selectedLabels.isEmpty) {
+                    return const BaseText(StringC.noLabelsAdded);
+                  }
                   return resultBuilder(
-                    items: selectedLabels,
+                    items: _selectedLabels,
                     itemBuilder: (context, i) {
                       return labelChip(
-                        label: selectedLabels[i],
-                        onTap: () => _labelTapped(selectedLabels[i]),
+                        label: _selectedLabels[i],
+                        onTap: () => _labelTapped(_selectedLabels[i]),
                         isSelected: true,
                       );
                     },
@@ -84,7 +94,7 @@ class _LabelsPageState extends State<LabelsPage> with LabelsView {
                   return labelChip(
                     label: _labelC.text,
                     onTap: () => _labelTapped(_labelC.text),
-                    isSelected: selectedLabels.contains(_labelC.text),
+                    isSelected: _selectedLabels.contains(_labelC.text),
                   );
                 } else if (state is LabelsFound) {
                   return resultBuilder(
@@ -92,7 +102,7 @@ class _LabelsPageState extends State<LabelsPage> with LabelsView {
                     itemBuilder: (context, i) {
                       return labelChip(
                         label: state.result[i],
-                        isSelected: selectedLabels.contains(state.result[i]),
+                        isSelected: _selectedLabels.contains(state.result[i]),
                         onTap: () => _labelTapped(state.result[i]),
                       );
                     },
@@ -103,7 +113,7 @@ class _LabelsPageState extends State<LabelsPage> with LabelsView {
                   itemBuilder: (context, i) {
                     return labelChip(
                       label: _labels[i],
-                      isSelected: selectedLabels.contains(_labels[i]),
+                      isSelected: _selectedLabels.contains(_labels[i]),
                       onTap: () => _labelTapped(_labels[i]),
                     );
                   },
@@ -126,10 +136,10 @@ class _LabelsPageState extends State<LabelsPage> with LabelsView {
 
   /// Function to add the label to the selected list if doesn't already exist.
   void _labelTapped(String label) {
-    if (selectedLabels.contains(label)) {
-      selectedLabels.remove(label);
+    if (_selectedLabels.contains(label)) {
+      _selectedLabels.remove(label);
     } else {
-      selectedLabels.add(label);
+      _selectedLabels.add(label);
     }
     setState(() {});
   }
