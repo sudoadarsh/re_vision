@@ -22,7 +22,7 @@ class Schemas {
       DbColumn(columnName: StringC.notes, datatype: DbDataType.text),
 
       /// The label column.
-      DbColumn(columnName: StringC.label, datatype: DbDataType.integer),
+      DbColumn(columnName: StringC.label, datatype: DbDataType.text),
 
       /// The created at column. This will store the time at which the task was
       /// first created.

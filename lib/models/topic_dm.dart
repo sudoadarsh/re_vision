@@ -12,6 +12,7 @@ class TopicDm extends BaseSqliteModel {
     String? id,
     String? topic,
     String? attachments,
+    String? label,
     String? notes,
     String? createdAt,
     String? scheduledTo,
@@ -21,6 +22,7 @@ class TopicDm extends BaseSqliteModel {
     _id = id;
     _topic = topic;
     _attachments = attachments;
+    _label = label;
     _notes = notes;
     _createdAt = createdAt;
     _scheduledTo = scheduledTo;
@@ -32,6 +34,7 @@ class TopicDm extends BaseSqliteModel {
     _id = json['id'];
     _topic = json['topic'];
     _attachments = json['attachments'];
+    _label = json['label'];
     _notes = json["notes"];
     _createdAt = json['created_at'];
     _scheduledTo = json['scheduled_to'];
@@ -42,6 +45,7 @@ class TopicDm extends BaseSqliteModel {
   String? _id;
   String? _topic;
   String? _attachments;
+  String? _label;
   String? _notes;
   String? _createdAt;
   String? _scheduledTo;
@@ -52,6 +56,7 @@ class TopicDm extends BaseSqliteModel {
     String? id,
     String? topic,
     String? attachments,
+    String? label,
     String? notes,
     String? createdAt,
     String? scheduledTo,
@@ -62,6 +67,7 @@ class TopicDm extends BaseSqliteModel {
         id: id ?? _id,
         topic: topic ?? _topic,
         attachments: attachments ?? _attachments,
+        label: label ?? _label ,
         notes: notes ?? _notes,
         createdAt: createdAt ?? _createdAt,
         scheduledTo: scheduledTo ?? _scheduledTo,
@@ -74,6 +80,8 @@ class TopicDm extends BaseSqliteModel {
   String? get topic => _topic;
 
   String? get attachments => _attachments;
+
+  String? get label => _label;
 
   String? get notes => _notes;
 
@@ -91,6 +99,7 @@ class TopicDm extends BaseSqliteModel {
     map['id'] = _id;
     map['topic'] = _topic;
     map['attachments'] = _attachments;
+    map["label"] = _label;
     map['notes'] = _notes;
     map['created_at'] = _createdAt;
     map['scheduled_to'] = _scheduledTo;

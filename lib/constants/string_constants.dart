@@ -29,6 +29,7 @@ class StringC {
   static const String userGrpPath = 'images/user_group.png';
   static const String revisionReqsPath = 'images/revision_request.png';
   static const String notesPath = 'images/note.png';
+  static const String noAttachmentsPath = 'images/no_attachments.png';
   static const String lottieComplete = 'lottiefiles/topic_complete.json';
   static const String lottieDelete = 'lottiefiles/topic_delete.json';
   static const String lottieNoTopics = 'lottiefiles/no_topics.json';
@@ -97,6 +98,7 @@ class StringC {
 
   static const String deleteAttachment = 'Delete this attachment?';
   static const String ok = 'Okay';
+  static const String resume = "Resume";
 
   static const String saveArticles = 'Save article(s)';
   static const String separator  = '◈◈◈';
@@ -104,7 +106,7 @@ class StringC {
   static const String tapToOpenFile = 'Tap to open the file';
 
   static const String areYouSureExit = 'Are you sure want to exit?';
-  static const String consequences = 'You have unsaved content, and will be lost unless you save it.';
+  static const String consequences = 'Unsaved changes will be lost.';
   static const String discard = 'Discard';
 
   static const String invalidUrl = 'Invalid Url';
@@ -113,13 +115,15 @@ class StringC {
 
   static const String addLabels = "Add label(s)";
   static const String searchLabels = "Search for labels";
+  static const String noTopicNameAdded = "Please add a topic name to save the revision.";
 
   // String constants used in labels page.
   static const String noLabelsAdded = "No label(s) added";
   static const String labels = "Label(s)";
 
   // String constants used in attachments page.
-  static const String attachmentOverview = "Add attachments to revise on the GO!";
+  static const String noAttachmentsAdded = "No attachment(s) added.";
+
 
   // String constants used in profile page.
   static const String starsProf = "Star(s)";

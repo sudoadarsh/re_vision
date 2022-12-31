@@ -82,4 +82,8 @@ class IconC {
 
   // Icon constants in the overview page.
   static const Icon reschedule = Icon(Icons.restart_alt_rounded);
+
+  // Icon constants in the attachments page.
+  static const Icon play = Icon(Icons.play_arrow_rounded);
+
 }
