@@ -46,7 +46,7 @@ class _FriendsPageState extends State<FriendsPage> {
       onWillPop: _onWillPop,
       child: Scaffold(
         appBar: AppBar(
-            backgroundColor: ColorC.button, title: BaseText(widget.title)),
+            backgroundColor: ColorC.secondary, title: BaseText(widget.title)),
         body: ListView.builder(
           itemCount: widget.frs.length,
           itemBuilder: (ctx, i) {
@@ -158,7 +158,7 @@ class _FriendsListState extends State<_FriendsList> {
   Widget _trailing() {
     return BaseElevatedButton(
       size: const Size(80, 40),
-      backgroundColor: !_isUndo ? ColorC.elevatedButton : null,
+      backgroundColor: !_isUndo ? ColorC.secondary : null,
       onPressed: () {
         !_isUndo
             ? widget.send(widget.frs[widget.i])

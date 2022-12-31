@@ -151,7 +151,7 @@ class _DashBoardPageState extends State<_DashBoardPage> {
                                   topics: missed, title: StringC.missed),
                             ));
                           },
-                          color: ColorC.buttonComp,
+                          color: ColorC.secondary,
                         ),
                       ],
                     );
@@ -323,7 +323,7 @@ class _DashBoardState extends State<DashBoard> {
             Center(
               heightFactor: 0.6,
               child: BaseElevatedRoundedButton(
-                backgroundColor: ColorC.elevatedButton,
+                backgroundColor: ColorC.secondary,
                 child: IconC.mainLogo,
                 onPressed: () {
                   // Navigate to home screen.
@@ -402,7 +402,7 @@ class _DashBoardState extends State<DashBoard> {
         setState(() {});
       },
       icon: icon,
-      color: val == grpVal ? ColorC.button : ColorC.white,
+      color: val == grpVal ? ColorC.secondary : ColorC.white,
     );
   }
 

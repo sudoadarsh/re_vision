@@ -41,7 +41,7 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
             title: BaseText(_req[ind].name ?? ''),
             subtitle: BaseText(_req[ind].email ?? ''),
             trailing: BaseElevatedButton(
-              backgroundColor: ColorC.elevatedButton,
+              backgroundColor: ColorC.secondary,
               onPressed: () {
                 _acceptReq(_req[ind]);
                 _req.removeAt(ind);

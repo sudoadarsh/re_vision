@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:re_vision/base_shared_prefs/base_shared_prefs.dart';
+import 'package:re_vision/base_widgets/base_divider.dart';
 
 import 'package:re_vision/base_widgets/base_elevated_button.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
@@ -33,26 +34,8 @@ class _Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(StringC.logoPath, scale: 4)
+    return Image.asset(StringC.logoPath)
         .paddingOnly(top: 24, bottom: 24);
-  }
-}
-
-/// Widget that displays the name of the application.
-///
-class _Message extends StatelessWidget {
-  const _Message({Key? key, required this.msg}) : super(key: key);
-
-  final String msg;
-
-  @override
-  Widget build(BuildContext context) {
-    return BaseText(
-      msg,
-      fontWeight: FontWeight.w300,
-      fontSize: 24.0,
-      textAlign: TextAlign.center,
-    );
   }
 }
 
@@ -107,8 +90,8 @@ class _FormState extends State<_Form> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _Message(msg: StringC.appName),
-          SizeC.spaceVertical20,
+          // const _Message(msg: StringC.appName),
+          SizeC.spaceVertical5,
           BaseTextFormFieldWithDepth(
             controller: _emailController,
             prefixIcon: IconC.email,
@@ -149,7 +132,7 @@ class _FormState extends State<_Form> {
 
           // The Sign-in/ Log-in button.
           BaseElevatedButton(
-            backgroundColor: ColorC.elevatedButton,
+            backgroundColor: ColorC.secondary,
             onPressed: () {
               _authCubit.fetchData<User?>(
                 data: AuthInModel(
@@ -297,30 +280,46 @@ class _LoginPageState extends State<LoginPage> {
               height: AppConfig.height(context),
               child: Column(
                 children: [
-                  Container(
-                    decoration: DecorC.boxDecorAll(radius: 20)
-                        .copyWith(color: ColorC.white),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        (AppConfig.height(context) * 0.05).separation(true),
-                        const _Logo(),
-                        (AppConfig.height(context) * 0.05).separation(true),
-                        const _Form(),
-                        const SizedBox(),
-                      ],
-                    ).paddingDefault(),
-                  ).paddingDefault(),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      (AppConfig.height(context) * 0.05).separation(true),
+                      const _Logo(),
+                      (AppConfig.height(context) * 0.05).separation(true),
+                      Container(
+                        decoration: DecorC.boxDecorAll(radius: 20)
+                            .copyWith(color: ColorC.white),
+                        child: Column(
+                          children: const [
+                            _Form(),
+                            SizedBox(),
+                          ],
+                        ),
+                      ),
+                      SizeC.spaceVertical5,
+                      Row(
+                        children: const [
+                          BaseDivider(color: ColorC.white),
+                          BaseText("Or continue with", color: ColorC.white),
+                          BaseDivider(color: ColorC.white),
+                        ],
+                      ),
+                      SizeC.spaceVertical5,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _AlternateMethods(iconPath: StringC.googlePath, onTap: () {}),
+                          _AlternateMethods(iconPath: StringC.applePath, onTap: () {}),
+                        ],
+                      )
+                    ],
+                  ).paddingDefault().paddingDefault(),
                 ],
               ),
             ),
           ),
         ),
         persistentFooterAlignment: AlignmentDirectional.center,
-        persistentFooterButtons: [
-          _AlternateMethods(iconPath: StringC.googlePath, onTap: () {}),
-          _AlternateMethods(iconPath: StringC.applePath, onTap: () {}),
-        ],
       ),
     );
   }

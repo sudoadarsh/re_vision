@@ -61,7 +61,7 @@ class _SearchPageState extends State<SearchPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const BaseText(StringC.search),
-          backgroundColor: ColorC.button,
+          backgroundColor: ColorC.secondary,
         ),
         body: SafeArea(
           child: Column(
@@ -197,7 +197,7 @@ class _UserResultState extends State<_UserResult> {
 
   BaseElevatedButton _requestButton() {
     return BaseElevatedButton(
-      backgroundColor: ColorC.elevatedButton,
+      backgroundColor: ColorC.secondary,
       size: SizeC.elevatedButton,
       onPressed: () {
         widget.onAdd(widget.data);

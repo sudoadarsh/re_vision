@@ -184,7 +184,7 @@ class _InvitesTileState extends State<_InvitesTile> {
           return const CupertinoActivityIndicator();
         }
         return BaseElevatedButton(
-          backgroundColor: ColorC.elevatedButton,
+          backgroundColor: ColorC.secondary,
           onPressed: _confirmAccept,
           size: const Size(80, 40),
           child: const BaseText(StringC.accept),
@@ -228,7 +228,7 @@ class _InvitesTileState extends State<_InvitesTile> {
               ),
               SizeC.spaceVertical10,
               BaseElevatedButton(
-                backgroundColor: ColorC.elevatedButton,
+                backgroundColor: ColorC.secondary,
                 size: SizeC.elevatedButton,
                 onPressed: _accept,
                 child: const BaseText(StringC.accept),

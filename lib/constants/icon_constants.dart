@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 
 class IconC {
   // The main logo.
-  static final Widget mainLogo = Image.asset(StringC.logoPath, scale: 8);
-  static final Widget mainLogoMin = Image.asset(StringC.logoPath, scale: 15);
+  static final Widget mainLogo = SvgPicture.asset(StringC.logoPath);
+  static final Widget mainLogoMin = SvgPicture.asset(StringC.logoPath);
 
   // Icons used in the login page.
   static const Icon email = Icon(

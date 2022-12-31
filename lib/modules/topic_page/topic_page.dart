@@ -62,7 +62,7 @@ class _AppBarState extends State<_AppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: ColorC.button,
+      backgroundColor: ColorC.secondary,
       title: BaseText(widget.title),
       actions: [
         TextButton(

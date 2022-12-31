@@ -21,7 +21,7 @@ class BaseSocialButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialButton(
       shape: DecorC.roundedRectangleBorder,
-      color: ColorC.elevatedButton,
+      color: ColorC.secondary,
       elevation: 4.0,
       onPressed: onPressed,
       child: Row(

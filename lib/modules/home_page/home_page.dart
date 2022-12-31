@@ -769,7 +769,7 @@ class _HomePageState extends State<HomePage> {
       return Container(
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          color: ColorC.button,
+          color: ColorC.secondary,
         ),
         child: events.isNotEmpty
             ? BaseText(
