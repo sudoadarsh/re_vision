@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:re_vision/base_shared_prefs/base_shared_prefs.dart';
 import 'package:re_vision/base_widgets/base_divider.dart';
 
 import 'package:re_vision/base_widgets/base_elevated_button.dart';
@@ -12,7 +11,6 @@ import 'package:re_vision/constants/date_time_constants.dart';
 import 'package:re_vision/constants/decoration_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
-import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/state_management/auth/auth_repo.dart';
 import 'package:re_vision/utils/app_config.dart';
 
@@ -34,15 +32,21 @@ class _Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(StringC.logoPath)
-        .paddingOnly(top: 24, bottom: 24);
+    return Image.asset(StringC.logoPath).paddingOnly(top: 24, bottom: 24);
   }
 }
 
 /// Widget that builds the form, validates the user credentials.
 ///
 class _Form extends StatefulWidget {
-  const _Form({Key? key}) : super(key: key);
+  const _Form({
+    Key? key,
+    this.isLogin = true,
+    required this.onTap,
+  }) : super(key: key);
+
+  final bool isLogin;
+  final VoidCallback onTap;
 
   @override
   State<_Form> createState() => _FormState();
@@ -56,9 +60,6 @@ class _FormState extends State<_Form> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   late final TextEditingController _usernameController;
-
-  // To alter between login and sign-in.
-  bool _loginState = true;
 
   // Button cubit to handle authentication.
   late final CommonButtonCubit _authCubit;
@@ -86,119 +87,112 @@ class _FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // const _Message(msg: StringC.appName),
-          SizeC.spaceVertical5,
-          BaseTextFormFieldWithDepth(
-            controller: _emailController,
-            prefixIcon: IconC.email,
-            labelText: StringC.emailOrAppleId,
-          ),
-          SizeC.spaceVertical10,
-          if (!_loginState) ...[
+    return Container(
+      decoration: DecorC.boxDecorAll(radius: 20).copyWith(color: ColorC.white),
+      child: Form(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizeC.spaceVertical5,
+
+            // The email field.
             BaseTextFormFieldWithDepth(
-              controller: _usernameController,
-              prefixIcon: IconC.user,
-              labelText: StringC.username,
+              controller: _emailController,
+              prefixIcon: IconC.email,
+              labelText: StringC.emailOrAppleId,
             ),
             SizeC.spaceVertical10,
-          ],
-          StatefulBuilder(builder: (context, sst) {
-            return BaseTextFormFieldWithDepth(
-              controller: _passwordController,
-              prefixIcon: IconC.password,
-              labelText: StringC.password,
-              suffixIcon: IconButton(
-                onPressed: () {
-                  sst(() => _isVisible = !_isVisible);
-                },
-                icon: _isVisible ? IconC.visibilityOff : IconC.visible,
-              ),
-              obscureText: !_isVisible,
-            );
-          }),
-          AnimatedCrossFade(
-            duration: DateTimeC.cd500,
-            firstChild: const LinkToPage(
-                title: StringC.empty, pageName: StringC.forgor, route: ""),
-            secondChild: SizeC.spaceVertical20,
-            crossFadeState: _loginState
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-          ),
 
-          // The Sign-in/ Log-in button.
-          BaseElevatedButton(
-            backgroundColor: ColorC.secondary,
-            onPressed: () {
-              _authCubit.fetchData<User?>(
-                data: AuthInModel(
-                  context: context,
-                  email: _emailController.text.trim(),
-                  password: _passwordController.text,
-                  login: _loginState,
+            // The username field.
+            if (!widget.isLogin) ...[
+              BaseTextFormFieldWithDepth(
+                controller: _usernameController,
+                prefixIcon: IconC.user,
+                labelText: StringC.username,
+              ),
+              SizeC.spaceVertical10
+            ],
+
+            // The password field.
+            StatefulBuilder(builder: (context, sst) {
+              return BaseTextFormFieldWithDepth(
+                controller: _passwordController,
+                prefixIcon: IconC.password,
+                labelText: StringC.password,
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    sst(() => _isVisible = !_isVisible);
+                  },
+                  icon: _isVisible ? IconC.visibilityOff : IconC.visible,
                 ),
+                obscureText: !_isVisible,
               );
-            },
-            child: BlocConsumer(
-              bloc: _authCubit,
-              listener: (context, state) {
-                if (state is CommonButtonSuccess) {
-                  User? user = state.data;
-                  if (user != null) {
-                    !_loginState ? _saveUserToCloud(user) : null;
-                    // Save the auth state.
-                    BaseSharedPrefsSingleton.setValue("auth", 1);
-                    // Navigate to the dashboard.
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        RouteC.dashboard, (route) => false);
-                  }
-                } else if (state is CommonButtonFailure) {
-                  // todo: add firebase exception snack bars.
-                  debugPrint(state.error.toString());
-                }
-              },
-              builder: (context, state) {
-                if (state is CommonButtonLoading) {
-                  return const CupertinoActivityIndicator().center();
-                }
-                return BaseText(
-                  _loginState ? StringC.login : StringC.createAccount,
-                  color: ColorC.white,
-                  fontWeight: FontWeight.w500,
+            }),
+
+            // Forget Password.
+            widget.isLogin
+                ? const LinkToPage(
+                    title: StringC.empty, pageName: StringC.forgor, route: "")
+                : SizeC.spaceVertical20,
+
+            // The Sign-in/ Log-in button.
+            BaseElevatedButton(
+              backgroundColor: ColorC.secondary,
+              onPressed: () {
+                _authCubit.fetchData<User?>(
+                  data: AuthInModel(
+                    context: context,
+                    email: _emailController.text.trim(),
+                    password: _passwordController.text,
+                    login: widget.isLogin,
+                  ),
                 );
               },
+              child: BlocConsumer(
+                bloc: _authCubit,
+                listener: (context, state) {
+                  if (state is CommonButtonSuccess) {
+                    User? user = state.data;
+                    if (user != null) {
+                      // !_loginState ? _saveUserToCloud(user) : null;
+                      // // Save the auth state.
+                      // BaseSharedPrefsSingleton.setValue("auth", 1);
+                      // // Navigate to the dashboard.
+                      // Navigator.of(context).pushNamedAndRemoveUntil(
+                      //     RouteC.dashboard, (route) => false);
+                    }
+                  } else if (state is CommonButtonFailure) {
+                    // todo: add firebase exception snack bars.
+                    debugPrint(state.error.toString());
+                  }
+                },
+                builder: (context, state) {
+                  if (state is CommonButtonLoading) {
+                    return const CupertinoActivityIndicator().center();
+                  }
+                  return BaseText(
+                    widget.isLogin ? StringC.login : StringC.createAccount,
+                    color: ColorC.white,
+                    fontWeight: FontWeight.w500,
+                  );
+                },
+              ),
             ),
-          ),
-          AnimatedCrossFade(
-            duration: DateTimeC.cd200,
-            firstChild: LinkToPage(
-              title: StringC.doNotHaveAccount,
-              pageName: StringC.createAccount,
+
+            // The create account or already have an account link.
+            LinkToPage(
+              title: widget.isLogin
+                  ? StringC.doNotHaveAccount
+                  : StringC.alreadyHaveAccount,
+              pageName: widget.isLogin ? StringC.createAccount : StringC.login,
               onTap: () {
-                _loginState = !_loginState;
                 _clearFields();
-                setState(() {});
+                widget.onTap();
               },
             ),
-            secondChild: LinkToPage(
-              title: StringC.alreadyHaveAccount,
-              pageName: StringC.login,
-              onTap: () {
-                _loginState = !_loginState;
-                _clearFields();
-                setState(() {});
-              },
-            ),
-            crossFadeState: _loginState
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-          )
-        ],
-      ).paddingDefault(),
+          ],
+        ).paddingDefault(),
+      ),
     );
   }
 
@@ -265,6 +259,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _pageController = PageController(viewportFraction: 1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -279,43 +282,52 @@ class _LoginPageState extends State<LoginPage> {
             child: SizedBox(
               height: AppConfig.height(context),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      (AppConfig.height(context) * 0.05).separation(true),
-                      const _Logo(),
-                      (AppConfig.height(context) * 0.05).separation(true),
-                      Container(
-                        decoration: DecorC.boxDecorAll(radius: 20)
-                            .copyWith(color: ColorC.white),
-                        child: Column(
-                          children: const [
-                            _Form(),
-                            SizedBox(),
-                          ],
-                        ),
-                      ),
-                      SizeC.spaceVertical5,
-                      Row(
-                        children: const [
-                          BaseDivider(color: ColorC.white),
-                          BaseText("Or continue with", color: ColorC.white),
-                          BaseDivider(color: ColorC.white),
-                        ],
-                      ),
-                      SizeC.spaceVertical5,
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _AlternateMethods(iconPath: StringC.googlePath, onTap: () {}),
-                          _AlternateMethods(iconPath: StringC.applePath, onTap: () {}),
-                        ],
-                      )
+                  (AppConfig.height(context) * 0.05).separation(true),
+                  const _Logo(),
+                  (AppConfig.height(context) * 0.05).separation(true),
+                  Flexible(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      allowImplicitScrolling: true,
+                      itemCount: 2,
+                      itemBuilder: (context, i) {
+                        return _Form(
+                          isLogin: i == 0,
+                          onTap: () {
+                            _pageController.animateToPage(
+                                i == 0 ? 1 : 0,
+                                duration: DateTimeC.cd500,
+                                curve: Curves.easeIn
+                            );
+                          },
+                        ).paddingOnly(left: 4, right: 4);
+                      },
+                      scrollDirection: Axis.horizontal,
+                    ),
+                  ),
+                  SizeC.spaceVertical5,
+                  Row(
+                    children: const [
+                      BaseDivider(color: ColorC.white),
+                      BaseText("Or continue with", color: ColorC.white),
+                      BaseDivider(color: ColorC.white),
                     ],
-                  ).paddingDefault().paddingDefault(),
+                  ),
+                  SizeC.spaceVertical5,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _AlternateMethods(
+                          iconPath: StringC.googlePath, onTap: () {}),
+                      _AlternateMethods(
+                          iconPath: StringC.applePath, onTap: () {}),
+                    ],
+                  )
                 ],
-              ),
+              ).paddingDefault().paddingDefault(),
             ),
           ),
         ),
