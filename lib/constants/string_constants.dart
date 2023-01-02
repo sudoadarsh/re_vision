@@ -58,6 +58,8 @@ class StringC {
   static const String view = "View";
   static const String missed = "Missed";
   static const String closeDialog = "Done";
+  static const String settings = "Settings";
+  static const String profile = "Profile";
 
   // String constants in the home page.
   static const String homeTitle = empty;
@@ -113,7 +115,7 @@ class StringC {
   static const String savedSuccessfully = 'Saved Successfully';
   static const String errorInSaving = 'Error while saving the topic!';
 
-  static const String addLabels = "Add label(s)";
+  static const String addLabels = "Add label";
   static const String searchLabels = "Search for labels";
   static const String noTopicNameAdded = "Please add a topic name to save the revision.";
 

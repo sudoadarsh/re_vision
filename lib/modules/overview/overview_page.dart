@@ -1,15 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:re_vision/base_widgets/base_confirmation_dialog.dart';
 import 'package:re_vision/base_widgets/base_rounded_elevated_button.dart';
 import 'package:re_vision/base_widgets/base_snackbar.dart';
 import 'package:re_vision/constants/icon_constants.dart';
 import 'package:re_vision/constants/string_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/models/topic_dm.dart';
+import 'package:re_vision/modules/home_page/home_page.dart';
 
 import '../../base_sqlite/sqlite_helper.dart';
-import '../../base_widgets/base_divider.dart';
 import '../../base_widgets/base_text.dart';
 import '../../constants/color_constants.dart';
 import '../../constants/date_time_constants.dart';
@@ -34,6 +35,15 @@ class OverViewPage extends StatefulWidget {
 }
 
 class _OverViewPageState extends State<OverViewPage> {
+  late List<TopicDm> topics;
+
+  @override
+  void initState() {
+    super.initState();
+
+    topics = widget.topics;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,29 +53,28 @@ class _OverViewPageState extends State<OverViewPage> {
         elevation: 0,
       ),
       body: ListView.builder(
-          itemCount: widget.topics.length,
+          itemCount: topics.length,
           itemBuilder: (context, i) {
             return Card(
                 child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const BaseDivider(),
-                    BaseText(
-                      'Level ${widget.topics[i].iteration}',
-                      fontWeight: FontWeight.w300,
-                      fontSize: 16.0,
-                    ),
-                    const BaseDivider(),
+                    LevelChip(iteration: topics[i].iteration ?? 0),
+                    if (topics[i].label != null && topics[i].label!.isNotEmpty)
+                      TopicLabelChip(label: topics[i].label!)
                   ],
                 ),
-                BaseText(widget.topics[i].topic ?? ''),
+                BaseText(topics[i].topic ?? ''),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     BaseElevatedRoundedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        _deleteTask(i);
+                      },
                       child: IconC.delete,
                     ),
                     BaseElevatedRoundedButton(
@@ -82,7 +91,37 @@ class _OverViewPageState extends State<OverViewPage> {
     );
   }
 
-  /// Alert dialog for when the user a missed re-schedule the revision.
+  // ----------------------------- Class methods -------------------------------
+  /// To delete tasks.
+  void _deleteTask(int i) async {
+
+    bool? done = await showDialog(
+      context: context,
+      builder: (_) => BaseConfirmationDialog(
+          title: StringC.deleteAlert,
+          content: Lottie.asset(StringC.lottieDelete,
+              height: 80, width: 80)),
+    ) ??
+        false;
+
+    if (!done) return;
+
+    try {
+      await BaseSqlite.delete(
+        tableName: StringC.topicTable,
+        where: StringC.id,
+        whereArgs: topics[i].id,
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+      // todo: catch error.
+    }
+
+    topics.removeAt(i);
+    setState(() {});
+  }
+
+  /// Alert dialog for when the user re-schedule the revision.
   Future<void> _scheduleAlert({
     required int i,
   }) async {
@@ -127,7 +166,7 @@ class _OverViewPageState extends State<OverViewPage> {
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
               primary: ColorC.primary,
-              onPrimary: ColorC.secondary,
+              onPrimary: ColorC.secondaryComp,
               onSurface: Colors.black,
             ),
             textButtonTheme: TextButtonThemeData(
@@ -146,8 +185,8 @@ class _OverViewPageState extends State<OverViewPage> {
 
     // Modelling the topic data.
     try {
-      TopicDm topicDm = widget.topics[i]
-          .copyWith(iteration: 1, scheduledTo: datePicked.toString());
+      TopicDm topicDm =
+          topics[i].copyWith(iteration: 1, scheduledTo: datePicked.toString());
 
       // Updating the local database.
       await BaseSqlite.update(
@@ -156,7 +195,7 @@ class _OverViewPageState extends State<OverViewPage> {
           where: StringC.id,
           whereArgs: topicDm.id);
 
-      widget.topics.removeAt(i);
+      topics.removeAt(i);
       setState(() {});
 
       // Success snack-bar.

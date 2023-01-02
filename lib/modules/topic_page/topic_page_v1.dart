@@ -127,7 +127,7 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
                         label: BaseText(
                           _selectedLabels.isEmpty
                               ? StringC.addLabels
-                              : StringC.labels,
+                              : _selectedLabels.first.toString(),
                           fontSize: 12,
                           fontWeight: FontWeight.w300,
                         ),
@@ -251,7 +251,7 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
         id: const Uuid().v1(),
         topic: _titleC.text,
         attachments: jsonEncode(jsonData),
-        label: jsonEncode(_selectedLabels),
+        label: _selectedLabels.isNotEmpty ? _selectedLabels.first : null,
         notes: jsonEncode(jsonQuill),
         createdAt: widget.selectedDay.toString().replaceAll('Z', ''),
         scheduledTo: widget.selectedDay.toString().replaceAll('Z', ''),
@@ -324,7 +324,7 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
       );
 
       // Setting up the labels.
-      _selectedLabels = jsonDecode(widget.topicDm?.label ?? "[]");
+      _selectedLabels.add(widget.topicDm?.label ?? "[]");
     } else {
       _notesC = QuillController.basic();
     }

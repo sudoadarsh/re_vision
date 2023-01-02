@@ -35,10 +35,7 @@ class IconC {
   static const Icon settings = Icon(Icons.settings);
   static const Icon notification = Icon(Icons.favorite);
   static const Icon search = Icon(Icons.search);
-  static const Icon profile = Icon(
-    Icons.person_pin,
-    color: ColorC.white,
-  );
+  static const Icon profile = Icon(Icons.person_pin);
   static final Widget star = Image.asset(StringC.starPath);
   static const Icon progress = Icon(Icons.auto_graph_rounded);
 
@@ -51,7 +48,7 @@ class IconC {
   static Widget userGrp = Image.asset(StringC.userGrpPath, scale: 15.0);
   static const Icon arrowB = Icon(Icons.chevron_left);
   static const Icon arrowF = Icon(Icons.chevron_right);
-  static const Icon goToToday = Icon (Icons.my_location);
+  static const Icon goToToday = Icon(Icons.my_location);
 
   // Icons used in the topic page.
   static const Icon article = Icon(Icons.link);
@@ -86,5 +83,4 @@ class IconC {
 
   // Icon constants in the attachments page.
   static const Icon play = Icon(Icons.play_arrow_rounded);
-
 }

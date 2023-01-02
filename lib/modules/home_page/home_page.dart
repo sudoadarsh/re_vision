@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
-import 'package:re_vision/base_widgets/base_divider.dart';
+import 'package:re_vision/base_widgets/base_confirmation_dialog.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/common_cubit/common__cubit.dart';
@@ -71,15 +71,14 @@ class _Cards extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizeC.spaceVertical5,
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const BaseDivider(),
-                BaseText(
-                  'Level ${topic.iteration}',
-                  fontWeight: FontWeight.w300,
-                  fontSize: 16.0,
-                ),
-                const BaseDivider(),
+                LevelChip(iteration: topic.iteration ?? 0),
+                (topic.label != null && topic.label!.isNotEmpty)
+                    ? TopicLabelChip(label: topic.label!)
+                    : SizeC.none
               ],
             ),
             BaseText(topic.topic ?? ''),
@@ -149,7 +148,7 @@ class _Cards extends StatelessWidget {
               ],
             ),
           ],
-        ).paddingDefault(),
+        ).paddingOnly(left: 8, right: 8, bottom: 8),
       ),
     );
   }
@@ -215,28 +214,82 @@ class _Cards extends StatelessWidget {
   }
 
   // The Dialog to display for confirmation of delete/completion.
-  CupertinoAlertDialog _confirmDialog(
+  BaseConfirmationDialog _confirmDialog(
     BuildContext context, {
     required String assetName,
     required String title,
   }) {
-    return CupertinoAlertDialog(
-      title: BaseText(title),
-      content: Lottie.asset(assetName, height: 80, width: 80),
-      actions: [
-        CupertinoDialogAction(
-          onPressed: () {
-            Navigator.of(context).pop(true);
-          },
-          child: const BaseText(StringC.ok),
-        ),
-        CupertinoDialogAction(
-          onPressed: () {
-            Navigator.of(context).pop(false);
-          },
-          child: const BaseText(StringC.cancel),
-        ),
-      ],
+    return BaseConfirmationDialog(
+        title: title, content: Lottie.asset(assetName, height: 80, width: 80));
+  }
+}
+
+/// The modified level chips.
+class LevelChip extends StatelessWidget {
+  const LevelChip({Key? key, required this.iteration}) : super(key: key);
+
+  final int iteration;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: DecorC.boxDecorAll(radius: 10.0)
+          .copyWith(color: _getColor(iteration)),
+      child: BaseText(
+        'Level $iteration',
+        fontWeight: FontWeight.w500,
+        color: _getTxTColor(iteration),
+      ).paddingHorizontal8(),
+    );
+  }
+
+  /// To get the correct color for the iteration label.
+  Color _getColor(int iteration) {
+    switch (iteration) {
+      case 1:
+        return ColorC.bronze;
+      case 2:
+        return ColorC.silver;
+      case 3:
+        return ColorC.gold;
+      default:
+        return ColorC.secondaryComp;
+    }
+  }
+
+  Color _getTxTColor(int iteration) {
+    switch (iteration) {
+      case 1:
+        return ColorC.bronzeD;
+      case 2:
+        return ColorC.silverD;
+      case 3:
+        return ColorC.goldD;
+      default:
+        return ColorC.secondaryComp;
+    }
+  }
+}
+
+/// The topic Label chip.
+class TopicLabelChip extends StatelessWidget {
+  const TopicLabelChip({Key? key, required this.label}) : super(key: key);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 150, minHeight: 22, maxHeight: 22),
+      child: Container(
+        decoration:
+            DecorC.boxDecorAll(radius: 10.0).copyWith(color: ColorC.primary),
+        child: BaseText(
+          label,
+          fontWeight: FontWeight.w500,
+          color: ColorC.secondaryComp,
+        ).paddingHorizontal8(),
+      ),
     );
   }
 }
@@ -556,8 +609,7 @@ class _HomePageState extends State<HomePage> {
                     color: ColorC.primary,
                     onPressed: () {
                       if (BaseAuth.currentUser() != null) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            RouteC.dashboard, (route) => false);
+                        Navigator.of(context).pushNamed(RouteC.dashboard);
                         return;
                       }
                       _loginRequest();
@@ -655,12 +707,6 @@ class _HomePageState extends State<HomePage> {
                               _focusedDay = focusedDay;
                               sst();
                             },
-                            /*onFormatChanged: (format) {
-                              if (_calendarFormat != format) {
-                                _calendarFormat = format;
-                                sst();
-                              }
-                            },*/
                             onPageChanged: (focusedDay) {
                               _focusedDay = focusedDay;
                             },
@@ -769,13 +815,13 @@ class _HomePageState extends State<HomePage> {
       return Container(
         decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          color: ColorC.secondary,
+          color: ColorC.secondaryComp,
         ),
         child: events.isNotEmpty
             ? BaseText(
                 events.length.toString(),
                 fontSize: 12.0,
-                color: ColorC.secondary,
+                color: ColorC.white,
               ).paddingAll4()
             : const SizedBox.shrink(),
       );

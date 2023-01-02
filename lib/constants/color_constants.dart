@@ -16,4 +16,13 @@ class ColorC {
   static const Color link = Color.fromRGBO(18, 75, 217, 1.0);
   static final Color disabledColor = Colors.grey.shade500;
   static const Color delete = Colors.red;
+
+  static const Color bronze = Color.fromRGBO(205, 127, 50, 1);
+  static const Color bronzeD = Color.fromRGBO(227, 184, 144, 1.0);
+  static const Color silver = Color.fromRGBO(192, 192, 192, 1);
+  static const Color silverD = Color.fromRGBO(250, 248, 248, 1.0);
+  static const Color gold = Color.fromRGBO(255, 215, 0, 1);
+  static const Color goldD = Color.fromRGBO(252, 244, 222, 1.0);
+
+
 }

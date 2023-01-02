@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:re_vision/modules/attachment/attachment_page.dart';
-import 'package:re_vision/modules/dashboard/dashboard_page.dart';
+import 'package:re_vision/modules/dashboard/dashboard_v1_page.dart';
 import 'package:re_vision/modules/friends/friends_page.dart';
 import 'package:re_vision/modules/topic_page/topic_page_v1.dart';
 import 'package:re_vision/routes/route_constants.dart';
@@ -18,7 +18,7 @@ class RouteGenerator {
       //   page = const SignInPage();
       //   break;
       case RouteC.dashboard:
-        page = const DashBoard();
+        page = const DashBoardPageV1();
         break;
       case RouteC.homePage:
         page = const HomePage();

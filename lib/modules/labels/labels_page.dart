@@ -59,9 +59,10 @@ class _LabelsPageState extends State<LabelsPage> with LabelsView {
     return Material(
       color: Colors.transparent,
       child: SizedBox(
-        height: AppConfig.height(context) * 0.5,
+        height: AppConfig.height(context) * 0.2,
         width: double.maxFinite,
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             BaseUnderlineField(
@@ -139,6 +140,7 @@ class _LabelsPageState extends State<LabelsPage> with LabelsView {
     if (_selectedLabels.contains(label)) {
       _selectedLabels.remove(label);
     } else {
+      _selectedLabels.clear();
       _selectedLabels.add(label);
     }
     setState(() {});

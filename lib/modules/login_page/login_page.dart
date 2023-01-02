@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:re_vision/base_widgets/base_divider.dart';
 
 import 'package:re_vision/base_widgets/base_elevated_button.dart';
+import 'package:re_vision/base_widgets/base_snackbar.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/base_widgets/link_to_page.dart';
 import 'package:re_vision/constants/date_time_constants.dart';
@@ -22,6 +23,7 @@ import '../../constants/size_constants.dart';
 import '../../constants/string_constants.dart';
 import '../../models/auth_in_model.dart';
 import '../../models/user_dm.dart';
+import '../../routes/route_constants.dart';
 import '../../utils/cloud/base_cloud.dart';
 import '../../utils/cloud/cloud_constants.dart';
 
@@ -154,16 +156,14 @@ class _FormState extends State<_Form> {
                   if (state is CommonButtonSuccess) {
                     User? user = state.data;
                     if (user != null) {
-                      // !_loginState ? _saveUserToCloud(user) : null;
-                      // // Save the auth state.
-                      // BaseSharedPrefsSingleton.setValue("auth", 1);
-                      // // Navigate to the dashboard.
-                      // Navigator.of(context).pushNamedAndRemoveUntil(
-                      //     RouteC.dashboard, (route) => false);
+                      widget.isLogin ? _saveUserToCloud(user) : null;
+                      // Navigate to the dashboard.
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                          RouteC.dashboard, (route) => false);
                     }
                   } else if (state is CommonButtonFailure) {
-                    // todo: add firebase exception snack bars.
-                    debugPrint(state.error.toString());
+                    baseSnackBar(context,
+                        message: state.error, leading: IconC.failed);
                   }
                 },
                 builder: (context, state) {
@@ -297,11 +297,9 @@ class _LoginPageState extends State<LoginPage> {
                         return _Form(
                           isLogin: i == 0,
                           onTap: () {
-                            _pageController.animateToPage(
-                                i == 0 ? 1 : 0,
+                            _pageController.animateToPage(i == 0 ? 1 : 0,
                                 duration: DateTimeC.cd500,
-                                curve: Curves.easeIn
-                            );
+                                curve: Curves.easeIn);
                           },
                         ).paddingOnly(left: 4, right: 4);
                       },

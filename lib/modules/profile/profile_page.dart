@@ -70,7 +70,7 @@ class _UserStats extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration:
-          DecorC.boxDecorAll(radius: 10).copyWith(color: ColorC.primaryComp),
+          DecorC.boxDecorAll(radius: 10).copyWith(color: ColorC.secondary),
       child: SizedBox(
         height: 55,
         child: Row(
@@ -103,7 +103,7 @@ class _UserStats extends StatelessWidget {
           BaseText(
             subtitle,
             fontWeight: FontWeight.w300,
-            color: ColorC.subtitle,
+            color: ColorC.white,
           ),
         ],
       ),
@@ -164,27 +164,22 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              decoration: DecorC.boxDecorAll(radius: 10.0)
-                  .copyWith(color: ColorC.primary),
-              child: Column(
-                children: [
-                  const _ProfilePic(profileURL: ""),
-                  SizeC.spaceVertical10,
-                  BaseText(
-                    cUser?.displayName ?? "",
-                    color: ColorC.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w300,
-                  ),
-                  BaseText(cUser?.email ?? "", color: ColorC.subtitle),
-                  SizeC.spaceVertical10,
-                  const _EditProfile(),
-                  SizeC.spaceVertical10,
-                  _UserStats(frs: widget.friends),
-                ],
-              ).paddingDefault(),
-            ),
+            Column(
+              children: [
+                const _ProfilePic(profileURL: ""),
+                SizeC.spaceVertical10,
+                BaseText(
+                  cUser?.displayName ?? "",
+                  fontSize: 20,
+                  fontWeight: FontWeight.w300,
+                ),
+                BaseText(cUser?.email ?? ""),
+                SizeC.spaceVertical10,
+                const _EditProfile(),
+                SizeC.spaceVertical10,
+                _UserStats(frs: widget.friends),
+              ],
+            ).paddingDefault(),
             SizeC.spaceVertical10,
             Expanded(
               child: ListView(

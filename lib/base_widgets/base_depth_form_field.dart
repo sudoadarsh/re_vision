@@ -51,7 +51,7 @@ class BaseTextFormFieldWithDepth extends StatelessWidget {
       controller: controller,
       maxLines: maxLines ?? 1,
       validator: validator,
-      style: Theme.of(context).primaryTextTheme.bodyMedium,
+      // style: Theme.of(context).primaryTextTheme.bodyMedium,
       cursorColor: Theme.of(context).primaryColor,
       decoration: InputDecoration(
         hintText: hintText,
