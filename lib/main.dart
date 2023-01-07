@@ -6,7 +6,6 @@ import 'package:re_vision/base_sqlite/sqlite_helper.dart';
 import 'package:re_vision/routes/route_constants.dart';
 import 'package:re_vision/routes/route_generator.dart';
 import 'package:re_vision/state_management/attachment/attachment_cubit.dart';
-import 'package:re_vision/state_management/notifications/notification_cubit.dart';
 import 'package:re_vision/utils/cloud/base_cloud.dart';
 import 'package:re_vision/utils/custom_theme_data.dart';
 import 'package:re_vision/utils/social_auth/base_auth.dart';
@@ -37,9 +36,6 @@ class Root extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) => AttachmentCubit(),
-        ),
-        BlocProvider(
-          create: (context) => NotificationCubit(),
         ),
       ],
       child: MaterialApp(
