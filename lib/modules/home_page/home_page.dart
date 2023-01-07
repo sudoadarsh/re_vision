@@ -149,7 +149,7 @@ class _Cards extends StatelessWidget {
             ),
           ],
         ).paddingOnly(left: 8, right: 8, bottom: 8),
-      ),
+      ).paddingHorizontal8(),
     );
   }
 
@@ -279,17 +279,14 @@ class TopicLabelChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 150, minHeight: 22, maxHeight: 22),
-      child: Container(
-        decoration:
-            DecorC.boxDecorAll(radius: 10.0).copyWith(color: ColorC.primary),
-        child: BaseText(
-          label,
-          fontWeight: FontWeight.w500,
-          color: ColorC.secondaryComp,
-        ).paddingHorizontal8(),
-      ),
+    return Container(
+      decoration:
+          DecorC.boxDecorAll(radius: 10.0).copyWith(color: ColorC.primary),
+      child: BaseText(
+        label,
+        fontWeight: FontWeight.w500,
+        color: ColorC.secondaryComp,
+      ).paddingHorizontal8(),
     );
   }
 }
@@ -559,6 +556,12 @@ class _HomePageState extends State<HomePage> {
   // To store the topics for all the days.
   List<TopicDm> _topics = [];
 
+  // The list of labels of the visible topics.
+  List<String?> _labels = [];
+
+  // The list of selected labels.
+  List<String> _selectedLabels = [];
+
   // To store the friends of the current user.
   List<QueryDocumentSnapshot<JSON>> _friends = [];
 
@@ -598,6 +601,7 @@ class _HomePageState extends State<HomePage> {
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool isInnerScrolled) {
           return [
+            // The app bar.
             SliverAppBar.large(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               title: const BaseText(StringC.revision),
@@ -628,6 +632,8 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ),
+
+            // Today's Topic section.
             SliverToBoxAdapter(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -641,7 +647,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Card(
                         shape: DecorC.roundedRectangleBorder,
-                        elevation: _calendarVisible ? 2.0 : 1.0,
+                        elevation: _calendarVisible ? 4.0 : 1.0,
                         child: IconButton(
                           color: ColorC.primary,
                           onPressed: isToday
@@ -661,11 +667,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Card(
                         shape: DecorC.roundedRectangleBorder,
-                        elevation: _calendarVisible ? 2.0 : 1.0,
+                        elevation: _calendarVisible ? 4.0 : 1.0,
                         child: IconButton(
-                          color: _calendarVisible
-                              ? ColorC.primary
-                              : ColorC.disabledColor,
+                          color: ColorC.primary,
                           onPressed: () {
                             _calendarVisible = !_calendarVisible;
                             sst();
@@ -678,6 +682,8 @@ class _HomePageState extends State<HomePage> {
                 ],
               ).paddingOnly(left: 16, right: 4),
             ),
+
+            // The calendar.
             SliverToBoxAdapter(
               child: BaseExpandedSection(
                 expand: _calendarVisible,
@@ -705,6 +711,10 @@ class _HomePageState extends State<HomePage> {
                             onDaySelected: (selectedDay, focusedDay) {
                               _selectedDay = selectedDay;
                               _focusedDay = focusedDay;
+                              _labels = filterTopics(_selectedDay)
+                                  .map((e) => e.label)
+                                  .where((e) => e != null)
+                                  .toList();
                               sst();
                             },
                             onPageChanged: (focusedDay) {
@@ -720,6 +730,51 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+
+            // The labels.
+            if (_labels.isNotEmpty) SliverPadding(
+              padding: const EdgeInsets.only(left: 10),
+              sliver: SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 50,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _labels.length,
+                    itemBuilder: (context, i) {
+                      return InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () {
+                          if (_selectedLabels.contains(_labels[i])) {
+                            _selectedLabels.remove(_labels[i]);
+                            sst();
+                            return;
+                          }
+
+                          _selectedLabels.add(_labels[i]!);
+                          sst();
+                        },
+                        child: Chip(
+                          avatar: _selectedLabels.contains(_labels[i])
+                              ? const CircleAvatar(
+                                  backgroundColor: ColorC.white,
+                                  foregroundColor: ColorC.primary,
+                                  child: IconC.complete,
+                                )
+                              : null,
+                          elevation: 4,
+                          label: BaseText(
+                            _labels[i] ?? "",
+                            color: ColorC.secondaryComp,
+                            fontSize: 12,
+                          ),
+                          backgroundColor: ColorC.primary,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            )
           ];
         },
         body: BlocConsumer(
@@ -728,9 +783,16 @@ class _HomePageState extends State<HomePage> {
             if (state is CommonCubitStateLoaded) {
               List data = state.data;
               _topics = data.map((e) => TopicDm.fromJson(e)).toList();
+
+              _labels = filterTopics(_selectedDay)
+                  .map((e) => e.label)
+                  .where((e) => e != null)
+                  .toList();
+
               initialPage.isNegative
                   ? initialPage = _dateController.page?.toInt() ?? 0
                   : null;
+
               sst();
             }
           },
@@ -741,6 +803,12 @@ class _HomePageState extends State<HomePage> {
 
             // Getting the filtered topics for the day.
             List<TopicDm> filteredTopics = filterTopics(_selectedDay);
+
+            if (_selectedLabels.isNotEmpty) {
+              filteredTopics = filteredTopics
+                  .where((e) => _selectedLabels.contains(e.label))
+                  .toList();
+            }
 
             return filteredTopics.isEmpty
                 ? SingleChildScrollView(

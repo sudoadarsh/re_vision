@@ -7,7 +7,7 @@ mixin TopicPageView on State<TopicPageV1> {
   /// The app bar title.
   PreferredSizeWidget title({
     required TextEditingController controller,
-    required VoidCallback onSaveTap,
+    required VoidCallback? onSaveTap,
     required FocusNode focusNode,
   }) {
     return _Title(
@@ -23,7 +23,7 @@ class _Title extends StatefulWidget with PreferredSizeWidget {
   }) : super(key: key);
 
   final TextEditingController titleC;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final FocusNode focusNode;
 
   @override

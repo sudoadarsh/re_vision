@@ -109,7 +109,7 @@ class StringC {
 
   static const String areYouSureExit = 'Are you sure want to exit?';
   static const String consequences = 'Unsaved changes will be lost.';
-  static const String discard = 'Discard';
+  static const String exit = 'Exit';
 
   static const String invalidUrl = 'Invalid Url';
   static const String savedSuccessfully = 'Saved Successfully';

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:re_vision/modules/dashboard/widgets/db_app_bar.dart';
 import 'package:re_vision/modules/dashboard/widgets/state_card.dart';
 
-mixin DashBoardView on State<DashboardNavItem> {
+mixin DashBoardView on State<DashboardPageV1> {
   /// The app bar.
   Widget appBar() {
     return const DBAppBar();

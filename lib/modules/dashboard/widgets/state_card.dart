@@ -11,7 +11,8 @@ class StatCard extends StatelessWidget {
     required this.stat,
     required this.subtitle,
     required this.link,
-    required this.onLinkTap, required this.color,
+    required this.onLinkTap,
+    required this.color,
   }) : super(key: key);
 
   final int stat;
@@ -22,41 +23,46 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minWidth: 150),
-      child: Container(
-        decoration: DecorC.boxDecorAll(radius: 10).copyWith(
-          color: color,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                BaseText(
-                  stat.toString(),
-                  fontSize: 60,
-                  fontWeight: FontWeight.bold,
-                  color: ColorC.white,
-                ),
-                TextButton(
-                  onPressed: onLinkTap,
-                  child: Row(
-                    children: [
-                      BaseText(link),
-                      const Icon(Icons.keyboard_arrow_right_rounded)
-                    ],
+    return InkWell(
+      onTap: onLinkTap,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 150),
+        child: Container(
+          decoration: DecorC.boxDecorAll(radius: 10).copyWith(
+            color: color,
+          ),
+          child: Stack(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BaseText(
+                    stat.toString(),
+                    fontSize: 60,
+                    fontWeight: FontWeight.bold,
+                    color: ColorC.white,
                   ),
+                  BaseText(subtitle, color: ColorC.white),
+                ],
+              ).paddingDefault(),
+              Positioned(
+                top: 2,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    BaseText(link, color: ColorC.white),
+                    const Icon(
+                      Icons.keyboard_arrow_right_rounded,
+                      color: ColorC.white,
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            BaseText(subtitle, color: ColorC.white),
-          ],
-        ).paddingDefault(),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
-

@@ -8,67 +8,84 @@ import 'package:re_vision/models/reqs_dm.dart';
 import 'package:re_vision/modules/notification/invites_page.dart';
 import 'package:re_vision/modules/notification/requests_page.dart';
 
+import '../../utils/cloud/base_cloud.dart';
+import '../../utils/cloud/cloud_constants.dart';
+import '../../utils/social_auth/base_auth.dart';
+
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({
     Key? key,
-    required this.req,
   }) : super(key: key);
-
-  final List<ReqsDm> req;
 
   @override
   State<NotificationsPage> createState() => _NotificationsPageState();
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  late List<ReqsDm> _frReqs;
-  late List<ReqsDm> _topicReqs;
-
   @override
   void initState() {
     super.initState();
 
-    _frReqs = widget.req.where((e) => e.primaryId == null).toList();
-    _topicReqs = widget.req.where((e) => e.primaryId != null).toList();
+    // _frReqs = widget.req.where((e) => e.primaryId == null).toList();
+    // _topicReqs = widget.req.where((e) => e.primaryId != null).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar.medium(
-            automaticallyImplyLeading: false,
-            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            title: const BaseText(StringC.notifications),
-          ),
-          SliverToBoxAdapter(
-            child: _RequestsTile(
-              title: StringC.frRequests,
-              list: _frReqs,
-              image: StringC.friendPath,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (_) => FrRequestsPage(req: _frReqs)),
-                );
-              },
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: _RequestsTile(
-              title: StringC.revisionInvites,
-              list: _topicReqs,
-              image: StringC.revisionReqsPath,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                      builder: (_) => InvitesPage(topicInvites: _topicReqs)),
-                );
-              },
-            ),
-          ),
-        ],
+      body: StreamBuilder(
+        stream: BaseCloud.db
+            ?.collection(CloudC.users)
+            .doc(BaseAuth.currentUser()?.uid ?? "")
+            .collection(CloudC.requests)
+            .snapshots(),
+        builder: (context, snap) {
+          List<ReqsDm> frReqs = [];
+          List<ReqsDm> topicReqs = [];
+          if (snap.hasData) {
+            List<ReqsDm> data =
+                snap.data?.docs.map((e) => ReqsDm.fromJson(e)).toList() ?? [];
+            frReqs = data.where((e) => e.primaryId == null).toList();
+            topicReqs = data.where((e) => e.primaryId != null).toList();
+          }
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar.medium(
+                automaticallyImplyLeading: false,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                title: const BaseText(StringC.notifications),
+              ),
+              SliverToBoxAdapter(
+                child: _RequestsTile(
+                  title: StringC.frRequests,
+                  list: frReqs,
+                  image: StringC.friendPath,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => FrRequestsPage(req: frReqs),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: _RequestsTile(
+                  title: StringC.revisionInvites,
+                  list: topicReqs,
+                  image: StringC.revisionReqsPath,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => InvitesPage(topicInvites: topicReqs),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

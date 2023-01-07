@@ -321,11 +321,11 @@ enum _TopicEnum { attachment, notes }
 class TopicPage extends StatefulWidget {
   const TopicPage({
     Key? key,
-    required this.selectedDay,
+    this.selectedDay,
     this.topicDm,
   }) : super(key: key);
 
-  final DateTime selectedDay;
+  final DateTime? selectedDay;
   final TopicDm? topicDm;
 
   @override
@@ -625,7 +625,7 @@ class _TopicPageState extends State<TopicPage> {
                     },
                   ),
                   CupertinoDialogAction(
-                    child: const BaseText(StringC.discard),
+                    child: const BaseText(StringC.exit),
                     onPressed: () {
                       Navigator.of(context).pop(true);
                     },
@@ -985,8 +985,9 @@ class _CommonTile extends StatelessWidget {
 
 // Screen arguments.
 class TopicPageArguments {
-  final DateTime selectedDay;
+  final DateTime? selectedDay;
   final TopicDm? topicDm;
+  bool fromOverview;
 
-  TopicPageArguments({required this.selectedDay, this.topicDm});
+  TopicPageArguments({this.selectedDay, this.topicDm, this.fromOverview = false});
 }

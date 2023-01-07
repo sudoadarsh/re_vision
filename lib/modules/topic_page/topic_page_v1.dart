@@ -26,12 +26,14 @@ import 'package:tuple/tuple.dart';
 class TopicPageV1 extends StatefulWidget {
   const TopicPageV1({
     Key? key,
-    required this.selectedDay,
+    this.selectedDay,
     this.topicDm,
+    required this.fromOverview,
   }) : super(key: key);
 
-  final DateTime selectedDay;
+  final DateTime? selectedDay;
   final TopicDm? topicDm;
+  final bool fromOverview;
 
   @override
   State<TopicPageV1> createState() => _TopicPageV1State();
@@ -103,7 +105,7 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
         // The app bar.
         appBar: title(
           controller: _titleC,
-          onSaveTap: _onSaveTap,
+          onSaveTap: widget.fromOverview ? null : _onSaveTap,
           focusNode: _titleFN,
         ),
 
@@ -277,9 +279,11 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
     } else {
       // Creating the topic data.
       final TopicDm? data = widget.topicDm?.copyWith(
-          topic: _titleC.text,
-          attachments: jsonEncode(jsonData),
-          notes: jsonEncode(jsonQuill));
+        topic: _titleC.text,
+        attachments: jsonEncode(jsonData),
+        notes: jsonEncode(jsonQuill),
+        label: _selectedLabels.isNotEmpty ? _selectedLabels.first : null,
+      );
 
       // Updating the database.
       try {
@@ -324,7 +328,9 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
       );
 
       // Setting up the labels.
-      _selectedLabels.add(widget.topicDm?.label ?? "[]");
+      if (widget.topicDm?.label?.isNotEmpty ?? false) {
+        _selectedLabels.add(widget.topicDm?.label);
+      }
     } else {
       _notesC = QuillController.basic();
     }
@@ -352,6 +358,9 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
 
   // To alert the user before leaving the screen.
   Future<bool> _onWillPop() async {
+    // Don't show the dialog if this screen is called from the overview page.
+    if (widget.fromOverview) return true;
+
     return await showDialog(
           context: context,
           builder: (context) => CupertinoAlertDialog(
@@ -365,7 +374,7 @@ class _TopicPageV1State extends State<TopicPageV1> with TopicPageView {
                 },
               ),
               CupertinoDialogAction(
-                child: const BaseText(StringC.discard, color: ColorC.delete),
+                child: const BaseText(StringC.exit, color: ColorC.delete),
                 onPressed: () {
                   Navigator.of(context).pop(true);
                 },

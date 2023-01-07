@@ -7,9 +7,8 @@ import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/modules/dashboard/dashboard_view.dart';
 import 'package:re_vision/modules/dashboard/widgets/db_app_bar.dart';
+import 'package:re_vision/modules/notification/notifications_page.dart';
 import 'package:re_vision/modules/profile/profile_page.dart';
-import 'package:re_vision/state_management/notifications/notification_cubit.dart';
-import 'package:re_vision/utils/notification_stream.dart';
 
 import '../../base_widgets/base_depth_form_field.dart';
 import '../../base_widgets/sliver_section_header.dart';
@@ -29,14 +28,14 @@ import '../../utils/social_auth/base_auth.dart';
 import '../overview/overview_page.dart';
 import '../search_page/search_page.dart';
 
-class DashBoardPageV1 extends StatefulWidget {
-  const DashBoardPageV1({Key? key}) : super(key: key);
+class BaseNavigator extends StatefulWidget {
+  const BaseNavigator({Key? key}) : super(key: key);
 
   @override
-  State<DashBoardPageV1> createState() => _DashBoardPageV1State();
+  State<BaseNavigator> createState() => _BaseNavigatorState();
 }
 
-class _DashBoardPageV1State extends State<DashBoardPageV1> {
+class _BaseNavigatorState extends State<BaseNavigator> {
   /// The selected page from the [BottomNavigationBar].
   late int _selectedIndex;
 
@@ -54,9 +53,9 @@ class _DashBoardPageV1State extends State<DashBoardPageV1> {
 
     _pages = [
       // The dashboard page.
-      const DashboardNavItem(),
+      const DashboardPageV1(),
       // The notifications page.
-      const Placeholder(),
+      const NotificationsPage(),
       // The profile page.
       ProfilePage(friends: _friends.map((e) => FriendDm.fromJson(e)).toList()),
     ];
@@ -76,28 +75,37 @@ class _DashBoardPageV1State extends State<DashBoardPageV1> {
 
           // The notification navigation item.
           BottomNavigationBarItem(
-            icon: BlocBuilder<NotificationCubit, NotificationState>(
-              builder: (context, state) {
+            icon: StreamBuilder(
+              stream: BaseCloud.db
+                  ?.collection(CloudC.users)
+                  .doc(BaseAuth.currentUser()?.uid ?? "")
+                  .collection(CloudC.requests)
+                  .snapshots(),
+              builder: (context, snap) {
                 List<ReqsDm> data = [];
-                if (state is NotificationStateChange) {
-                  data = state.notifications;
+                if (snap.hasData) {
+                  data =
+                      snap.data?.docs.map((e) => ReqsDm.fromJson(e)).toList() ??
+                          [];
                 }
                 return Stack(
                   clipBehavior: Clip.none,
                   alignment: Alignment.topRight,
                   children: [
                     IconC.notification,
-                    data.isNotEmpty ?  Positioned(
-                      top: -2,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: ColorC.gold,
-                        ),
-                        height: 8,
-                        width: 8,
-                      ),
-                    ) : SizeC.none
+                    data.isNotEmpty
+                        ? Positioned(
+                            top: -2,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: ColorC.gold,
+                              ),
+                              height: 8,
+                              width: 8,
+                            ),
+                          )
+                        : SizeC.none
                   ],
                 );
               },
@@ -134,14 +142,14 @@ class _DashBoardPageV1State extends State<DashBoardPageV1> {
   }
 }
 
-class DashboardNavItem extends StatefulWidget {
-  const DashboardNavItem({Key? key}) : super(key: key);
+class DashboardPageV1 extends StatefulWidget {
+  const DashboardPageV1({Key? key}) : super(key: key);
 
   @override
-  State<DashboardNavItem> createState() => DashboardNavItemState();
+  State<DashboardPageV1> createState() => DashboardPageV1State();
 }
 
-class DashboardNavItemState extends State<DashboardNavItem> with DashBoardView {
+class DashboardPageV1State extends State<DashboardPageV1> with DashBoardView {
   /// Custom cubit to fetch the data from the database.
   late final CommonCubit _dbCubit;
 
@@ -152,13 +160,6 @@ class DashboardNavItemState extends State<DashboardNavItem> with DashBoardView {
     _dbCubit = CommonCubit(TopicRepo());
     // Fetch the database data.
     _dbCubit.fetchData();
-
-    NotificationStream.instance.getNotifications().listen((event) {
-      List<QueryDocumentSnapshot<Map<String, dynamic>>> data = event.docs;
-      context
-          .read<NotificationCubit>()
-          .change(data.map((e) => ReqsDm.fromJson(e)).toList());
-    });
   }
 
   @override

@@ -14,6 +14,8 @@ import '../../base_sqlite/sqlite_helper.dart';
 import '../../base_widgets/base_text.dart';
 import '../../constants/color_constants.dart';
 import '../../constants/date_time_constants.dart';
+import '../../routes/route_constants.dart';
+import '../topic_page/topic_page.dart';
 
 /// Redirected here from the dashboard. Can be either missed or completed
 /// revision list.
@@ -55,38 +57,62 @@ class _OverViewPageState extends State<OverViewPage> {
       body: ListView.builder(
           itemCount: topics.length,
           itemBuilder: (context, i) {
-            return Card(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    LevelChip(iteration: topics[i].iteration ?? 0),
-                    if (topics[i].label != null && topics[i].label!.isNotEmpty)
-                      TopicLabelChip(label: topics[i].label!)
-                  ],
-                ),
-                BaseText(topics[i].topic ?? ''),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    BaseElevatedRoundedButton(
-                      onPressed: () {
-                        _deleteTask(i);
-                      },
-                      child: IconC.delete,
-                    ),
-                    BaseElevatedRoundedButton(
-                      onPressed: () {
-                        _scheduleAlert(i: i);
-                      },
-                      child: IconC.reschedule,
-                    ),
-                  ],
-                ),
-              ],
-            ).paddingDefault());
+            return InkWell(
+              onTap: () {
+                Navigator.of(context).pushNamed(
+                  RouteC.topicPage,
+                  arguments: TopicPageArguments(
+                    topicDm: topics[i],
+                    fromOverview: true,
+                  ),
+                );
+              },
+              child: Card(
+                      child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      LevelChip(iteration: topics[i].iteration ?? 0),
+                      if (topics[i].label != null &&
+                          topics[i].label!.isNotEmpty)
+                        TopicLabelChip(label: topics[i].label!)
+                    ],
+                  ),
+
+                  // The topic name.
+                  BaseText(topics[i].topic ?? ''),
+
+                  // The subtitle of the topic.
+                  const BaseText(
+                    StringC.tapToSeeMore,
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w300,
+                  ),
+
+                  // The action buttons.
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      BaseElevatedRoundedButton(
+                        onPressed: () {
+                          _deleteTask(i);
+                        },
+                        child: IconC.delete,
+                      ),
+                      BaseElevatedRoundedButton(
+                        onPressed: () {
+                          _scheduleAlert(i: i);
+                        },
+                        child: IconC.reschedule,
+                      ),
+                    ],
+                  ),
+                ],
+              ).paddingDefault())
+                  .paddingHorizontal8(),
+            );
           }),
     );
   }
@@ -94,14 +120,13 @@ class _OverViewPageState extends State<OverViewPage> {
   // ----------------------------- Class methods -------------------------------
   /// To delete tasks.
   void _deleteTask(int i) async {
-
     bool? done = await showDialog(
-      context: context,
-      builder: (_) => BaseConfirmationDialog(
-          title: StringC.deleteAlert,
-          content: Lottie.asset(StringC.lottieDelete,
-              height: 80, width: 80)),
-    ) ??
+          context: context,
+          builder: (_) => BaseConfirmationDialog(
+              title: StringC.deleteAlert,
+              content:
+                  Lottie.asset(StringC.lottieDelete, height: 80, width: 80)),
+        ) ??
         false;
 
     if (!done) return;

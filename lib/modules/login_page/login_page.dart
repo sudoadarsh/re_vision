@@ -276,7 +276,7 @@ class _LoginPageState extends State<LoginPage> {
         primaryColor: ColorC.primary,
       ),
       child: Scaffold(
-        backgroundColor: ColorC.primary,
+        // backgroundColor: ColorC.primary,
         body: SafeArea(
           child: SingleChildScrollView(
             child: SizedBox(
@@ -309,9 +309,9 @@ class _LoginPageState extends State<LoginPage> {
                   SizeC.spaceVertical5,
                   Row(
                     children: const [
-                      BaseDivider(color: ColorC.white),
-                      BaseText("Or continue with", color: ColorC.white),
-                      BaseDivider(color: ColorC.white),
+                      BaseDivider(color: Colors.black),
+                      BaseText("Or continue with"),
+                      BaseDivider(color: Colors.black),
                     ],
                   ),
                   SizeC.spaceVertical5,

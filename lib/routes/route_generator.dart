@@ -18,7 +18,7 @@ class RouteGenerator {
       //   page = const SignInPage();
       //   break;
       case RouteC.dashboard:
-        page = const DashBoardPageV1();
+        page = const BaseNavigator();
         break;
       case RouteC.homePage:
         page = const HomePage();
@@ -26,7 +26,11 @@ class RouteGenerator {
       case RouteC.topicPage:
         final args = settings.arguments as TopicPageArguments;
         // page = TopicPage(selectedDay: args.selectedDay, topicDm: args.topicDm);
-        page = TopicPageV1(selectedDay: args.selectedDay, topicDm: args.topicDm);
+        page = TopicPageV1(
+          selectedDay: args.selectedDay,
+          topicDm: args.topicDm,
+          fromOverview: args.fromOverview,
+        );
         break;
       case RouteC.loginPage:
         page = const LoginPage();
@@ -51,4 +55,3 @@ class RouteGenerator {
     return MaterialPageRoute(builder: (_) => page);
   }
 }
-

@@ -18,7 +18,6 @@ import 'package:re_vision/models/friend_dm.dart';
 import 'package:re_vision/models/reqs_dm.dart';
 import 'package:re_vision/models/topic_dm.dart';
 import 'package:re_vision/models/user_dm.dart';
-import 'package:re_vision/modules/notification/notifications_page.dart';
 import 'package:re_vision/modules/overview/overview_page.dart';
 import 'package:re_vision/modules/profile/profile_page.dart';
 import 'package:re_vision/modules/search_page/search_page.dart';
@@ -420,7 +419,7 @@ class _DashBoardState extends State<DashBoard> {
           friends: _friends.map((e) => FriendDm.fromJson(e)).toList(),
         );
       case CurrentS.notifications:
-        return NotificationsPage(req: _requests);
+        // return NotificationsPage(req: _requests);
       default:
         return const _DashBoardPage();
     }
