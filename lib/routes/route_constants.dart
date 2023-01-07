@@ -7,4 +7,5 @@ class RouteC {
   static const String friendsPage = '/friends_page';
   static const String dashboard = '/dashboard';
   static const String attachments = '/attachments';
+  static const String profilePic = "/profile_pic";
 }

@@ -156,7 +156,14 @@ class _FormState extends State<_Form> {
                   if (state is CommonButtonSuccess) {
                     User? user = state.data;
                     if (user != null) {
-                      widget.isLogin ? _saveUserToCloud(user) : null;
+                      if (!widget.isLogin) {
+
+                        _saveUserToCloud(user);
+
+                        // Navigate to add profile pic page.
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            RouteC.profilePic, (route) => false);
+                      }
                       // Navigate to the dashboard.
                       Navigator.of(context).pushNamedAndRemoveUntil(
                           RouteC.dashboard, (route) => false);
@@ -241,8 +248,11 @@ class _AlternateMethods extends StatelessWidget {
       child: Container(
         width: 50,
         height: 50,
-        decoration:
-            const BoxDecoration(shape: BoxShape.circle, color: ColorC.white),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: ColorC.white,
+          border: Border.all(color: ColorC.primary),
+        ),
         child: Image.asset(iconPath, scale: 18),
       ),
     ).paddingDefault();
@@ -319,9 +329,13 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       _AlternateMethods(
-                          iconPath: StringC.googlePath, onTap: () {}),
+                        iconPath: StringC.googlePath,
+                        onTap: () {},
+                      ),
                       _AlternateMethods(
-                          iconPath: StringC.applePath, onTap: () {}),
+                        iconPath: StringC.applePath,
+                        onTap: () {},
+                      ),
                     ],
                   )
                 ],

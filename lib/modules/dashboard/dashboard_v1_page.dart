@@ -124,6 +124,7 @@ class _BaseNavigatorState extends State<BaseNavigator> {
         selectedIconTheme: const IconThemeData(size: 30),
         selectedItemColor: ColorC.primary,
         onTap: (i) {
+          if (_selectedIndex == i) return;
           _selectedIndex = i;
           setState(() {});
         },

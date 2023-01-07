@@ -41,7 +41,7 @@ class Root extends StatelessWidget {
       child: MaterialApp(
         theme: CustomThemeData.themeData,
         onGenerateRoute: RouteGenerator.generate,
-        initialRoute: RouteC.dashboard,
+        initialRoute: RouteC.profilePic,
       ),
     );
   }
