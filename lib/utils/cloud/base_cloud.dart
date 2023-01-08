@@ -63,7 +63,7 @@ class BaseCloud {
           .doc(subDocument);
 
       // Update the data in the sub collection.
-      ref?.update(data);
+      await ref?.update(data);
     } catch (e) {
       debugPrint("Error while updating data in the sub collection");
     }

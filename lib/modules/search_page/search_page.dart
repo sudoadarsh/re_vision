@@ -203,7 +203,7 @@ class _UserResultState extends State<_UserResult> {
         widget.onAdd(widget.data);
         _changeButton();
       },
-      child: const BaseText(StringC.add),
+      child: const BaseText(StringC.add, color: ColorC.white),
     );
   }
 

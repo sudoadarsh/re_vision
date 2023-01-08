@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:re_vision/base_widgets/base_confirmation_dialog.dart';
 import 'package:re_vision/base_widgets/base_expanded_section.dart';
+import 'package:re_vision/base_widgets/base_notification_badge.dart';
 import 'package:re_vision/base_widgets/base_text.dart';
 import 'package:re_vision/common_cubit/common__cubit.dart';
 import 'package:re_vision/constants/color_constants.dart';
@@ -133,6 +134,7 @@ class _Cards extends StatelessWidget {
                 BaseElevatedRoundedButton(
                   onPressed: () async {
                     showModalBottomSheet(
+                      shape: DecorC.roundedRectangleBorderTop,
                       context: context,
                       builder: (_) => BaseModalSheetWithNotch(
                         context: _,
@@ -312,7 +314,7 @@ class _ShareOptions extends StatelessWidget {
           // To share attachments to friends.
           ListTile(
             title: const BaseText(StringC.shareRevision),
-            leading: IconC.mainLogoMin,
+            leading: IconC.edit,
             onTap: onRevisionShare,
           ),
           // To share attachments view other media.
@@ -560,7 +562,7 @@ class _HomePageState extends State<HomePage> {
   List<String?> _labels = [];
 
   // The list of selected labels.
-  List<String> _selectedLabels = [];
+  late List<String> _selectedLabels;
 
   // To store the friends of the current user.
   List<QueryDocumentSnapshot<JSON>> _friends = [];
@@ -577,6 +579,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     _calendarVisible = false;
+    _selectedLabels = [];
 
     _getFriends();
 
@@ -605,30 +608,65 @@ class _HomePageState extends State<HomePage> {
             SliverAppBar.large(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               title: const BaseText(StringC.revision),
+              automaticallyImplyLeading: false,
               actions: [
                 // Navigate to dashboard page.
-                Card(
-                  shape: DecorC.roundedRectangleBorder,
-                  child: IconButton(
-                    color: ColorC.primary,
-                    onPressed: () {
-                      if (BaseAuth.currentUser() != null) {
-                        Navigator.of(context).pushNamed(RouteC.dashboard);
-                        return;
+                StreamBuilder(
+                    stream: BaseCloud.db
+                        ?.collection(CloudC.users)
+                        .doc(BaseAuth.currentUser()?.uid ?? "")
+                        .collection(CloudC.requests)
+                        .snapshots(),
+                    builder: (context, snap) {
+                      List<ReqsDm> data = [];
+
+                      if (snap.hasData) {
+                        data = snap.data?.docs
+                                .map((e) => ReqsDm.fromJson(e))
+                                .where((e) => e.status == 0)
+                                .toList() ??
+                            [];
                       }
-                      _loginRequest();
-                    },
-                    icon: IconC.dashboard,
-                  ),
-                ),
+
+                      return Stack(
+                        children: [
+                          Card(
+                            shape: DecorC.roundedRectangleBorder,
+                            child: IconButton(
+                              color: ColorC.primary,
+                              onPressed: () {
+                                if (BaseAuth.currentUser() != null) {
+                                  Navigator.of(context)
+                                      .pushNamed(RouteC.dashboard);
+                                  return;
+                                }
+                                _loginRequest();
+                              },
+                              icon: IconC.dashboard,
+                            ),
+                          ),
+                          data.isNotEmpty
+                              ? const Positioned(
+                                  right: 4,
+                                  top: 8,
+                                  child: BaseNotificationBadge(radius: 12),
+                                )
+                              : SizeC.none,
+                        ],
+                      );
+                    }),
 
                 // Navigate to the add topic screen.
-                Card(
-                  shape: DecorC.roundedRectangleBorder,
-                  child: IconButton(
-                    onPressed: _navigateToTopicPage,
-                    icon: IconC.add,
-                  ),
+                Stack(
+                  children: [
+                    Card(
+                      shape: DecorC.roundedRectangleBorder,
+                      child: IconButton(
+                        onPressed: _navigateToTopicPage,
+                        icon: IconC.add,
+                      ),
+                    ),
+                  ],
                 )
               ],
             ),
@@ -714,6 +752,7 @@ class _HomePageState extends State<HomePage> {
                               _labels = filterTopics(_selectedDay)
                                   .map((e) => e.label)
                                   .where((e) => e != null)
+                                  .toSet()
                                   .toList();
                               sst();
                             },
@@ -732,49 +771,50 @@ class _HomePageState extends State<HomePage> {
             ),
 
             // The labels.
-            if (_labels.isNotEmpty) SliverPadding(
-              padding: const EdgeInsets.only(left: 10),
-              sliver: SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 50,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _labels.length,
-                    itemBuilder: (context, i) {
-                      return InkWell(
-                        splashColor: Colors.transparent,
-                        onTap: () {
-                          if (_selectedLabels.contains(_labels[i])) {
-                            _selectedLabels.remove(_labels[i]);
-                            sst();
-                            return;
-                          }
+            if (_labels.isNotEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.only(left: 6),
+                sliver: SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 50,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _labels.length,
+                      itemBuilder: (context, i) {
+                        return InkWell(
+                          splashColor: Colors.transparent,
+                          onTap: () {
+                            if (_selectedLabels.contains(_labels[i])) {
+                              _selectedLabels.remove(_labels[i]);
+                              sst();
+                              return;
+                            }
 
-                          _selectedLabels.add(_labels[i]!);
-                          sst();
-                        },
-                        child: Chip(
-                          avatar: _selectedLabels.contains(_labels[i])
-                              ? const CircleAvatar(
-                                  backgroundColor: ColorC.white,
-                                  foregroundColor: ColorC.primary,
-                                  child: IconC.complete,
-                                )
-                              : null,
-                          elevation: 4,
-                          label: BaseText(
-                            _labels[i] ?? "",
-                            color: ColorC.secondaryComp,
-                            fontSize: 12,
-                          ),
-                          backgroundColor: ColorC.primary,
-                        ),
-                      );
-                    },
+                            _selectedLabels.add(_labels[i]!);
+                            sst();
+                          },
+                          child: Chip(
+                            avatar: _selectedLabels.contains(_labels[i])
+                                ? const CircleAvatar(
+                                    backgroundColor: ColorC.white,
+                                    foregroundColor: ColorC.primary,
+                                    child: IconC.complete,
+                                  )
+                                : null,
+                            elevation: 4,
+                            label: BaseText(
+                              _labels[i] ?? "",
+                              color: ColorC.secondaryComp,
+                              fontSize: 12,
+                            ),
+                            backgroundColor: ColorC.primary,
+                          ).paddingOnly(left: 8),
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ),
-            )
+              )
           ];
         },
         body: BlocConsumer(
@@ -787,6 +827,7 @@ class _HomePageState extends State<HomePage> {
               _labels = filterTopics(_selectedDay)
                   .map((e) => e.label)
                   .where((e) => e != null)
+                  .toSet()
                   .toList();
 
               initialPage.isNegative

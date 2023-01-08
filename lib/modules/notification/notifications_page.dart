@@ -22,13 +22,6 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  @override
-  void initState() {
-    super.initState();
-
-    // _frReqs = widget.req.where((e) => e.primaryId == null).toList();
-    // _topicReqs = widget.req.where((e) => e.primaryId != null).toList();
-  }
 
   @override
   Widget build(BuildContext context) {

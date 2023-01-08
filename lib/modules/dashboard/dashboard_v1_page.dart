@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:re_vision/base_widgets/base_notification_badge.dart';
 import 'package:re_vision/constants/color_constants.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
 import 'package:re_vision/modules/dashboard/dashboard_view.dart';
@@ -84,9 +85,11 @@ class _BaseNavigatorState extends State<BaseNavigator> {
               builder: (context, snap) {
                 List<ReqsDm> data = [];
                 if (snap.hasData) {
-                  data =
-                      snap.data?.docs.map((e) => ReqsDm.fromJson(e)).toList() ??
-                          [];
+                  data = snap.data?.docs
+                          .map((e) => ReqsDm.fromJson(e))
+                          .where((e) => e.status == 0)
+                          .toList() ??
+                      [];
                 }
                 return Stack(
                   clipBehavior: Clip.none,
@@ -94,16 +97,9 @@ class _BaseNavigatorState extends State<BaseNavigator> {
                   children: [
                     IconC.notification,
                     data.isNotEmpty
-                        ? Positioned(
+                        ? const Positioned(
                             top: -2,
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: ColorC.gold,
-                              ),
-                              height: 8,
-                              width: 8,
-                            ),
+                            child: BaseNotificationBadge(),
                           )
                         : SizeC.none
                   ],

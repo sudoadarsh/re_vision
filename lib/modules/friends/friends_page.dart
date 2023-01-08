@@ -84,7 +84,7 @@ class _FriendsPageState extends State<FriendsPage> {
         context: context,
         builder: (_) {
           return CupertinoAlertDialog(
-            title: const BaseText(StringC.alert),
+            title: const BaseText(StringC.appName),
             content: RichText(
               textAlign: TextAlign.center,
               maxLines: 10,
@@ -167,7 +167,7 @@ class _FriendsListState extends State<_FriendsList> {
         setState(() {});
       },
       child: !_isUndo
-          ? const BaseText(StringC.send)
+          ? const BaseText(StringC.send, color: ColorC.white)
           : const BaseText(StringC.undo),
     );
   }

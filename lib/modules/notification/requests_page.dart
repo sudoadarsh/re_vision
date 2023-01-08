@@ -28,6 +28,13 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
   User? cUser = BaseAuth.currentUser();
 
   @override
+  void initState() {
+    super.initState();
+
+    _updateNotificationStatus();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -48,7 +55,7 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
                 setState(() {});
               },
               size: const Size(80, 40),
-              child: const BaseText(StringC.accept),
+              child: const BaseText(StringC.accept, color: ColorC.white),
             ),
           );
         },
@@ -73,6 +80,18 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
         subCollection: CloudC.requests,
         subDocument: req.uuid ?? "",
     );
+  }
+
+  void _updateNotificationStatus() async {
+    for (ReqsDm req in widget.req) {
+      await BaseCloud.updateSC(
+          collection: CloudC.users,
+          document: cUser?.uid ?? "",
+          subCollection: CloudC.requests,
+          subDocument: req.uuid ?? "",
+          data: req.copyWith(status: 1).toJson()
+      );
+    }
   }
 
   void _updateFCollection(ReqsDm req) async {

@@ -187,7 +187,7 @@ class _InvitesTileState extends State<_InvitesTile> {
           backgroundColor: ColorC.secondary,
           onPressed: _confirmAccept,
           size: const Size(80, 40),
-          child: const BaseText(StringC.accept),
+          child: const BaseText(StringC.accept, color: ColorC.white),
         );
       },
     );
@@ -231,7 +231,7 @@ class _InvitesTileState extends State<_InvitesTile> {
                 backgroundColor: ColorC.secondary,
                 size: SizeC.elevatedButton,
                 onPressed: _accept,
-                child: const BaseText(StringC.accept),
+                child: const BaseText(StringC.accept, color: ColorC.white),
               ),
             ],
           ).paddingDefault(),
