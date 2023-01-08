@@ -12,6 +12,7 @@ import 'package:re_vision/constants/date_time_constants.dart';
 import 'package:re_vision/constants/decoration_constants.dart';
 import 'package:re_vision/extensions/double_extensions.dart';
 import 'package:re_vision/extensions/widget_extensions.dart';
+import 'package:re_vision/modules/profile_pic/profile_pic_page.dart';
 import 'package:re_vision/state_management/auth/auth_repo.dart';
 import 'package:re_vision/utils/app_config.dart';
 
@@ -157,16 +158,21 @@ class _FormState extends State<_Form> {
                     User? user = state.data;
                     if (user != null) {
                       if (!widget.isLogin) {
-
                         _saveUserToCloud(user);
 
                         // Navigate to add profile pic page.
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                            RouteC.profilePic, (route) => false);
+                          RouteC.profilePic,
+                          (route) => false,
+                          arguments: ProfilePicArguments(user: user),
+                        );
+                      } else {
+
+                        // Navigate to the dashboard.
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                            RouteC.dashboard, (route) => false);
                       }
-                      // Navigate to the dashboard.
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          RouteC.dashboard, (route) => false);
+
                     }
                   } else if (state is CommonButtonFailure) {
                     baseSnackBar(context,

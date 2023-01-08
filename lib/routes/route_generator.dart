@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:re_vision/modules/attachment/attachment_page.dart';
 import 'package:re_vision/modules/dashboard/dashboard_v1_page.dart';
 import 'package:re_vision/modules/friends/friends_page.dart';
+import 'package:re_vision/modules/profile_pic/camera_page.dart';
 import 'package:re_vision/modules/profile_pic/profile_pic_page.dart';
 import 'package:re_vision/modules/topic_page/topic_page_v1.dart';
 import 'package:re_vision/routes/route_constants.dart';
@@ -48,7 +49,12 @@ class RouteGenerator {
         page = const AttachmentPage();
         break;
       case RouteC.profilePic:
-        page = const ProfilePicPage();
+        final args = settings.arguments as ProfilePicArguments;
+        page = ProfilePicPage(user: args.user);
+        break;
+      case RouteC.camera:
+        final args = settings.arguments as CameraPageArguments;
+        page = CameraPage(camera: args.camera);
         break;
       default:
         page = const Scaffold(

@@ -166,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             Column(
               children: [
-                const _ProfilePic(profileURL: ""),
+                _ProfilePic(profileURL: cUser?.photoURL ?? ""),
                 SizeC.spaceVertical10,
                 BaseText(
                   cUser?.displayName ?? "",

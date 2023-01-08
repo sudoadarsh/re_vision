@@ -83,4 +83,9 @@ class IconC {
 
   // Icon constants in the attachments page.
   static const Icon play = Icon(Icons.play_arrow_rounded);
+
+  // Icon constants in the profile pic page.
+  static const Icon repeat = Icon(Icons.repeat);
+  static const Icon camera = Icon(Icons.camera);
+
 }

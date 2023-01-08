@@ -8,4 +8,5 @@ class RouteC {
   static const String dashboard = '/dashboard';
   static const String attachments = '/attachments';
   static const String profilePic = "/profile_pic";
+  static const String camera = "/camera";
 }

@@ -162,4 +162,12 @@ class StringC {
   static const String rescheduleAlert = "This topic will be rescheduled and the level will be set to 1.";
   static const String reSuccess = "Reschedule Success";
   static const String reFailed = "Reschedule Failed";
+
+  // String constants used in the profile pic page.
+  static const String skip = "Skip";
+  static const String selectPicForProfile = "Select a picture for your profile";
+  static const String continue_ = "Continue";
+  static const String openAppSettings = "To proceed please turn on the permission(s) from the app settings.";
+  static const String takeAPicture = "Take a picture";
+
 }

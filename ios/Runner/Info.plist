@@ -47,5 +47,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Please provide Re-vision access to photo library in able to add attachments. </string>
+	<key>NSCameraUsageDescription</key>
+	<string>Please allow Re-vision to access your camera.</string>
 </dict>
 </plist>
