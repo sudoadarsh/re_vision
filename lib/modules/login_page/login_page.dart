@@ -23,10 +23,7 @@ import '../../constants/icon_constants.dart';
 import '../../constants/size_constants.dart';
 import '../../constants/string_constants.dart';
 import '../../models/auth_in_model.dart';
-import '../../models/user_dm.dart';
 import '../../routes/route_constants.dart';
-import '../../utils/cloud/base_cloud.dart';
-import '../../utils/cloud/cloud_constants.dart';
 
 /// Widget to get the logo of the application.
 ///
@@ -158,21 +155,21 @@ class _FormState extends State<_Form> {
                     User? user = state.data;
                     if (user != null) {
                       if (!widget.isLogin) {
-                        _saveUserToCloud(user);
 
                         // Navigate to add profile pic page.
                         Navigator.of(context).pushNamedAndRemoveUntil(
                           RouteC.profilePic,
                           (route) => false,
-                          arguments: ProfilePicArguments(user: user),
+                          arguments: ProfilePicArguments(
+                            user: user,
+                            username: _usernameController.text.trim(),
+                          ),
                         );
                       } else {
-
                         // Navigate to the dashboard.
                         Navigator.of(context).pushNamedAndRemoveUntil(
                             RouteC.dashboard, (route) => false);
                       }
-
                     }
                   } else if (state is CommonButtonFailure) {
                     baseSnackBar(context,
@@ -216,23 +213,6 @@ class _FormState extends State<_Form> {
     FocusScope.of(context).unfocus();
   }
 
-  Future<void> _saveUserToCloud(User user) async {
-    // Modelling the data.
-    UserFBDm dataToSave = UserFBDm(
-      name: _usernameController.text.trim(),
-      email: user.email,
-    );
-
-    // Creating the main collection.
-    BaseCloud.create(
-      collection: CloudC.users,
-      document: user.uid,
-      data: dataToSave.toJson(),
-    );
-
-    // Update the user name of the user.
-    user.updateDisplayName(_usernameController.text.trim());
-  }
 }
 
 /// Alternate Login methods.

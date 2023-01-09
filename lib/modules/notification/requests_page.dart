@@ -45,6 +45,14 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
         itemCount: _req.length,
         itemBuilder: (context, ind) {
           return ListTile(
+            leading: CircleAvatar(
+              radius: 25,
+              backgroundImage: const AssetImage(StringC.defaultPPPath),
+              foregroundImage: NetworkImage(_req[ind].picURL ?? ""),
+              onForegroundImageError: (_, __) {
+                debugPrint('Error loading profile image.');
+              },
+            ),
             title: BaseText(_req[ind].name ?? ''),
             subtitle: BaseText(_req[ind].email ?? ''),
             trailing: BaseElevatedButton(
@@ -75,10 +83,10 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
   void _removeRequest(ReqsDm req) async {
     // Remove the request from the current user.
     BaseCloud.deleteSC(
-        collection: CloudC.users,
-        document: cUser?.uid ?? "",
-        subCollection: CloudC.requests,
-        subDocument: req.uuid ?? "",
+      collection: CloudC.users,
+      document: cUser?.uid ?? "",
+      subCollection: CloudC.requests,
+      subDocument: req.uuid ?? "",
     );
   }
 
@@ -89,13 +97,11 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
           document: cUser?.uid ?? "",
           subCollection: CloudC.requests,
           subDocument: req.uuid ?? "",
-          data: req.copyWith(status: 1).toJson()
-      );
+          data: req.copyWith(status: 1).toJson());
     }
   }
 
   void _updateFCollection(ReqsDm req) async {
-
     try {
       // Update the friends sub list of other user (Add the current user).
       BaseCloud.createSC(
@@ -104,19 +110,25 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
         subCollection: CloudC.friends,
         subDocument: cUser?.uid ?? "",
         data: FriendDm(
-                name: cUser?.displayName, email: cUser?.email, uuid: cUser?.uid)
-            .toJson(),
+          name: cUser?.displayName,
+          email: cUser?.email,
+          uuid: cUser?.uid,
+          picURL: cUser?.photoURL,
+        ).toJson(),
       );
 
       // Update the friends sub list of the current user.
       BaseCloud.createSC(
-          collection: CloudC.users,
-          document: cUser?.uid ?? '',
-          subCollection: CloudC.friends,
-          subDocument: req.uuid ?? '',
-          data: FriendDm(
-            name: req.name, email: req.email, uuid: req.uuid
-          ).toJson(),
+        collection: CloudC.users,
+        document: cUser?.uid ?? '',
+        subCollection: CloudC.friends,
+        subDocument: req.uuid ?? '',
+        data: FriendDm(
+          name: req.name,
+          email: req.email,
+          uuid: req.uuid,
+          picURL: req.picURL,
+        ).toJson(),
       );
     } catch (e) {
       debugPrint("Error while updating data of OU: $e");

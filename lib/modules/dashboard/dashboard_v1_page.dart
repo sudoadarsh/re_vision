@@ -307,6 +307,7 @@ class DashboardPageV1State extends State<DashboardPageV1> with DashBoardView {
           uuid: currentU?.uid,
           email: currentU?.email,
           name: currentU?.displayName,
+          picURL: currentU?.photoURL,
           status: 0,
         ).toJson(),
       );

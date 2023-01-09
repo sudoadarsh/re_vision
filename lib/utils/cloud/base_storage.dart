@@ -42,8 +42,8 @@ class FBStorageSingleton implements FBStorage {
     final Reference? bucketRef = storageRef?.child("$bucketPath/$contentPath");
 
     // Upload the file.
-    UploadTask? uploadTask = bucketRef?.putFile(file);
+    TaskSnapshot? snapshot = await bucketRef?.putFile(file);
     
-    return uploadTask?.snapshot.ref.getDownloadURL();
+    return snapshot?.ref.getDownloadURL();
   }
 }

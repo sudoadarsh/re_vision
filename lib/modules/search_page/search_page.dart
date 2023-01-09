@@ -185,6 +185,14 @@ class _UserResultState extends State<_UserResult> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      leading: CircleAvatar(
+        radius: 25,
+        backgroundImage: const AssetImage(StringC.defaultPPPath),
+        foregroundImage: NetworkImage(widget.data.picURL ?? ""),
+        onForegroundImageError: (_, __) {
+          debugPrint('Error loading profile image.');
+        },
+      ),
       title: BaseText(widget.data.name ?? ""),
       subtitle: BaseText(widget.data.email ?? ""),
       trailing: _alreadyAFr

@@ -18,17 +18,26 @@ import 'package:re_vision/utils/permission_handler_util.dart';
 
 import '../../base_widgets/base_text.dart';
 import '../../constants/string_constants.dart';
+import '../../models/user_dm.dart';
+import '../../utils/cloud/base_cloud.dart';
+import '../../utils/cloud/cloud_constants.dart';
 
 class ProfilePicArguments {
   final User user;
+  final String username;
 
-  ProfilePicArguments({required this.user});
+  ProfilePicArguments({required this.user, required this.username});
 }
 
 class ProfilePicPage extends StatefulWidget {
-  const ProfilePicPage({Key? key, required this.user}) : super(key: key);
+  const ProfilePicPage({
+    Key? key,
+    required this.user,
+    required this.username,
+  }) : super(key: key);
 
   final User user;
+  final String username;
 
   @override
   State<ProfilePicPage> createState() => _ProfilePicPageState();
@@ -86,7 +95,7 @@ class _ProfilePicPageState extends State<ProfilePicPage> {
                   )
                 ],
               ),
-            if (_selectedFile == null) _firstChild(),
+            if (_selectedFile == null) _selectPicture(),
             SizeC.spaceVertical10,
 
             // The continue button.
@@ -108,6 +117,8 @@ class _ProfilePicPageState extends State<ProfilePicPage> {
 
                         await widget.user.updatePhotoURL(downloadUrl);
 
+                        _saveUserToCloud(widget.user, downloadUrl ?? "");
+
                         // Navigate to the dashboard page.
                         if (!mounted) return;
                         Navigator.of(context).pushNamedAndRemoveUntil(
@@ -127,6 +138,8 @@ class _ProfilePicPageState extends State<ProfilePicPage> {
             BaseElevatedButton(
               backgroundColor: ColorC.secondary,
               onPressed: () {
+                _saveUserToCloud(widget.user, "");
+
                 Navigator.of(context).pushNamedAndRemoveUntil(
                     RouteC.dashboard, (route) => false);
               },
@@ -138,7 +151,7 @@ class _ProfilePicPageState extends State<ProfilePicPage> {
     );
   }
 
-  Widget _firstChild() {
+  Widget _selectPicture() {
     return Column(
       children: [
         InkWell(
@@ -209,5 +222,26 @@ class _ProfilePicPageState extends State<ProfilePicPage> {
         ),
       ],
     );
+  }
+
+  // --------------------------- Class methods ---------------------------------
+
+  Future<void> _saveUserToCloud(User user, String downloadURL) async {
+    // Modelling the data.
+    UserFBDm dataToSave = UserFBDm(
+      name: widget.username,
+      email: user.email,
+      picURL: downloadURL,
+    );
+
+    // Creating the main collection.
+    BaseCloud.create(
+      collection: CloudC.users,
+      document: user.uid,
+      data: dataToSave.toJson(),
+    );
+
+    // Update the user name of the user.
+    await user.updateDisplayName(widget.username);
   }
 }

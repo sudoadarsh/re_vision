@@ -148,6 +148,14 @@ class _FriendsListState extends State<_FriendsList> {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      leading: CircleAvatar(
+        radius: 25,
+        backgroundImage: const AssetImage(StringC.defaultPPPath),
+        foregroundImage: NetworkImage(widget.frs[widget.i].picURL ?? ""),
+        onForegroundImageError: (_, __) {
+          debugPrint('Error loading profile image.');
+        },
+      ),
       title: BaseText(widget.frs[widget.i].name ?? ""),
       subtitle: BaseText(widget.frs[widget.i].email ?? ""),
       trailing: widget.fromProfile ? SizeC.none : _trailing(),

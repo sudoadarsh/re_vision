@@ -82,7 +82,7 @@ class _Cards extends StatelessWidget {
                     : SizeC.none
               ],
             ),
-            BaseText(topic.topic ?? ''),
+            BaseText(topic.topic ?? '', fontSize: 18),
             const BaseText(
               StringC.tapToSeeMore,
               fontSize: 12.0,
@@ -241,7 +241,7 @@ class LevelChip extends StatelessWidget {
         'Level $iteration',
         fontWeight: FontWeight.w500,
         color: _getTxTColor(iteration),
-      ).paddingHorizontal8(),
+      ).paddingOnly(left: 8.0, right: 8.0, top: 4.0, bottom: 4.0),
     );
   }
 
@@ -288,7 +288,7 @@ class TopicLabelChip extends StatelessWidget {
         label,
         fontWeight: FontWeight.w500,
         color: ColorC.secondaryComp,
-      ).paddingHorizontal8(),
+      ).paddingOnly(left: 8.0, right: 8.0, top: 4.0, bottom: 4.0),
     );
   }
 }
@@ -451,6 +451,7 @@ class _TopicCardsState extends State<_TopicCards> {
           email: cUser?.email,
           uuid: cUser?.uid,
           status: 0,
+          picURL: cUser?.photoURL
         ).toJson(),
       );
 
@@ -467,6 +468,7 @@ class _TopicCardsState extends State<_TopicCards> {
             email: fr.email,
             uuid: fr.uuid,
             status: 0,
+            picURL: fr.picURL
           ).toJson(),
         );
 
@@ -481,6 +483,7 @@ class _TopicCardsState extends State<_TopicCards> {
                   name: cUser?.displayName,
                   email: cUser?.email,
                   status: 0,
+                  picURL: cUser?.photoURL,
                   uuid: cUser?.uid)
               .toJson(),
         );
@@ -805,7 +808,6 @@ class _HomePageState extends State<HomePage> {
                             label: BaseText(
                               _labels[i] ?? "",
                               color: ColorC.secondaryComp,
-                              fontSize: 12,
                             ),
                             backgroundColor: ColorC.primary,
                           ).paddingOnly(left: 8),

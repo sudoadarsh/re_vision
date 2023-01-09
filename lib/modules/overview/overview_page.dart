@@ -82,7 +82,7 @@ class _OverViewPageState extends State<OverViewPage> {
                   ),
 
                   // The topic name.
-                  BaseText(topics[i].topic ?? ''),
+                  BaseText(topics[i].topic ?? '', fontSize: 18),
 
                   // The subtitle of the topic.
                   const BaseText(
