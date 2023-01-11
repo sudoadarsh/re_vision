@@ -170,4 +170,7 @@ class StringC {
   static const String openAppSettings = "To proceed please turn on the permission(s) from the app settings.";
   static const String takeAPicture = "Take a picture";
 
+  // String constants used in the status page.
+  static const String statusTitle = "Status";
+
 }

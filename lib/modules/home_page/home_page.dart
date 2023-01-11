@@ -39,6 +39,7 @@ import '../../utils/cloud/base_cloud.dart';
 import '../../utils/cloud/cloud_constants.dart';
 import '../../utils/social_auth/base_auth.dart';
 import '../friends/friends_page.dart';
+import '../status/status_page.dart';
 
 class _Cards extends StatelessWidget {
   const _Cards({
@@ -94,7 +95,24 @@ class _Cards extends StatelessWidget {
                 // The user group.
                 topic.isOnline == 1
                     ? BaseElevatedRoundedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            shape: DecorC.roundedRectangleBorderTop,
+                            builder: (context) {
+                              return Column(
+                                children: [
+                                  const BaseNotch(),
+                                  Flexible(
+                                    child: StatusPage(
+                                      primaryKey: topic.id ?? "",
+                                    ),
+                                  )
+                                ],
+                              );
+                            },
+                          );
+                        },
                         child: IconC.userGrp,
                       )
                     : SizeC.none,
@@ -447,12 +465,12 @@ class _TopicCardsState extends State<_TopicCards> {
         subCollection: CloudC.users,
         subDocument: cUser?.uid ?? "",
         data: TopicUserDm(
-          name: cUser?.displayName,
-          email: cUser?.email,
-          uuid: cUser?.uid,
-          status: 0,
-          picURL: cUser?.photoURL
-        ).toJson(),
+                name: cUser?.displayName,
+                email: cUser?.email,
+                uuid: cUser?.uid,
+                status: 0,
+                picURL: cUser?.photoURL)
+            .toJson(),
       );
 
       // Add the rest of the users in the sub-collection as well.
@@ -464,12 +482,12 @@ class _TopicCardsState extends State<_TopicCards> {
           subCollection: CloudC.users,
           subDocument: fr.uuid ?? "",
           data: TopicUserDm(
-            name: fr.name,
-            email: fr.email,
-            uuid: fr.uuid,
-            status: 0,
-            picURL: fr.picURL
-          ).toJson(),
+                  name: fr.name,
+                  email: fr.email,
+                  uuid: fr.uuid,
+                  status: 0,
+                  picURL: fr.picURL)
+              .toJson(),
         );
 
         await BaseCloud.createSC(

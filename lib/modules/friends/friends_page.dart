@@ -45,8 +45,7 @@ class _FriendsPageState extends State<FriendsPage> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        appBar: AppBar(
-            backgroundColor: ColorC.secondary, title: BaseText(widget.title)),
+        appBar: AppBar(title: BaseText(widget.title)),
         body: ListView.builder(
           itemCount: widget.frs.length,
           itemBuilder: (ctx, i) {
@@ -73,7 +72,6 @@ class _FriendsPageState extends State<FriendsPage> {
 
   // ------------------------------- Functions ---------------------------------
   Future<bool> _onWillPop() async {
-
     if (sendReqs.isEmpty || widget.fromProfile) {
       return true;
     }
@@ -81,43 +79,43 @@ class _FriendsPageState extends State<FriendsPage> {
     NavigatorState nav = Navigator.of(context);
 
     bool confirmed = (await showDialog(
-        context: context,
-        builder: (_) {
-          return CupertinoAlertDialog(
-            title: const BaseText(StringC.appName),
-            content: RichText(
-              textAlign: TextAlign.center,
-              maxLines: 10,
-              text: TextSpan(
-                style: const TextStyle(color: Colors.black),
-                children: [
-                  const TextSpan(text: StringC.sureWantToSent),
-                  TextSpan(
-                    text:
-                    "${StringC.toThesePeople} ${sendReqs.map((e) => "${e.name}")}",
-                  )
+            context: context,
+            builder: (_) {
+              return CupertinoAlertDialog(
+                title: const BaseText(StringC.appName),
+                content: RichText(
+                  textAlign: TextAlign.center,
+                  maxLines: 10,
+                  text: TextSpan(
+                    style: const TextStyle(color: Colors.black),
+                    children: [
+                      const TextSpan(text: StringC.sureWantToSent),
+                      TextSpan(
+                        text:
+                            "${StringC.toThesePeople} ${sendReqs.map((e) => "${e.name}")}",
+                      )
+                    ],
+                  ),
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    child: const BaseText(StringC.confirm),
+                    onPressed: () => Navigator.of(context).pop(true),
+                  ),
+                  CupertinoDialogAction(
+                    child: const BaseText(StringC.cancel),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
                 ],
-              ),
-            ),
-            actions: [
-              CupertinoDialogAction(
-                child: const BaseText(StringC.confirm),
-                onPressed: () => Navigator.of(context).pop(true),
-              ),
-              CupertinoDialogAction(
-                child: const BaseText(StringC.cancel),
-                onPressed: () => Navigator.of(context).pop(false),
-              ),
-            ],
-          );
-        })) ??
+              );
+            })) ??
         false;
 
     if (!confirmed) {
       return false;
     } else {
-     nav.pop<List<FriendDm>>(sendReqs);
-     return true;
+      nav.pop<List<FriendDm>>(sendReqs);
+      return true;
     }
   }
 }

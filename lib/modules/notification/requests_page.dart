@@ -39,7 +39,6 @@ class _FrRequestsPageState extends State<FrRequestsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const BaseText(StringC.frRequests),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: ListView.builder(
         itemCount: _req.length,

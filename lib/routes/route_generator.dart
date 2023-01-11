@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:re_vision/modules/attachment/attachment_page.dart';
 import 'package:re_vision/modules/dashboard/dashboard_v1_page.dart';
 import 'package:re_vision/modules/friends/friends_page.dart';
-import 'package:re_vision/modules/leaderboard/leaderboard_page.dart';
 import 'package:re_vision/modules/profile_pic/camera_page.dart';
 import 'package:re_vision/modules/profile_pic/profile_pic_page.dart';
 import 'package:re_vision/modules/topic_page/topic_page_v1.dart';
@@ -10,6 +9,7 @@ import 'package:re_vision/routes/route_constants.dart';
 
 import '../modules/home_page/home_page.dart';
 import '../modules/login_page/login_page.dart';
+import '../modules/status/status_page.dart';
 import '../modules/topic_page/topic_page.dart';
 
 class RouteGenerator {
@@ -58,7 +58,8 @@ class RouteGenerator {
         page = CameraPage(camera: args.camera);
         break;
       case RouteC.leaderboard:
-        page = const LeaderboardPage();
+        final args = settings.arguments as StatusPageArguments;
+        page = StatusPage(primaryKey: args.primaryKey);
         break;
       default:
         page = const Scaffold(

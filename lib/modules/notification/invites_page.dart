@@ -53,7 +53,6 @@ class _InvitesPageState extends State<InvitesPage> {
     return Scaffold(
       appBar: AppBar(
         title: const BaseText(StringC.revisionInvites),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       ),
       body: ListView.builder(
         itemCount: reqs.length,

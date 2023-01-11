@@ -51,8 +51,6 @@ class _OverViewPageState extends State<OverViewPage> {
     return Scaffold(
       appBar: AppBar(
         title: BaseText(widget.title),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
       ),
       body: ListView.builder(
           itemCount: topics.length,

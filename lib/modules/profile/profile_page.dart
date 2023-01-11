@@ -28,8 +28,8 @@ class _ProfilePic extends StatelessWidget {
       alignment: AlignmentDirectional.center,
       children: [
         Container(
-          width: 120,
-          height: 120,
+          width: 110,
+          height: 110,
           decoration:
               const BoxDecoration(shape: BoxShape.circle, color: ColorC.white),
         ),
